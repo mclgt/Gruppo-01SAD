@@ -4,14 +4,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @brief Test per l'entità Model Track.
- * Verifica la corretta memorizzazione e recupero dei dati del brano.
+ * @brief Test per l'entità Track.
+ *        Verifica la corretta memorizzazione e recupero dei dati del brano.
  */
 public class TrackTest {
 
     @Test
     public void testTrackConstructorAndGetters() {
-        Track track = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera", "C:/audio.wav");
+        Track track = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
+                "C:/audio.wav");
 
         assertEquals("Bohemian Rhapsody", track.getTitle());
         assertEquals("Queen", track.getAuthor());
@@ -24,8 +25,8 @@ public class TrackTest {
 
     @Test
     public void testSetters() {
-        Track track = new Track("", "", 0, "", 0, "", "");
-        
+        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+
         track.setTitle("Creep");
         track.setAuthor("Radiohead");
         track.setYear(1992);
@@ -33,7 +34,7 @@ public class TrackTest {
         track.setDuration(238);
         track.setAlbum("Pablo Honey");
         track.setFilePath("C:/audio.wav");
-        
+
         assertEquals("Creep", track.getTitle());
         assertEquals("Radiohead", track.getAuthor());
         assertEquals(1992, track.getYear());
