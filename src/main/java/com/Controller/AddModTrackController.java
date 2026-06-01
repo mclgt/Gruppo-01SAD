@@ -1,10 +1,10 @@
 package com.Controller;
 
 import com.Model.Track;
+import com.DataLayer.TrackProxy;
 
 import java.io.File;
 
-import com.DataLayer.TrackProxy;
 import com.Factory.TrackFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -114,13 +114,13 @@ public class AddModTrackController implements ITrackImporter {
 
             int duration = 0;
             if (txtDuration.getText() != null && !txtDuration.getText().isEmpty()) {
-                String durationTmp = txtDuration.getText();
-                duration = convertSeconds(durationTmp);
+                duration = convertSeconds(txtDuration.getText());
             }
             int year = 0;
             if (txtYear.getText() != null && !txtYear.getText().isEmpty()) {
                 year = Integer.parseInt(txtYear.getText());
             }
+
             if (isEditMode) {
                 trackToModify.setTitle(title);
                 trackToModify.setAuthor(author);
@@ -128,14 +128,13 @@ public class AddModTrackController implements ITrackImporter {
                 trackToModify.setGenre(genre);
                 trackToModify.setYear(year);
                 trackToModify.setDuration(duration);
-
                 if (!filePath.equals(trackToModify.getFilePath())) {
                     trackToModify.setFilePath(filePath);
                     trackToModify.setAudioSource(new TrackProxy(filePath));
                 }
-
             } else {
                 Track newTrack = TrackFactory.createTrack(title, author, year, genre, duration, album, filePath);
+                newTrack.setAudioSource(new TrackProxy(filePath));
                 if (mainController != null) {
                     mainController.addTrackMainTable(newTrack);
                 }
