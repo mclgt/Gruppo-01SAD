@@ -3,11 +3,16 @@ package com.Controller;
 import java.io.IOException;
 import java.util.Optional;
 
-import com.Model.Track;
 import com.Model.Library;
+import com.Model.Track;
+import com.State.PlayerContext;
+import com.Strategy.PlaybackContext;
+import com.Strategy.SequentialStrategy;
 
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.util.Duration;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -33,6 +38,16 @@ public class MainController {
     @FXML
     private Button btnAddTrack;
     @FXML
+    private Button btnPlay;
+    @FXML
+    private Button btnPause;
+    @FXML
+    private Button btnPrev;
+    @FXML
+    private Button btnNext;
+    @FXML
+    private Label lblNowPlaying;
+    @FXML
     private TableView<Track> trackTable;
     @FXML
     private TableColumn<Track, String> titleCol;
@@ -56,6 +71,10 @@ public class MainController {
     private Label lblYear;
 
     private Library trackList = new Library();
+    private PlayerContext playerContext;
+    private Track currentTrack;
+    private PauseTransition playbackTimer;
+    private boolean sequentialMode = false;
 
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
@@ -69,6 +88,7 @@ public class MainController {
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
         trackTable.setItems(trackList.getLibrary());
+        playerContext = new PlayerContext(new PlaybackContext(new SequentialStrategy()));
         detailPanel.setVisible(false);
         trackTable.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
             updateDetailPanel(newVal);
@@ -162,7 +182,6 @@ public class MainController {
      */
 
     @FXML
-
     private void handleRemoveTrack(ActionEvent event) {
         Track selectedTrack = this.trackTable.getSelectionModel().getSelectedItem();
         if (selectedTrack != null) {
@@ -175,7 +194,7 @@ public class MainController {
                 this.trackList.removeTrack(selectedTrack);
                 this.trackTable.getSelectionModel().clearSelection();
             }
-        } else {
+        } else{
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nessuna selezione");
             alert.setHeaderText("Nessuna traccia selezionata");
@@ -183,8 +202,7 @@ public class MainController {
             alert.showAndWait();
         }
     }
-
-    /**
+/**
      * @brief Aggiorna il pannello di dettaglio in base alla traccia selezionato. Se
      *        non viene selezionata alcuna traccia, il pannello scompare.
      * @param t traccia selezionata dalla tabella
@@ -200,6 +218,110 @@ public class MainController {
             lblGenre.setText(t.getGenre());
             lblYear.setText(t.getYear() == 0 ? "-" : String.valueOf(t.getYear()));
             lblDuration.setText(t.getFormattedDuration());
+        }
+    }
+
+    @FXML
+    public void playSong() {
+        Track selected = trackTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Nessuna selezione");
+            alert.setHeaderText("Nessuna traccia selezionata");
+            alert.setContentText("Seleziona una traccia dalla lista per riprodurla.");
+            alert.showAndWait();
+            return;
+        }
+        if (playerContext.isPlaying() && selected == playerContext.getCurrentTrack()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Già in riproduzione");
+            alert.setHeaderText(null);
+            alert.setContentText("Sto già eseguendo questo brano.");
+            alert.showAndWait();
+            return;
+        }
+        sequentialMode = false;
+        currentTrack = selected;
+        playerContext.play(currentTrack);
+        updateNowPlayingLabel();
+        startPlaybackTimer(currentTrack);
+    }
+
+    @FXML
+    public void SequentialRip(ActionEvent event) {
+        Track selected = trackTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Nessuna selezione");
+            alert.setHeaderText("Nessuna traccia selezionata");
+            alert.setContentText("Seleziona una traccia dalla lista per avviare la riproduzione sequenziale.");
+            alert.showAndWait();
+            return;
+        }
+        sequentialMode = true;
+        currentTrack = selected;
+        playerContext.play(currentTrack);
+        updateNowPlayingLabel();
+        startPlaybackTimer(currentTrack);
+    }
+
+    private void startPlaybackTimer(Track track) {
+        if (playbackTimer != null)
+            playbackTimer.stop();
+        playbackTimer = new PauseTransition(Duration.seconds(track.getDuration()));
+        playbackTimer.setOnFinished(e -> {
+            if (!sequentialMode) {
+                lblNowPlaying.setText("Canzone terminata");
+                System.out.println(
+                        "[PLAYER] Riproduzione singola terminata: " + playerContext.getCurrentTrack().getTitle());
+                return;
+            }
+            Track before = playerContext.getCurrentTrack();
+            playerContext.next(trackList.getLibrary(),before);
+            Track after = playerContext.getCurrentTrack();
+            if (after != null && after != before) {
+                currentTrack = after;
+                updateNowPlayingLabel();
+                startPlaybackTimer(currentTrack);
+            } else {
+                lblNowPlaying.setText("Canzone terminata");
+            }
+        });
+        playbackTimer.play();
+    }
+
+    @FXML
+    public void handleNext(ActionEvent event) {
+        if (playbackTimer != null)
+            playbackTimer.stop();
+        Track before = playerContext.getCurrentTrack();
+        playerContext.next(trackList.getLibrary(),before);
+        Track after = playerContext.getCurrentTrack();
+        if (after != null && after != before) {
+            currentTrack = after;
+            updateNowPlayingLabel();
+            startPlaybackTimer(currentTrack);
+        }
+    }
+
+    @FXML
+    public void handlePrev(ActionEvent event) {
+        if (playbackTimer != null)
+            playbackTimer.stop();
+        Track before = playerContext.getCurrentTrack();
+        playerContext.previous(trackList.getLibrary(),before);
+        Track after = playerContext.getCurrentTrack();
+        if (after != null && after != before) {
+            currentTrack = after;
+            updateNowPlayingLabel();
+            startPlaybackTimer(currentTrack);
+        }
+    }
+
+    private void updateNowPlayingLabel() {
+        Track track = playerContext.getCurrentTrack();
+        if (playerContext.isPlaying() && track != null) {
+            lblNowPlaying.setText("▶  " + track.getTitle() + "  —  " + track.getAuthor());
         }
     }
 
