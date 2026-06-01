@@ -3,6 +3,9 @@ package com.Controller;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.Command.ICommand;
+import com.Command.RemoveTrack;
+import com.Command.UndoManager;
 import com.Model.Library;
 import com.Model.Track;
 import com.State.PlayerContext;
@@ -69,13 +72,15 @@ public class MainController {
     private Label lblDuration;
     @FXML
     private Label lblYear;
+    @FXML
+    private Button btnUndo;
 
     private Library trackList = new Library();
     private PlayerContext playerContext;
     private Track currentTrack;
     private PauseTransition playbackTimer;
     private boolean sequentialMode = false;
-
+    private UndoManager undoManager = new UndoManager();
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
      *        tra le colonne della tabella e le StringProperty del modello Track,
@@ -93,6 +98,8 @@ public class MainController {
         trackTable.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
             updateDetailPanel(newVal);
         });
+
+        btnUndo.disableProperty().bind(undoManager.undoDisabledProperty());
     }
 
     /**
@@ -174,10 +181,10 @@ public class MainController {
     /**
      * @brief Rimuove il brano selezionato dalla tabella principale, l'evento è
      *        generato a partire dalla pressione sul pulsante "Rimuovi Brano", viene
-     *        mostrato a
-     *        schermo un messaggio di conferma. Nel caso in cui non sia selezionato
-     *        alcun brano,
-     *        viene mostrato un messaggio di avviso.
+     *        mostrato a schermo un messaggio di conferma. Nel caso in cui non sia 
+     *        selezionato alcun brano, viene mostrato un messaggio di avviso. Se il 
+     *        brano rimosso è attualmente in riproduzione, la riproduzione viene 
+     *        interrotta e viene avviata la traccia successiva,se presente.
      * @param event evento generato dalla pressione del pulsante
      */
 
@@ -191,6 +198,7 @@ public class MainController {
             alert.setContentText(selectedTrack.getTitle());
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
+                ICommand removeCommand = new RemoveTrack(trackList.getLibrary(), selectedTrack);
                 if (playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack()) {
                     playbackTimer.stop();
                     Track before = playerContext.getCurrentTrack();
@@ -199,7 +207,8 @@ public class MainController {
                     updateNowPlayingLabel();
                     startPlaybackTimer(this.currentTrack);  
                 }          
-            this.trackList.removeTrack(selectedTrack);
+            removeCommand.execute();
+            undoManager.push(removeCommand);
             this.trackTable.getSelectionModel().clearSelection();
             }
         } else{
@@ -335,5 +344,15 @@ public class MainController {
             lblNowPlaying.setText("Nessuna traccia in riproduzione");
         }
     }
-
+ 
+    /**
+     * @brief Gestisce l'evento di pressione sul pulsante di undo.
+     * Richiama il metodo undo() dell'UndoManager, che si occupa di
+     * annullare l'ultima operazione.
+     * @param event
+     */
+    @FXML
+    public void handleUndo(ActionEvent event) {
+        undoManager.undo();
+    }
 }
