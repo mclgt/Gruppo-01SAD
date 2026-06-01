@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.EditTrackController">
+<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.AddModTrackController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
@@ -30,36 +30,42 @@
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="Titolo:" />
-            <Label text="Artista:" GridPane.rowIndex="1" />
-            <Label text="Album:" GridPane.rowIndex="2" />
-            <Label text="File Audio:" GridPane.rowIndex="3" />
+            <Label text="Autore:" GridPane.rowIndex="1" />
+            <Label text="Album:" GridPane.rowIndex="3" />
+            <Label text="File Audio:" GridPane.rowIndex="5" />
             
-            <TextField fx:id="txtTitolo" GridPane.columnIndex="1" />
-            <TextField fx:id="txtArtista" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="txtAlbum" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="txtTitle" GridPane.columnIndex="1" />
+            <TextField fx:id="txtAuthor" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="txtAlbum" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             
-            <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <children>
                   <TextField fx:id="txtFilePath" editable="false" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnSfoglia" mnemonicParsing="false" text="..." />
+                  <Button fx:id="btnChoose" onAction="#handleSelectFile" mnemonicParsing="false" text="..." />
                </children>
             </HBox>
-            <Label text="Durata:" GridPane.rowIndex="4" />
-            <TextField fx:id="txtFilePath1" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="Durata:" GridPane.rowIndex="6" />
+            <TextField fx:id="txtDuration" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <Label text="Genere:" GridPane.rowIndex="4" />
+            <TextField fx:id="txtGenre" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="Anno:" GridPane.rowIndex="2" />
+            <TextField fx:id="txtYear" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
       
       <HBox alignment="CENTER_RIGHT" spacing="15.0">
          <children>
-            <Button fx:id="btnAnnulla" cancelButton="true" mnemonicParsing="false" text="Annulla" />
+            <Button fx:id="btnDelete"  onAction="#handleDelete" cancelButton="true" mnemonicParsing="false" text="Annulla" />
             
-            <Button fx:id="btnSalva" defaultButton="true" mnemonicParsing="false" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold;" text="Salva Modifiche" />
+            <Button fx:id="btnSave" onAction="#handleSave" defaultButton="true" mnemonicParsing="false" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold;" text="Salva Modifiche" />
          </children>
          <VBox.margin>
             <Insets top="10.0" />

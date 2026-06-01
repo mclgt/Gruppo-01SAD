@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.AddTrackController">
+<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.AddModTrackController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
@@ -38,7 +38,7 @@
         </rowConstraints>
          <children>
             <Label text="Titolo:" />
-            <Label text="Artista:" GridPane.rowIndex="1" />
+            <Label text="Autore:" GridPane.rowIndex="1" />
             <Label text="Genere:" GridPane.rowIndex="2" />
             <Label text="File Audio:" GridPane.rowIndex="5" />
             
@@ -49,14 +49,14 @@
             <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <children>
                   <TextField fx:id="txtFilePath" editable="false" promptText="Nessun file selezionato..." HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnSfoglia" mnemonicParsing="false" text="..." />
+                  <Button fx:id="btnChoose" mnemonicParsing="false" onAction="#handleSelectFile" text="..." />
                </children>
             </HBox>
             <Label text="Durata: " GridPane.rowIndex="6" />
-            <TextField fx:id="txtDuration" promptText="Es. hh:mm:ss" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextField fx:id="txtDuration" promptText="Es. mm:ss" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <Label text="Anno:" GridPane.rowIndex="3" />
             <TextField fx:id="txtYear" promptText="Es.2022" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Label text="Album" GridPane.rowIndex="4" />
+            <Label text="Album:" GridPane.rowIndex="4" />
             <TextField fx:id="txtAlbum" promptText="Es. A Night at the Opera" GridPane.columnIndex="1" GridPane.rowIndex="4" />
          </children>
       </GridPane>

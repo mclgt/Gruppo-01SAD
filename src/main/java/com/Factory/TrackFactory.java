@@ -1,5 +1,8 @@
 package com.Factory;
 
+import java.io.File;
+
+import com.DataLayer.TrackProxy;
 import com.Model.Track;
 
 /**
@@ -26,21 +29,30 @@ public class TrackFactory {
      * @param genre    Genere musivale
      * @param duration Durata del brano espressa in secondi. Deve essere maggiore di
      *                 zero
+     * @param filePath Indica il percorso del file da importare
+     * 
      * @return Track: Una nuova istanza validata dalla classe
      * @throws IllegalArgumentException se il titolo o l'autore sono vuoto o se la
      *                                  durata è inferiore a zero.
      */
-    public static Track createTrack(String title, String author, int year, String genre, int duration, String album)
-            throws IllegalArgumentException {
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Errore: Il campo 'Titolo' non può essere vuoto.");
+    public static Track createTrack(String title, String author, int year, String genre, int duration, String album,
+            String filePath) {
+        if (filePath != null && !filePath.trim().isEmpty()) {
+            File audioFile = new File(filePath);
+
+            if (!audioFile.exists() || !audioFile.isFile()) {
+                throw new IllegalArgumentException("Errore: file audio mancante o non valido: " + filePath);
+            }
+        } else {
+            throw new IllegalArgumentException("Errore: il campo 'File Audio' non può essere vuoto.");
         }
-        if (author == null || author.trim().isEmpty()) {
-            throw new IllegalArgumentException("Errore: Il campo 'Autore' non può essere vuoto.");
-        }
-        if (duration < 0) {
-            throw new IllegalArgumentException("Errore: Il campo 'Durata' deve contenere un valore maggiore di zero.");
-        }
-        return new Track(title.trim(), author.trim(), year, genre.trim(), duration, album.trim());
+
+        Track track = new Track(title.trim(), author.trim(), year, genre.trim(), duration, album.trim(),
+                filePath.trim());
+
+        TrackProxy proxy = new TrackProxy(filePath);
+        track.setAudioSource(proxy);
+
+        return track;
     }
 }
