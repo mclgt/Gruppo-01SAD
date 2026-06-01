@@ -12,7 +12,6 @@ import com.Strategy.SequentialStrategy;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.util.Duration;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -23,10 +22,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.input.MouseEvent;
+import javafx.util.Duration;
 
 /**
  * @brief Controller principale dell'applicazione, gestisce la schermata
@@ -191,8 +191,16 @@ public class MainController {
             alert.setContentText(selectedTrack.getTitle());
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                this.trackList.removeTrack(selectedTrack);
-                this.trackTable.getSelectionModel().clearSelection();
+                if (playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack()) {
+                    playbackTimer.stop();
+                    Track before = playerContext.getCurrentTrack();
+                    playerContext.next(trackList.getLibrary(),before);
+                    this.currentTrack = playerContext.getCurrentTrack();
+                    updateNowPlayingLabel();
+                    startPlaybackTimer(this.currentTrack);  
+                }          
+            this.trackList.removeTrack(selectedTrack);
+            this.trackTable.getSelectionModel().clearSelection();
             }
         } else{
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -322,6 +330,9 @@ public class MainController {
         Track track = playerContext.getCurrentTrack();
         if (playerContext.isPlaying() && track != null) {
             lblNowPlaying.setText("▶  " + track.getTitle() + "  —  " + track.getAuthor());
+        }
+        else if (track == null){
+            lblNowPlaying.setText("Nessuna traccia in riproduzione");
         }
     }
 
