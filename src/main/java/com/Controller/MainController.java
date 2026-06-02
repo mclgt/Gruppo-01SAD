@@ -207,7 +207,7 @@ public class MainController {
                 this.trackList.removeTrack(selectedTrack);
                 Platform.runLater(() -> trackTable.getSelectionModel().clearSelection());
             }
-        } else{
+        } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nessuna selezione");
             alert.setHeaderText("Nessuna traccia selezionata");
@@ -215,7 +215,8 @@ public class MainController {
             alert.showAndWait();
         }
     }
-/**
+
+    /**
      * @brief Aggiorna il pannello di dettaglio in base alla traccia selezionato. Se
      *        non viene selezionata alcuna traccia, il pannello scompare.
      * @param t traccia selezionata dalla tabella
@@ -227,8 +228,8 @@ public class MainController {
             detailPanel.setVisible(true);
             lblTitle.setText(t.getTitle());
             lblAuthor.setText(t.getAuthor());
-            lblAlbum.setText(t.getAlbum());
-            lblGenre.setText(t.getGenre());
+            lblAlbum.setText(t.getAlbum().trim().isEmpty() ? "-" : t.getAlbum());
+            lblGenre.setText(t.getGenre().trim().isEmpty() ? "-" : t.getGenre());
             lblYear.setText(t.getYear() == 0 ? "-" : String.valueOf(t.getYear()));
             lblDuration.setText(t.getFormattedDuration());
         }
@@ -331,7 +332,7 @@ public class MainController {
         if (playbackTimer != null) playbackTimer.stop();
         if (progressTimeline != null) progressTimeline.stop();
         Track before = playerContext.getCurrentTrack();
-        playerContext.next(trackList.getLibrary(),before);
+        playerContext.next(trackList.getLibrary(), before);
         Track after = playerContext.getCurrentTrack();
         if (after != null && after != before) {
             currentTrack = after;
@@ -345,7 +346,7 @@ public class MainController {
         if (playbackTimer != null) playbackTimer.stop();
         if (progressTimeline != null) progressTimeline.stop();
         Track before = playerContext.getCurrentTrack();
-        playerContext.previous(trackList.getLibrary(),before);
+        playerContext.previous(trackList.getLibrary(), before);
         Track after = playerContext.getCurrentTrack();
         if (after != null && after != before) {
             currentTrack = after;
