@@ -33,10 +33,10 @@ public class RemoveTrackTest {
         assertEquals(1, library.getTracksCount());
 
         ICommand removeCommand = new RemoveTrack(library, track1);
-        removeCommand.execute();
+        undoManager.executeCommand(removeCommand);
         assertEquals(0, library.getTracksCount());
 
-        removeCommand.undo();
+        undoManager.undo();
         assertEquals(1, library.getTracksCount());
     }
 
