@@ -43,4 +43,63 @@ public class TrackTest {
         assertEquals("Pablo Honey", track.getAlbum());
         assertEquals("C:/audio.wav", track.getFilePath());
     }
+
+    /**
+     * @brief Assicura che l'inserimento di un titolo vuoto lanci l'eccezione
+     *        IllegalArgument e non alteri lo stato dell'oggetto.
+     * 
+     */
+    @Test
+    public void testModifyTrack_noTitle() {
+        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            track.setTitle("  ");
+        });
+        assertTrue(ex.getMessage().contains("non può essere vuoto"));
+        assertEquals("A", track.getTitle(), "Il titolo non doveva essere modificato!");
+    }
+
+    /**
+     * @brief Assicura che l'inserimento di un autore vuoto lanci l'eccezione
+     *        IllegalArgument e non alteri lo stato dell'oggetto.
+     * 
+     */
+    @Test
+    public void testModifyTrack_noAuthor() {
+        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            track.setAuthor("  ");
+        });
+        assertTrue(ex.getMessage().contains("non può essere vuoto"));
+        assertEquals("B", track.getAuthor(), "L'autore non doveva essere modificato!");
+    }
+
+    /**
+     * @brief Assicura che l'inserimento di una durata negativa lanci l'eccezione
+     *        IllegalArgument e non alteri lo stato dell'oggetto.
+     * 
+     */
+    @Test
+    public void testModifyTrack_negativeDuration() {
+        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        assertThrows(IllegalArgumentException.class, () -> {
+            track.setDuration(-4);
+        });
+        assertEquals(0, track.getDuration(), "La durata non deve essere stata modificata");
+    }
+
+    /**
+     * @brief Assicura che l'inserimento di un percorso vuoto lanci l'eccezione
+     *        IllegalArgument e non alteri lo stato dell'oggetto.
+     * 
+     */
+    @Test
+    public void testModifyTrack_noPath() {
+        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        assertThrows(IllegalArgumentException.class, () -> {
+            track.setFilePath("  ");
+        });
+        assertEquals("E", track.getFilePath(), "Il percorso non deve essere modificato");
+    }
+
 }
