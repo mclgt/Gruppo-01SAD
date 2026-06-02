@@ -17,10 +17,11 @@ public class UndoManager {
     private BooleanProperty undoDisabled = new SimpleBooleanProperty(true);
 
     /** 
-     * @brief Aggiunge un comando allo storico, abilitando il pulsante di undo se necessario.
+     * @brief Esegue il comando, aggiunge un comando allo storico, abilitando il pulsante di undo se necessario.
      * @param command Il comando da aggiungere allo storico.
     */
-    public void push(ICommand command) {
+    public void executeCommand(ICommand command) {
+        command.execute();
         undoStack.push(command);
         undoDisabled.set(false);
     }

@@ -219,8 +219,7 @@ public class MainController {
                     updateNowPlayingLabel();
                     startPlaybackTimer(this.currentTrack);  
                 }          
-            removeCommand.execute();
-            undoManager.push(removeCommand);
+            undoManager.executeCommand(removeCommand);
             this.trackTable.getSelectionModel().clearSelection();
             }
         } else {
