@@ -1,6 +1,9 @@
 package com.Controller;
 
 import com.Model.Track;
+import com.Command.AddTrack;
+import com.Command.ICommand;
+import com.Command.ModifyTrack;
 import com.DataLayer.TrackProxy;
 
 import java.io.File;
@@ -122,21 +125,18 @@ public class AddModTrackController implements ITrackImporter {
             }
 
             if (isEditMode) {
-                trackToModify.setTitle(title);
-                trackToModify.setAuthor(author);
-                trackToModify.setAlbum(album);
-                trackToModify.setGenre(genre);
-                trackToModify.setYear(year);
-                trackToModify.setDuration(duration);
-                if (!filePath.equals(trackToModify.getFilePath())) {
-                    trackToModify.setFilePath(filePath);
-                    trackToModify.setAudioSource(new TrackProxy(filePath));
+                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author, year, genre, duration, album, filePath);
+
+                if(mainController != null) {
+                    mainController.getUndoManager().executeCommand(modifyCommand);
                 }
             } else {
                 Track newTrack = TrackFactory.createTrack(title, author, year, genre, duration, album, filePath);
                 newTrack.setAudioSource(new TrackProxy(filePath));
+
                 if (mainController != null) {
-                    mainController.addTrackMainTable(newTrack);
+                    ICommand addCommand = new AddTrack(mainController.getLibrary(), newTrack);
+                    mainController.getUndoManager().executeCommand(addCommand);
                 }
             }
             closeWindow();

@@ -84,7 +84,6 @@ public class MainController {
     @FXML
     private Button btnUndo;
 
-    private Library trackList = new Library();
     private PlayerContext playerContext;
     private Track currentTrack;
     private PauseTransition playbackTimer;
@@ -92,6 +91,8 @@ public class MainController {
     private int elapsedSeconds;
     private boolean sequentialMode = false;
     private boolean trackFinished = false;
+
+    private Library trackList = new Library();
     private UndoManager undoManager = new UndoManager();
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
@@ -112,6 +113,22 @@ public class MainController {
         });
 
         btnUndo.disableProperty().bind(undoManager.undoDisabledProperty());
+    }
+
+    /**
+     * @brief Fornisce il riferimento alla libreria musicale (che funge da Receiver globale)
+     * @return L'oggetto Library corrente.
+     */
+    public Library getLibrary() {
+        return trackList;
+    }
+
+    /**
+     * @brief Fornisce il riferimento all'Invoker del sistema per la gestione dell'Undo list.
+     * @return L'oggetto UndoManager corrente.
+     */
+    public UndoManager getUndoManager() {
+        return undoManager;
     }
 
     /**
@@ -172,7 +189,7 @@ public class MainController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(p));
             stage.showAndWait();
-            trackTable.getSelectionModel().clearSelection();
+            //trackTable.getSelectionModel().clearSelection();
 
         } catch (IOException ex) {
             System.err.print("Errore nel caricamento della finestra:" + ex.getMessage());
