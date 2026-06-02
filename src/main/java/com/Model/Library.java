@@ -1,5 +1,7 @@
 package com.Model;
 
+import com.DataLayer.TrackProxy;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -68,6 +70,36 @@ public class Library {
     public Track removeTrack(Track track) {
         this.library.remove(track);
         return track;
+    }
+
+    /**
+     * @brief Aggiorna i dati di un brano esistente nella libreria.
+     * Rimpiazza l'oggetto nella lista osservabile per forzare l'aggiornamento automatico della UI.
+     * * @param track Il brano originale da modificare.
+     * @param title Il nuovo titolo da assegnare.
+     * @param author Il nuovo autore da assegnare.
+     * @param year Il nuovo anno da assegnare.
+     * @param genre Il nuovo genere da assegnare.
+     * @param duration La nuova durata da assegnare.
+     * @param album Il nuovo album da assegnare.
+     * @param filePath Il nuovo percorso del file audio.
+     */
+    public void updateTrack(Track track, String title, String author, int year, String genre, int duration, String album, String filePath) {
+        int index = this.library.indexOf(track);
+
+        track.setTitle(title);
+        track.setAuthor(author);
+        track.setYear(year);
+        track.setGenre(genre);
+        track.setDuration(duration);
+        track.setAlbum(album);
+
+        if(filePath != null && !filePath.equals(track.getFilePath())) {
+            track.setFilePath(filePath);
+            track.setAudioSource(new TrackProxy(filePath));
+        }
+
+        this.library.set(index, track);
     }
 
     /**
