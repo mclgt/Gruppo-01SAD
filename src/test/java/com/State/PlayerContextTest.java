@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @brief Test per US-6: riproduzione singola traccia tramite PlayingState.
- *        Verifica il comportamento di play, next e previous nel solo stato Playing.
+ *        Verifica il comportamento di play, next e previous nel solo stato
+ *        Playing.
  *        Usa stub manuali per PlaybackContext, senza framework di mocking.
  * @author Christian
  */
@@ -59,7 +60,7 @@ public class PlayerContextTest {
         return new PlayerContext(playbackContext);
     }
 
-    //TEST DI PLAY o PlayingState 
+    // TEST DI PLAY o PlayingState
 
     @Test
     public void testPlay_startsPlaying() {
@@ -79,7 +80,8 @@ public class PlayerContextTest {
 
     @Test
     public void testPlay_differentTrack_updatesCurrentTrack() {
-        System.out.println("[TEST] play() su traccia diversa → deve aggiornare la traccia corrente e restare in Playing");
+        System.out
+                .println("[TEST] play() su traccia diversa → deve aggiornare la traccia corrente e restare in Playing");
         PlayerContext ctx = contextWith(null, null);
         ctx.play(track1);
         ctx.play(track2);
@@ -87,7 +89,7 @@ public class PlayerContextTest {
         assertTrue(ctx.isPlaying());
     }
 
-    //TEST PER NEXT TRACK
+    // TEST PER NEXT TRACK
 
     @Test
     public void testNext_withValidNext_updatesCurrentTrack() {
@@ -116,11 +118,12 @@ public class PlayerContextTest {
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
-    //TEST PER PREVIOUS TRACK
+    // TEST PER PREVIOUS TRACK
 
     @Test
     public void testPrevious_withValidPrevious_updatesCurrentTrack() {
-        System.out.println("[TEST] previous() con traccia precedente disponibile → deve aggiornare la traccia corrente");
+        System.out
+                .println("[TEST] previous() con traccia precedente disponibile → deve aggiornare la traccia corrente");
         PlayerContext ctx = contextWith(null, track1);
         ctx.play(track2);
         ctx.previous(queue, track2);
@@ -145,7 +148,7 @@ public class PlayerContextTest {
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
-    //TEST per riproduzione sequenziale US-8 
+    // TEST per riproduzione sequenziale US-8
 
     private PlayerContext sequentialContext() {
         System.out.println("\n [TEST US-8] sequential Context");
