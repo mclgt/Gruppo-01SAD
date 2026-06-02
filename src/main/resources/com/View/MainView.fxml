@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="650.0"  onMouseClicked="#handleBackgroundClick" prefWidth="1000.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.MainController">
+<BorderPane onMouseClicked="#handleBackgroundClick" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.MainController">
    
    <top>
       <VBox BorderPane.alignment="CENTER">
@@ -50,7 +50,7 @@
                            </image>
                         </ImageView>
                      </graphic></Button>
-                <Button fx:id="btnEditTrack"  onAction="#openModifyTrackView" mnemonicParsing="false" text="Modifica Brano">
+                <Button fx:id="btnEditTrack" mnemonicParsing="false" onAction="#openModifyTrackView" text="Modifica Brano">
                      <graphic>
                         <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -66,6 +66,15 @@
                            </image>
                         </ImageView>
                      </graphic></Button>
+                  <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#handleUndo" prefHeight="27.0" prefWidth="100.0" text="Annulla ">
+                     <graphic>
+                        <ImageView fitHeight="17.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../../../../../../../../../../Downloads/undo-arrow_icon-icons.com_56881.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
               </items>
             </ToolBar>
          </children>

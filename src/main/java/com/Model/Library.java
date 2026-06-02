@@ -40,14 +40,20 @@ public class Library {
      * @brief Inserisce un nuovo brano all'interno della libreria musicale.
      *
      * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
-     * @return Il riferimento alla ObservableList aggiornata contenente tutte le
-     *         tracce della libreria.
      */
-    public ObservableList<Track> addTrack(Track track) {
+    public void addTrack(Track track) {
         this.library.add(track);
-        return this.library;
     }
 
+    /**
+     * @brief Inserisce un nuovo brano in una posizione specifica all'interno della libreria musicale.
+     * 
+     * @param index La posizione in cui inserire il brano.
+     * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
+     */
+    public void addTrack(int index, Track track) {
+        this.library.add(index, track);
+    }
     /**
      * @brief Rimuove un brano specifico dalla libreria musicale.
      *
@@ -56,10 +62,12 @@ public class Library {
      *        Trattandosi di una lista osservabile, la rimozione scatena un evento
      *        di aggiornamento automatico sulla UI.
      *
-     * @param track L'oggetto Track da eliminare dalla collezione.
+     * @param track L'oggetto Track da eliminare dalla collezione
+     * @return L'oggetto Track che è stato rimosso.
      */
-    public void removeTrack(Track track) {
+    public Track removeTrack(Track track) {
         this.library.remove(track);
+        return track;
     }
 
     /**
