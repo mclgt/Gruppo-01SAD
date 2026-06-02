@@ -49,9 +49,9 @@ public class PlayerContextTest {
 
     @BeforeEach
     public void setUp() {
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "");
-        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "");
-        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "");
+        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3");
+        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3");
+        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3");
         queue = Arrays.asList(track1, track2, track3);
     }
 
