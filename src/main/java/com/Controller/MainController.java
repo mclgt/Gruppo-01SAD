@@ -210,7 +210,7 @@ public class MainController {
             alert.setContentText(selectedTrack.getTitle());
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                ICommand removeCommand = new RemoveTrack(trackList.getLibrary(), selectedTrack);
+                ICommand removeCommand = new RemoveTrack(trackList, selectedTrack);
                 if (playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack()) {
                     playbackTimer.stop();
                     Track before = playerContext.getCurrentTrack();

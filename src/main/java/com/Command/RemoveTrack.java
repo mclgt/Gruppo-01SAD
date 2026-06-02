@@ -1,8 +1,7 @@
 package com.Command;
 
 import com.Model.Track;
-
-import javafx.collections.ObservableList;
+import com.Model.Library;
 
 /**
  * @brief Rappresenta un ConcretoCommand che incapsula l'operazione di rimozione
@@ -11,7 +10,7 @@ import javafx.collections.ObservableList;
  * reinserire in caso di undo.
  */
 public class RemoveTrack implements ICommand {
-    private final ObservableList<Track> library;
+    private final Library receiver;
     private final Track track;
     private int index;
 
@@ -20,8 +19,8 @@ public class RemoveTrack implements ICommand {
      * @param library lista osservabile che rappresenta la libreria da cui rimuovere la traccia.
      * @param track la traccia da rimuovere.
      */
-    public RemoveTrack(ObservableList<Track> library, Track track) {
-        this.library = library;
+    public RemoveTrack(Library receiver, Track track) {
+        this.receiver = receiver;
         this.track = track;
     }
 
@@ -31,9 +30,9 @@ public class RemoveTrack implements ICommand {
      */
     @Override
     public void execute() {
-        this.index = library.indexOf(track);
+        this.index = this.receiver.getLibrary().indexOf(track);
         if(index != -1)
-            library.remove(track);
+            this.receiver.removeTrack(track);
     }
 
     /**
@@ -42,7 +41,7 @@ public class RemoveTrack implements ICommand {
      */
     @Override
     public void undo() {
-        library.add(index, track);
+        this.receiver.addTrack(index, track);
     }
     
 }

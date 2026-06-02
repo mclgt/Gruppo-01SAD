@@ -32,7 +32,7 @@ public class RemoveTrackTest {
         library.addTrack(track1);
         assertEquals(1, library.getTracksCount());
 
-        ICommand removeCommand = new RemoveTrack(library.getLibrary(), track1);
+        ICommand removeCommand = new RemoveTrack(library, track1);
         removeCommand.execute();
         assertEquals(0, library.getTracksCount());
 
