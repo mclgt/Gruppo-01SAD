@@ -27,13 +27,12 @@ public class SequentialStrategyTest {
     public void setUp() {
         strategy = new SequentialStrategy();
 
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "");
-        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "");
-        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "");
+        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3");
+        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3");
+        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3");
 
         queue = Arrays.asList(track1, track2, track3);
     }
-
 
     // Questi test servono per verificare se SequentialStrategy
     // gestisce correttamente i casi in cui si punta ad un brano successivo.
@@ -54,12 +53,12 @@ public class SequentialStrategyTest {
 
     @Test
     public void testNextTrack_trackNotInQueue_returnsNull() {
-        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "");
+        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy4.mp3");
         assertNull(strategy.nextTrack(queue, outsider));
     }
 
-    // Questi test servono per verificare se SequentialStrategy 
-    //gestisce correttamente i casi in cui si punta ad un brano precedente.
+    // Questi test servono per verificare se SequentialStrategy
+    // gestisce correttamente i casi in cui si punta ad un brano precedente.
 
     @Test
     public void testPreviousTrack_fromLast_returnsMiddle() {
@@ -78,7 +77,7 @@ public class SequentialStrategyTest {
 
     @Test
     public void testPreviousTrack_trackNotInQueue_returnsNull() {
-        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "");
+        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy4.mp3");
         assertNull(strategy.previousTrack(queue, outsider));
     }
 }
