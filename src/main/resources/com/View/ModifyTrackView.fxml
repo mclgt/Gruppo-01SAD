@@ -53,9 +53,9 @@
                </children>
             </HBox>
             <Label text="Durata:" GridPane.rowIndex="6" />
-            <TextField fx:id="txtDuration" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextField fx:id="txtDuration"  GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <Label text="Genere:" GridPane.rowIndex="4" />
-            <TextField fx:id="txtGenre" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="txtGenre"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label text="Anno:" GridPane.rowIndex="2" />
             <TextField fx:id="txtYear" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>

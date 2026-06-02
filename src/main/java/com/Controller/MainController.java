@@ -12,7 +12,9 @@ import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +24,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -73,13 +76,22 @@ public class MainController {
     @FXML
     private Label lblYear;
     @FXML
+    private Label lblCurrentTime;
+    @FXML
+    private Label lblTotalTime;
+    @FXML
+    private Slider progressSlider;
+    @FXML
     private Button btnUndo;
 
     private Library trackList = new Library();
     private PlayerContext playerContext;
     private Track currentTrack;
     private PauseTransition playbackTimer;
+    private Timeline progressTimeline;
+    private int elapsedSeconds;
     private boolean sequentialMode = false;
+    private boolean trackFinished = false;
     private UndoManager undoManager = new UndoManager();
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
@@ -211,7 +223,7 @@ public class MainController {
             undoManager.push(removeCommand);
             this.trackTable.getSelectionModel().clearSelection();
             }
-        } else{
+        } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Nessuna selezione");
             alert.setHeaderText("Nessuna traccia selezionata");
@@ -219,7 +231,8 @@ public class MainController {
             alert.showAndWait();
         }
     }
-/**
+
+    /**
      * @brief Aggiorna il pannello di dettaglio in base alla traccia selezionato. Se
      *        non viene selezionata alcuna traccia, il pannello scompare.
      * @param t traccia selezionata dalla tabella
@@ -231,8 +244,8 @@ public class MainController {
             detailPanel.setVisible(true);
             lblTitle.setText(t.getTitle());
             lblAuthor.setText(t.getAuthor());
-            lblAlbum.setText(t.getAlbum());
-            lblGenre.setText(t.getGenre());
+            lblAlbum.setText(t.getAlbum().trim().isEmpty() ? "-" : t.getAlbum());
+            lblGenre.setText(t.getGenre().trim().isEmpty() ? "-" : t.getGenre());
             lblYear.setText(t.getYear() == 0 ? "-" : String.valueOf(t.getYear()));
             lblDuration.setText(t.getFormattedDuration());
         }
@@ -249,7 +262,7 @@ public class MainController {
             alert.showAndWait();
             return;
         }
-        if (playerContext.isPlaying() && selected == playerContext.getCurrentTrack()) {
+        if (playerContext.isPlaying() && selected == playerContext.getCurrentTrack() && !trackFinished) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Già in riproduzione");
             alert.setHeaderText(null);
@@ -257,6 +270,7 @@ public class MainController {
             alert.showAndWait();
             return;
         }
+        trackFinished = false;
         sequentialMode = false;
         currentTrack = selected;
         playerContext.play(currentTrack);
@@ -283,18 +297,34 @@ public class MainController {
     }
 
     private void startPlaybackTimer(Track track) {
-        if (playbackTimer != null)
-            playbackTimer.stop();
-        playbackTimer = new PauseTransition(Duration.seconds(track.getDuration()));
+        if (playbackTimer != null) playbackTimer.stop();
+        if (progressTimeline != null) progressTimeline.stop();
+
+        elapsedSeconds = 0;
+        int total = track.getDuration();
+        progressSlider.setMax(total);
+        progressSlider.setValue(0);
+        lblCurrentTime.setText("0:00");
+        lblTotalTime.setText(formatTime(total));
+
+        progressTimeline = new Timeline(new KeyFrame(Duration.seconds(1), e -> {
+            elapsedSeconds++;
+            progressSlider.setValue(elapsedSeconds);
+            lblCurrentTime.setText(formatTime(elapsedSeconds));
+        }));
+        progressTimeline.setCycleCount(total);
+        progressTimeline.play();
+
+        playbackTimer = new PauseTransition(Duration.seconds(total));
         playbackTimer.setOnFinished(e -> {
             if (!sequentialMode) {
+                trackFinished = true;
                 lblNowPlaying.setText("Canzone terminata");
-                System.out.println(
-                        "[PLAYER] Riproduzione singola terminata: " + playerContext.getCurrentTrack().getTitle());
+                System.out.println("[PLAYER] Riproduzione singola terminata: " + playerContext.getCurrentTrack().getTitle());
                 return;
             }
             Track before = playerContext.getCurrentTrack();
-            playerContext.next(trackList.getLibrary(),before);
+            playerContext.next(trackList.getLibrary(), before);
             Track after = playerContext.getCurrentTrack();
             if (after != null && after != before) {
                 currentTrack = after;
@@ -307,12 +337,18 @@ public class MainController {
         playbackTimer.play();
     }
 
+    private String formatTime(int totalSeconds) {
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return String.format("%d:%02d", minutes, seconds);
+    }
+
     @FXML
     public void handleNext(ActionEvent event) {
-        if (playbackTimer != null)
-            playbackTimer.stop();
+        if (playbackTimer != null) playbackTimer.stop();
+        if (progressTimeline != null) progressTimeline.stop();
         Track before = playerContext.getCurrentTrack();
-        playerContext.next(trackList.getLibrary(),before);
+        playerContext.next(trackList.getLibrary(), before);
         Track after = playerContext.getCurrentTrack();
         if (after != null && after != before) {
             currentTrack = after;
@@ -323,10 +359,10 @@ public class MainController {
 
     @FXML
     public void handlePrev(ActionEvent event) {
-        if (playbackTimer != null)
-            playbackTimer.stop();
+        if (playbackTimer != null) playbackTimer.stop();
+        if (progressTimeline != null) progressTimeline.stop();
         Track before = playerContext.getCurrentTrack();
-        playerContext.previous(trackList.getLibrary(),before);
+        playerContext.previous(trackList.getLibrary(), before);
         Track after = playerContext.getCurrentTrack();
         if (after != null && after != before) {
             currentTrack = after;
