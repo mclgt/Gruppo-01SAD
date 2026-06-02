@@ -1,12 +1,12 @@
-package com.Model;
+package com.Command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.Command.ICommand;
-import com.Command.RemoveTrack;
-import com.Command.UndoManager;
+import com.Model.Library;
+import com.Model.Track;
 /**
  * @brief Definizione della classe di unit test per la rimozione delle tracce.
  */
@@ -30,14 +30,18 @@ public class RemoveTrackTest {
     @Test
     public void testRemoveTrackCommand() {
         library.addTrack(track1);
-        assertEquals(1, library.getTracksCount());
+        library.addTrack(track2);
+        library.addTrack(track3);
 
-        ICommand removeCommand = new RemoveTrack(library, track1);
+        assertEquals(3, library.getTracksCount());
+
+        ICommand removeCommand = new RemoveTrack(library, track2);
         undoManager.executeCommand(removeCommand);
-        assertEquals(0, library.getTracksCount());
+
+        assertEquals(2, library.getTracksCount());
+        assertFalse(library.getLibrary().contains(track2), "La traccia non è stata rimossa dalla libreria");
 
         undoManager.undo();
-        assertEquals(1, library.getTracksCount());
+        assertEquals(3, library.getTracksCount());
     }
-
 }

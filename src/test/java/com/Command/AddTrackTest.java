@@ -1,4 +1,4 @@
-package com.Model;
+package com.Command;
 
 /**
  * @brief Classe di test per verificare l'aggiunta di un brano 
@@ -8,6 +8,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.Model.Library;
+import com.Model.Track;
 
 public class AddTrackTest {
     private Library l;
@@ -21,10 +24,17 @@ public class AddTrackTest {
     }
 
     @Test
-    public void testAddTrack_success() {
-        l.addTrack(t);
-        assertEquals(1, l.getTracksCount(), "La libreria dovrebbe contenere 1 brano");
-        assertTrue(l.getLibrary().contains(t), "La libreria dovrebbe contenre il brano");
-    }
+    public void testAddTrack_executeAndUndo() {
+        ICommand addCommand = new AddTrack(l, t);
 
+        // Fase di execute
+        addCommand.execute();
+        assertEquals(1, l.getTracksCount());
+        assertTrue(l.getLibrary().contains(t));
+
+        // Fase di undo
+        addCommand.undo();
+        assertEquals(0, l.getTracksCount());
+        assertFalse(l.getLibrary().contains(t));
+    }
 }
