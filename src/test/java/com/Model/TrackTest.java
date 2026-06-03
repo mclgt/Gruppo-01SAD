@@ -25,7 +25,7 @@ public class TrackTest {
 
     @Test
     public void testSetters() {
-        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
 
         track.setTitle("Creep");
         track.setAuthor("Radiohead");
@@ -35,13 +35,13 @@ public class TrackTest {
         track.setAlbum("Pablo Honey");
         track.setFilePath("C:/audio.wav");
 
-        assertEquals("Creep", track.getTitle());
-        assertEquals("Radiohead", track.getAuthor());
-        assertEquals(1992, track.getYear());
-        assertEquals("Alternative Rock", track.getGenre());
-        assertEquals(238, track.getDuration());
-        assertEquals("Pablo Honey", track.getAlbum());
-        assertEquals("C:/audio.wav", track.getFilePath());
+        assertEquals("Creep", track.getTitle(), "Il titolo dovrebbe essere modificato");
+        assertEquals("Radiohead", track.getAuthor(), "L'Autore dovrebbe essere modificato");
+        assertEquals(1992, track.getYear(), "L'anno dovrebbe essere modificato");
+        assertEquals("Alternative Rock", track.getGenre(), "Il genere dovrebbe essere modificato");
+        assertEquals(238, track.getDuration(), "La durata dovrebbe essere modificato");
+        assertEquals("Pablo Honey", track.getAlbum(), "L'album dovrebbe essere modificato");
+        assertEquals("C:/audio.wav", track.getFilePath(), "Il path dovrebbe essere modificato");
     }
 
     /**
@@ -51,7 +51,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_noTitle() {
-        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             track.setTitle("  ");
         });
@@ -66,11 +66,27 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_noAuthor() {
-        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             track.setAuthor("  ");
         });
         assertTrue(ex.getMessage().contains("non può essere vuoto"));
+        assertEquals("B", track.getAuthor(), "L'autore non doveva essere modificato!");
+    }
+
+    /**
+     * @brief Assicura che l'inserimento di un autore contente solo punteggiatura
+     *        lanci l'eccezione
+     *        IllegalArgument e non alteri lo stato dell'oggetto.
+     * 
+     */
+    @Test
+    public void testModifyTrack_invalidAuthor() {
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            track.setAuthor(";");
+        });
+        assertTrue(ex.getMessage().contains("punteggiatura"));
         assertEquals("B", track.getAuthor(), "L'autore non doveva essere modificato!");
     }
 
@@ -81,11 +97,20 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_negativeDuration() {
-        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
         assertThrows(IllegalArgumentException.class, () -> {
             track.setDuration(-4);
         });
-        assertEquals(0, track.getDuration(), "La durata non deve essere stata modificata");
+        assertEquals(1, track.getDuration(), "La durata non deve essere stata modificata");
+    }
+
+    @Test
+    public void testModiftyTrack_zeroDuration() {
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        assertThrows(IllegalArgumentException.class, () -> {
+            track.setDuration(0);
+        });
+        assertEquals(1, track.getDuration(), "La durata non deve essere stata modificata");
     }
 
     /**
@@ -95,7 +120,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_noPath() {
-        Track track = new Track("A", "B", 0, "C", 0, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
         assertThrows(IllegalArgumentException.class, () -> {
             track.setFilePath("  ");
         });

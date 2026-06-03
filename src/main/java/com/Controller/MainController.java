@@ -416,6 +416,8 @@ public class MainController {
             lblNowPlaying.setText("▶  " + track.getTitle() + "  —  " + track.getAuthor());
         } else if (track == null) {
             lblNowPlaying.setText("Nessuna traccia in riproduzione");
+            playbackTimer.stop();
+            progressTimeline.stop();
         }
     }
 

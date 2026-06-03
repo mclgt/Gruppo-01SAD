@@ -68,12 +68,12 @@ public class LibraryTest {
     @Test
     public void testUpdateTrack_success() {
         l.addTrack(track1);
-        l.updateTrack(track1, "esempio1", "esempio2", 2020, "esempio3", 0, "esempio4", "esempio5.mp3");
+        l.updateTrack(track1, "esempio1", "esempio2", 2020, "esempio3", 1, "esempio4", "esempio5.mp3");
         assertEquals("esempio1", track1.getTitle(), "Il titolo dovrebbe essere cambiato");
         assertEquals("esempio2", track1.getAuthor(), "L'autore dovrebbe essere cambiato");
         assertEquals(2020, track1.getYear(), "L'anno dovrebbe essere cambiato");
         assertEquals("esempio3", track1.getGenre(), "Il genere dovrebbe essere cambiato");
-        assertEquals(0, track1.getDuration(), "La durata dovrebbe essere cambiata");
+        assertEquals(1, track1.getDuration(), "La durata dovrebbe essere cambiata");
         assertEquals("esempio4", track1.getAlbum(), "L'album dovrebbe essere cambiato");
         assertEquals("esempio5.mp3", track1.getFilePath(), "Il path dovrebbe essere cambiato");
 

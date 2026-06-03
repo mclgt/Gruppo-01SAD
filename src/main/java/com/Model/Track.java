@@ -89,6 +89,9 @@ public class Track {
         if (author == null || author.trim().isEmpty()) {
             throw new IllegalArgumentException("Il campo 'Autore' non può essere vuoto");
         }
+        if (!author.matches(".*[\\p{L}\\d].*")) {
+            throw new IllegalArgumentException("Il campo 'Autore' non può essere composto solo da punteggiatura");
+        }
         this.author.set(author);
     }
 
@@ -101,8 +104,8 @@ public class Track {
     }
 
     public void setDuration(int duration) {
-        if (duration < 0) {
-            throw new IllegalArgumentException("Il campo 'Durata' non può avere valore negativo");
+        if (duration <= 0) {
+            throw new IllegalArgumentException("Il campo 'Durata' non può avere valore negativo o nullo");
         }
         this.duration.set(duration);
     }
