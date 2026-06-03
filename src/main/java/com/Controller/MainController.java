@@ -1,6 +1,8 @@
 package com.Controller;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Optional;
 
 import com.Command.ICommand;
@@ -91,6 +93,7 @@ public class MainController {
     private int elapsedSeconds;
     private boolean sequentialMode = false;
     private boolean trackFinished = false;
+    private final Deque<Boolean> deletedPlayingStack = new ArrayDeque<>();
 
     private Library trackList = new Library();
     private UndoManager undoManager = new UndoManager();
@@ -232,6 +235,7 @@ public class MainController {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 ICommand removeCommand = new RemoveTrack(trackList, selectedTrack);
                 boolean wasPlaying = playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack();
+                deletedPlayingStack.push(wasPlaying);
                 if (wasPlaying) {
                     if (playbackTimer != null) playbackTimer.stop();
                     if (progressTimeline != null) progressTimeline.stop();
@@ -252,6 +256,7 @@ public class MainController {
                         lblTotalTime.setText("0:00");
                         lblNowPlaying.setText("Nessuna traccia in riproduzione");
                         playerContext.stop();
+                        playerContext.setCurrentTrack(null);
                         currentTrack = null;
                     }
                 }
@@ -437,5 +442,17 @@ public class MainController {
     @FXML
     public void handleUndo(ActionEvent event) {
         undoManager.undo();
+        boolean wasPlayingDelete = !deletedPlayingStack.isEmpty() && deletedPlayingStack.pop();
+        if (wasPlayingDelete) {
+            if (playbackTimer != null) playbackTimer.stop();
+            if (progressTimeline != null) progressTimeline.stop();
+            progressSlider.setValue(0);
+            lblCurrentTime.setText("0:00");
+            lblTotalTime.setText("0:00");
+            lblNowPlaying.setText("Nessuna traccia in riproduzione");
+            playerContext.setCurrentTrack(null);
+            currentTrack = null;
+            trackFinished = false;
+        }
     }
 }
