@@ -27,18 +27,6 @@
       <VBox BorderPane.alignment="CENTER">
          <children>
             <MenuBar>
-              <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Esci" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Aiuto">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Info su App" />
-                  </items>
-                </Menu>
-              </menus>
             </MenuBar>
             <ToolBar prefHeight="40.0">
               <items>
@@ -100,7 +88,7 @@
       <TableView fx:id="trackTable" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <columns>
           <TableColumn fx:id="titleCol" prefWidth="250.0" text="Titolo" />
-          <TableColumn fx:id="authorCol" prefWidth="200.0" text="Artista" />
+          <TableColumn fx:id="authorCol" prefWidth="200.0" text="Autore" />
           <TableColumn fx:id="genreCol" prefWidth="150.0" text="Genere" />
         </columns>
          <columnResizePolicy>
@@ -199,9 +187,9 @@
                   <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playSong" prefHeight="40.0" prefWidth="80.0" text="▶ Play">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
-                  <Button fx:id="btnPause" mnemonicParsing="false" prefHeight="40.0" prefWidth="80.0" text="⏸ Pausa">
+                  <!-- <Button fx:id="btnPause" mnemonicParsing="false" prefHeight="40.0" prefWidth="80.0" text="⏸ Pausa">
                      <font><Font name="System Bold" size="14.0" /></font>
-                  </Button>
+                  </Button> -->
                   <Button fx:id="btnNext" mnemonicParsing="false" onAction="#handleNext" prefHeight="35.0" prefWidth="45.0" text="⏭">
                      <font><Font size="14.0" /></font>
                   </Button>

@@ -39,11 +39,11 @@ public class ModifyTrack implements ICommand {
 
     @Override
     public void undo() {
-        receiver.updateTrack(trackToModify, newTitle, newAuthor, newYear, newGenre, newDuration, newAlbum, newFilePath);
+        receiver.updateTrack(trackToModify, oldTitle, oldAuthor, oldYear, oldGenre, oldDuration, oldAlbum, oldFilePath);
     }
 
     @Override
     public void execute() {
-        receiver.updateTrack(trackToModify, oldTitle, oldAuthor, oldYear, oldGenre, oldDuration, oldAlbum, oldFilePath);
+        receiver.updateTrack(trackToModify, newTitle, newAuthor, newYear, newGenre, newDuration, newAlbum, newFilePath);
     }
 }
