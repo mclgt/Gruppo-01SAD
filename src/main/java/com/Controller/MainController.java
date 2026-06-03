@@ -229,12 +229,7 @@ public class MainController {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 ICommand removeCommand = new RemoveTrack(trackList, selectedTrack);
                 if (playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack()) {
-                    playbackTimer.stop();
-                    Track before = playerContext.getCurrentTrack();
-                    playerContext.next(trackList.getLibrary(),before);
-                    this.currentTrack = playerContext.getCurrentTrack();
-                    updateNowPlayingLabel();
-                    startPlaybackTimer(this.currentTrack);  
+                    handleNext(null);
                 }          
             undoManager.executeCommand(removeCommand);
             this.trackTable.getSelectionModel().clearSelection();
@@ -394,6 +389,8 @@ public class MainController {
         }
         else if (track == null){
             lblNowPlaying.setText("Nessuna traccia in riproduzione");
+            playbackTimer.stop();
+            progressTimeline.stop();
         }
     }
  
