@@ -94,6 +94,7 @@ public class MainController {
 
     private Library trackList = new Library();
     private UndoManager undoManager = new UndoManager();
+
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
      *        tra le colonne della tabella e le StringProperty del modello Track,
@@ -116,7 +117,8 @@ public class MainController {
     }
 
     /**
-     * @brief Fornisce il riferimento alla libreria musicale (che funge da Receiver globale)
+     * @brief Fornisce il riferimento alla libreria musicale (che funge da Receiver
+     *        globale)
      * @return L'oggetto Library corrente.
      */
     public Library getLibrary() {
@@ -124,7 +126,8 @@ public class MainController {
     }
 
     /**
-     * @brief Fornisce il riferimento all'Invoker del sistema per la gestione dell'Undo list.
+     * @brief Fornisce il riferimento all'Invoker del sistema per la gestione
+     *        dell'Undo list.
      * @return L'oggetto UndoManager corrente.
      */
     public UndoManager getUndoManager() {
@@ -189,7 +192,7 @@ public class MainController {
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(new Scene(p));
             stage.showAndWait();
-            //trackTable.getSelectionModel().clearSelection();
+            // trackTable.getSelectionModel().clearSelection();
 
         } catch (IOException ex) {
             System.err.print("Errore nel caricamento della finestra:" + ex.getMessage());
@@ -210,9 +213,9 @@ public class MainController {
     /**
      * @brief Rimuove il brano selezionato dalla tabella principale, l'evento è
      *        generato a partire dalla pressione sul pulsante "Rimuovi Brano", viene
-     *        mostrato a schermo un messaggio di conferma. Nel caso in cui non sia 
-     *        selezionato alcun brano, viene mostrato un messaggio di avviso. Se il 
-     *        brano rimosso è attualmente in riproduzione, la riproduzione viene 
+     *        mostrato a schermo un messaggio di conferma. Nel caso in cui non sia
+     *        selezionato alcun brano, viene mostrato un messaggio di avviso. Se il
+     *        brano rimosso è attualmente in riproduzione, la riproduzione viene
      *        interrotta e viene avviata la traccia successiva,se presente.
      * @param event evento generato dalla pressione del pulsante
      */
@@ -229,15 +232,23 @@ public class MainController {
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 ICommand removeCommand = new RemoveTrack(trackList, selectedTrack);
                 if (playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack()) {
-                    playbackTimer.stop();
-                    Track before = playerContext.getCurrentTrack();
-                    playerContext.next(trackList.getLibrary(),before);
-                    this.currentTrack = playerContext.getCurrentTrack();
-                    updateNowPlayingLabel();
-                    startPlaybackTimer(this.currentTrack);  
-                }          
-            undoManager.executeCommand(removeCommand);
-            this.trackTable.getSelectionModel().clearSelection();
+                    if (playbackTimer != null)
+                        playbackTimer.stop();
+                    if (progressTimeline != null)
+                        progressTimeline.stop();
+
+                    // qui imposto lo slider a zero così che torni all'inizio qualora venga rimossa
+                    // una canzone
+                    // nel vecchio codice si passava ad un'altra canzone avendo
+                    // playerContext.next();
+                    progressSlider.setValue(0);
+                    lblCurrentTime.setText("0:00");
+                    lblNowPlaying.setText("Nessuna traccia in riproduzione");
+                    playerContext.stop();
+                    currentTrack = null;
+                }
+                undoManager.executeCommand(removeCommand);
+                this.trackTable.getSelectionModel().clearSelection();
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -313,8 +324,10 @@ public class MainController {
     }
 
     private void startPlaybackTimer(Track track) {
-        if (playbackTimer != null) playbackTimer.stop();
-        if (progressTimeline != null) progressTimeline.stop();
+        if (playbackTimer != null)
+            playbackTimer.stop();
+        if (progressTimeline != null)
+            progressTimeline.stop();
 
         elapsedSeconds = 0;
         int total = track.getDuration();
@@ -335,8 +348,14 @@ public class MainController {
         playbackTimer.setOnFinished(e -> {
             if (!sequentialMode) {
                 trackFinished = true;
+
+                // siccome la sequential mode mi anddava alla prossima canzone
+                // così facendo resetto lo slider e l'utente deve rimettere un brano in play
+                progressSlider.setValue(0);
+                lblCurrentTime.setText("0:00");
                 lblNowPlaying.setText("Canzone terminata");
-                System.out.println("[PLAYER] Riproduzione singola terminata: " + playerContext.getCurrentTrack().getTitle());
+                System.out.println(
+                        "[PLAYER] Riproduzione singola terminata: " + playerContext.getCurrentTrack().getTitle());
                 return;
             }
             Track before = playerContext.getCurrentTrack();
@@ -361,8 +380,10 @@ public class MainController {
 
     @FXML
     public void handleNext(ActionEvent event) {
-        if (playbackTimer != null) playbackTimer.stop();
-        if (progressTimeline != null) progressTimeline.stop();
+        if (playbackTimer != null)
+            playbackTimer.stop();
+        if (progressTimeline != null)
+            progressTimeline.stop();
         Track before = playerContext.getCurrentTrack();
         playerContext.next(trackList.getLibrary(), before);
         Track after = playerContext.getCurrentTrack();
@@ -375,8 +396,10 @@ public class MainController {
 
     @FXML
     public void handlePrev(ActionEvent event) {
-        if (playbackTimer != null) playbackTimer.stop();
-        if (progressTimeline != null) progressTimeline.stop();
+        if (playbackTimer != null)
+            playbackTimer.stop();
+        if (progressTimeline != null)
+            progressTimeline.stop();
         Track before = playerContext.getCurrentTrack();
         playerContext.previous(trackList.getLibrary(), before);
         Track after = playerContext.getCurrentTrack();
@@ -391,16 +414,15 @@ public class MainController {
         Track track = playerContext.getCurrentTrack();
         if (playerContext.isPlaying() && track != null) {
             lblNowPlaying.setText("▶  " + track.getTitle() + "  —  " + track.getAuthor());
-        }
-        else if (track == null){
+        } else if (track == null) {
             lblNowPlaying.setText("Nessuna traccia in riproduzione");
         }
     }
- 
+
     /**
      * @brief Gestisce l'evento di pressione sul pulsante di undo.
-     * Richiama il metodo undo() dell'UndoManager, che si occupa di
-     * annullare l'ultima operazione.
+     *        Richiama il metodo undo() dell'UndoManager, che si occupa di
+     *        annullare l'ultima operazione.
      * @param event
      */
     @FXML
