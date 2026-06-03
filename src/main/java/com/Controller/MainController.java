@@ -231,24 +231,30 @@ public class MainController {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 ICommand removeCommand = new RemoveTrack(trackList, selectedTrack);
-                if (playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack()) {
-                    if (playbackTimer != null)
-                        playbackTimer.stop();
-                    if (progressTimeline != null)
-                        progressTimeline.stop();
-
-                    // qui imposto lo slider a zero così che torni all'inizio qualora venga rimossa
-                    // una canzone
-                    // nel vecchio codice si passava ad un'altra canzone avendo
-                    // playerContext.next();
-                    progressSlider.setValue(0);
-                    lblCurrentTime.setText("0:00");
-                    lblNowPlaying.setText("Nessuna traccia in riproduzione");
-                    playerContext.stop();
-                    currentTrack = null;
+                boolean wasPlaying = playerContext.isPlaying() && selectedTrack == playerContext.getCurrentTrack();
+                if (wasPlaying) {
+                    if (playbackTimer != null) playbackTimer.stop();
+                    if (progressTimeline != null) progressTimeline.stop();
                 }
+                int idx = trackList.getLibrary().indexOf(selectedTrack);
                 undoManager.executeCommand(removeCommand);
                 this.trackTable.getSelectionModel().clearSelection();
+                if (wasPlaying) {
+                    if (!trackList.getLibrary().isEmpty()) {
+                        int nextIdx = Math.min(idx, trackList.getLibrary().size() - 1);
+                        currentTrack = trackList.getLibrary().get(nextIdx);
+                        playerContext.play(currentTrack);
+                        updateNowPlayingLabel();
+                        startPlaybackTimer(currentTrack);
+                    } else {
+                        progressSlider.setValue(0);
+                        lblCurrentTime.setText("0:00");
+                        lblTotalTime.setText("0:00");
+                        lblNowPlaying.setText("Nessuna traccia in riproduzione");
+                        playerContext.stop();
+                        currentTrack = null;
+                    }
+                }
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -353,6 +359,7 @@ public class MainController {
                 // così facendo resetto lo slider e l'utente deve rimettere un brano in play
                 progressSlider.setValue(0);
                 lblCurrentTime.setText("0:00");
+                lblTotalTime.setText("0:00");
                 lblNowPlaying.setText("Canzone terminata");
                 System.out.println(
                         "[PLAYER] Riproduzione singola terminata: " + playerContext.getCurrentTrack().getTitle());
