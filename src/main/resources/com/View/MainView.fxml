@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane onMouseClicked="#handleBackgroundClick" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.MainController">
+<BorderPane onMouseClicked="#handleBackgroundClick" prefHeight="650.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.core.MainController">
    
    <top>
       <VBox BorderPane.alignment="CENTER">
@@ -193,7 +193,7 @@
                   <Button fx:id="btnNext" mnemonicParsing="false" onAction="#handleNext" prefHeight="35.0" prefWidth="45.0" text="⏭">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Button fx:id="btnSeq" mnemonicParsing="false" onAction="#SequentialRip" prefHeight="40.0" prefWidth="84.0" text="Seq.">
+                  <Button fx:id="btnSeq" mnemonicParsing="false" onAction="#sequentialRip" prefHeight="40.0" prefWidth="84.0" text="Seq.">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
