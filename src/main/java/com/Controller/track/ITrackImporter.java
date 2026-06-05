@@ -1,4 +1,4 @@
-package com.Controller;
+package com.Controller.track;
 
 import javafx.stage.Window;
 import java.io.File;
