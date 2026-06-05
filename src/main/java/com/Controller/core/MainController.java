@@ -6,10 +6,12 @@ import java.util.Deque;
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
+import com.Controller.playlist.PlaylistListController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.Model.Library;
 import com.Model.Track;
+import com.Model.Playlist;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -39,16 +41,21 @@ public class MainController {
     private VBox detailPanel;
     @FXML
     private Label lblTitle, lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear;
-
     @FXML
     private Label lblNowPlaying, lblCurrentTime, lblTotalTime;
     @FXML
     private Slider progressSlider;
     @FXML
     private Button btnUndo;
+    @FXML
+    private TableView<Playlist> playlistList;
+    @FXML
+    private TableColumn<Playlist, String> nameCol;
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
+
+    private final PlaylistListController playlistListController = new PlaylistListController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -72,6 +79,7 @@ public class MainController {
         trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
                 lblAlbum, lblGenre, lblDuration, lblYear);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
+        playlistListController.init(this, playlistList, nameCol);
     }
 
     /**
@@ -176,5 +184,12 @@ public class MainController {
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
         trackTableController.clearSelection();
+        playlistListController.clearSelection();
     }
+
+    @FXML
+    public void openModPlaylistView(ActionEvent ev) {
+        playlistListController.openModPlaylistView(ev);
+    }
+
 }

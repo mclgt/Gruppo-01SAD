@@ -4,14 +4,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class PlaylistTest {
 
     @Test
     public void testPlaylistInitialization() {
         Playlist playlist = new Playlist("Rock Anni 90");
-        
+
         assertEquals("Rock Anni 90", playlist.getName());
         assertTrue(playlist.getTracks().isEmpty(), "La playlist appena creata deve essere vuota");
         assertEquals(0, playlist.getTotalDuration(), "La durata iniziale deve essere 0");
@@ -35,14 +35,32 @@ public class PlaylistTest {
     public void testRemoveTrack() {
         Playlist playlist = new Playlist("Test Remove");
         Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album", "path1.wav");
-        
+
         playlist.addTrack(t1);
         assertEquals(1, playlist.getTracks().size());
 
         Track rimosso = playlist.removeTrack(t1);
-        
+
         assertNotNull(rimosso, "Il metodo deve restituire il brano rimosso");
         assertTrue(playlist.getTracks().isEmpty(), "La playlist deve essere di nuovo vuota");
         assertEquals(0, playlist.getTotalDuration());
+    }
+
+    @Test
+    public void testPlaylistSetter_success() {
+        Playlist playlist = new Playlist("Rock Anni 90");
+        playlist.setName("Pop anni 2000");
+        assertEquals("Pop anni 2000", playlist.getName());
+    }
+
+    @Test
+    public void testPlaylistSetter_noName() {
+        Playlist playlist = new Playlist("Rock Anni 90");
+        try {
+            playlist.setName(" ");
+            fail("Ci si aspettava un'eccezione per nome vuoto");
+        } catch (IllegalArgumentException ex) {
+            assertEquals("Il nome della playlist non può essere vuoto!", ex.getMessage());
+        }
     }
 }
