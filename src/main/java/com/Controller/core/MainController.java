@@ -1,12 +1,14 @@
 package com.Controller.core;
 
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
-import com.Controller.playlist.PlaylistListController;
+import com.Controller.playlist.PlaylistController;
+import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.Model.Library;
@@ -16,14 +18,18 @@ import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
@@ -40,6 +46,8 @@ public class MainController {
     @FXML
     private VBox detailPanel;
     @FXML
+    private StackPane centerContentArea;
+    @FXML
     private Label lblTitle, lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear;
     @FXML
     private Label lblNowPlaying, lblCurrentTime, lblTotalTime;
@@ -55,7 +63,7 @@ public class MainController {
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
 
-    private final PlaylistListController playlistListController = new PlaylistListController();
+    private final PlaylistTableController playlistListController = new PlaylistTableController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -63,6 +71,7 @@ public class MainController {
     private final PlaybackTimerManager timerManager = new PlaybackTimerManager();
     private WindowManager windowManager = new WindowManager(this);
     private Library trackList = new Library();
+    private ObservableList<Playlist> userPlaylists = FXCollections.observableArrayList();
 
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
@@ -124,6 +133,10 @@ public class MainController {
         return playerController;
     }
 
+    public ObservableList<Playlist> getUserPlaylists(){
+        return userPlaylists;
+    }
+
     public void addTrackMainTable(Track track) {
         trackList.addTrack(track);
     }
@@ -174,6 +187,38 @@ public class MainController {
     @FXML
     public void openModifyTrackView(ActionEvent ev) {
         trackTableController.openModifyTrackView(ev);
+    }
+
+    @FXML
+    public void openAddPlaylistView(ActionEvent ev){
+        windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null);
+    }
+
+    public void openPlaylistView(Playlist selectedPlaylist){
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
+            VBox playlistViewNode = loader.load();
+
+            PlaylistController playlistController = loader.getController();
+            playlistController.setMainController(this);
+            playlistController.setPlaylistData(selectedPlaylist);
+
+            centerContentArea.getChildren().clear();
+            centerContentArea.getChildren().add(playlistViewNode);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
+     * chiudendo di fatto la vista della playlist.
+     */
+    public void restoreMainLibraryView(){
+        if(centerContentArea != null && trackTable != null){
+            centerContentArea.getChildren().clear();
+            centerContentArea.getChildren().add(trackTable);
+        }
     }
 
     @FXML
