@@ -124,7 +124,7 @@
                   </Button>
                </children>
             </HBox>
-            <ListView prefHeight="424.0" prefWidth="199.0">
+            <ListView fx:id="playlistList" prefHeight="424.0" prefWidth="199.0">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
