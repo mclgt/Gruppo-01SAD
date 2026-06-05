@@ -83,10 +83,10 @@
                <children>
                   <Label prefHeight="25.0" prefWidth="57.0" text="Playlist">
                      <font>
-                        <Font size="14.0" />
+                        <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Button contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false">
+                  <Button fx:id="btnAddPlaylist" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false">
                      <HBox.margin>
                         <Insets left="20.0" />
                      </HBox.margin>
@@ -98,7 +98,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false">
+                  <Button fx:id="btnModPlaylist" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -110,7 +110,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Button contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" text="-">
+                  <Button fx:id="btnDeletePlaylist" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" text="-">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
