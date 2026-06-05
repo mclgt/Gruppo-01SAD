@@ -6,6 +6,7 @@ import java.util.Deque;
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
+import com.Controller.playlist.PlaylistListController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.Model.Library;
@@ -19,7 +20,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -48,10 +48,14 @@ public class MainController {
     @FXML
     private Button btnUndo;
     @FXML
-    private ListView<Playlist> playlistList;
+    private TableView<Playlist> playlistList;
+    @FXML
+    private TableColumn<Playlist, String> nameCol;
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
+
+    private final PlaylistListController playlistListController = new PlaylistListController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -75,6 +79,7 @@ public class MainController {
         trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
                 lblAlbum, lblGenre, lblDuration, lblYear);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
+        playlistListController.init(this, playlistList, nameCol);
     }
 
     /**
@@ -179,16 +184,12 @@ public class MainController {
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
         trackTableController.clearSelection();
+        playlistListController.clearSelection();
     }
 
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
-        Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
-        if (selectedPlaylist != null) {
-            windowManager.openPlaylistWindow("/com/View/ModifyPlaylistView.fxml", "Modifica Playlist",
-                    selectedPlaylist);
-        } else {
-            windowManager.showWarning("Attenzione", "Seleziona prima una playlist da modificare");
-        }
+        playlistListController.openModPlaylistView(ev);
     }
+
 }

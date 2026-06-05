@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.Controller.core.MainController;
 import com.Controller.track.AddModTrackController;
-import com.Controller.playlist.ModPlaylistController;
+import com.Controller.playlist.AddModPlaylistController;
 import com.Model.Track;
 import com.Model.Playlist;
 
@@ -15,14 +15,30 @@ import javafx.scene.control.Alert;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/**
+ * @brief Classe per la gestione delle finestre e dei popup di sistema.
+ *        Gestisce il caricamento dei file FXML, l'inizializzazione dei
+ *        controller e la visualizzazione degli alert o delle finestre.
+ */
 public class WindowManager {
     public final MainController mainController;
 
+    /**
+     * @brief Costruttore del WindowManager
+     * @param mainController controller principale dell'applicazione,
+     */
     public WindowManager(MainController mainController) {
         this.mainController = mainController;
     }
 
-    // vale solo per i brani
+    /**
+     * @brief Apre la finestra di dialogo dedicata alla creazione o modifica di un
+     *        Brano. Si occupa di caricare il file FXML, passare il controller
+     *        principale e l'eventuale traccia, per poi mostrare la finestra.
+     * @param fxmlPath      percorso del file FXML da caricare
+     * @param title         titolo da assegnare alla finestra
+     * @param trackToModify eventuale traccia da modificare, null se si deve creare
+     */
     public void openWindow(String fxmlPath, String title, Track trackToModify) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
@@ -45,11 +61,19 @@ public class WindowManager {
         }
     }
 
+    /**
+     * @brief Apre la finestra di dialogo per modificare una playlist. Carica il
+     *        file FXML specificato, imposta il maincontroller e la playlist da
+     *        modificare.
+     * @param fxmlPath         percorso del file FXML da caricare
+     * @param title            titolo da assegnare alla finestra
+     * @param playlistToModify playlist da modificare
+     */
     public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent p = loader.load();
-            ModPlaylistController controller = loader.getController();
+            AddModPlaylistController controller = loader.getController();
             controller.setMainController(mainController);
             if (playlistToModify != null) {
                 controller.setPlaylist(playlistToModify);
@@ -64,6 +88,12 @@ public class WindowManager {
         }
     }
 
+    /**
+     * @brief Mostra un warning all'utente. Interrompe il flusso dell'applicazione
+     *        finché l'utente non chiude l'alert.
+     * @param title   titolo della finestra
+     * @param content messaggio da mostrare nel popup
+     */
     public void showWarning(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
@@ -72,6 +102,12 @@ public class WindowManager {
         alert.showAndWait();
     }
 
+    /**
+     * @brief Mostra un popup informativo all'utente. Interrompe il flusso finché
+     *        l'utente non chiude l'alert.
+     * @param title   titolo della finestra di informazioni
+     * @param content messaggio da mostrare nel popup
+     */
     public void showInfo(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);

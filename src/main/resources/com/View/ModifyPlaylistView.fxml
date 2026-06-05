@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.playlist.ModPlaylistController">
+<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.playlist.AddModPlaylistController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
@@ -38,7 +38,7 @@
       
       <HBox alignment="CENTER_RIGHT" spacing="15.0">
          <children>
-            <Button fx:id="btnDelete" onAction="#handleCancel" cancelButton="true" mnemonicParsing="false" text="Annulla" />
+            <Button fx:id="btnDelete" onAction="#handleDelete" cancelButton="true" mnemonicParsing="false" text="Annulla" />
             
             <Button fx:id="btnSave" onAction="#handleSave" defaultButton="true" mnemonicParsing="false" style="-fx-background-color: #4caf50; -fx-text-fill: white; -fx-font-weight: bold;" text="Salva Modifiche" />
          </children>
