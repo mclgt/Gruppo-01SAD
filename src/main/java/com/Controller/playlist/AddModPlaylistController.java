@@ -4,6 +4,7 @@ import com.Model.Playlist;
 
 import com.Controller.core.MainController;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -55,7 +56,22 @@ public class AddModPlaylistController {
     public void handleSave(ActionEvent ev) {
         String name = txtPlaylistName.getText().trim();
         try {
-            currentPlaylist.setName(name);
+            ObservableList<Playlist> existingPlaylists = mainController.getUserPlaylists();
+            for(Playlist p : existingPlaylists){
+                if((currentPlaylist == null || !p.equals(existingPlaylists)) && p.getName().equalsIgnoreCase(name)){
+                    throw new IllegalArgumentException("Esiste già una playlist chiamata '" + name + "'. Scegli un altro nome.");
+                }
+            }
+
+            if(currentPlaylist == null){
+                Playlist newPlaylist = new Playlist(name);
+                mainController.getUserPlaylists().add(newPlaylist);
+
+                mainController.openPlaylistView(newPlaylist);
+            }else{
+                currentPlaylist.setName(name);
+            }
+            
             closeWindow();
         } catch (IllegalArgumentException e) {
             mainController.getWindowManager().showWarning("Attenzione", e.getMessage());

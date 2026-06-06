@@ -67,6 +67,18 @@ public class Playlist {
     }
 
     /**
+     * @brief Aggiunge un brano alla playlist nel posto desiderato. Il brano viene aggiunto solo se non
+     *        nullo e se non è presente nella lista.
+     * @param track oggetto track da aggiungere.
+     * @param index la posizione nella quale inserire il brano all'interno della playlist.
+     */
+    public void addTrack(int index, Track track){
+        if(track != null && !tracks.contains(track)){
+            tracks.add(index, track);
+        }
+    }
+
+    /**
      * @brief Rimuove un brano specifico dalla playlist tramite il riferimento
      *        all'oggetto.
      * @param track traccia da rimuovere
@@ -99,6 +111,14 @@ public class Playlist {
      */
     public ObservableList<Track> getTracks() {
         return tracks;
+    }
+
+    /**
+     * @brief Restituisce il numero di brani contenuti nella playlist.
+     * @return il numero di brani effettivamente contenuti nella playlist.
+     */
+    public int getTracksCount(){
+        return tracks.size();
     }
 
     /**
