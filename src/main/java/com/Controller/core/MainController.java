@@ -11,6 +11,7 @@ import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
+import com.DataLayer.TrackProxy;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.Playlist;
@@ -89,6 +90,20 @@ public class MainController {
                 lblAlbum, lblGenre, lblDuration, lblYear);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistListController.init(this, playlistList, nameCol);
+
+        // Playlist hardcoded creata solo per facilitare le prove di loop e shuffle
+        String[][] demoData = {
+            {"Canzone Alpha",   "Artista Uno",   "Rock",      "Album A", "2020", "7"},
+            {"Canzone Beta",    "Artista Due",   "Pop",       "Album B", "2021", "6"},
+            {"Canzone Gamma",   "Artista Tre",   "Jazz",      "Album C", "2019", "8"},
+            {"Canzone Delta",   "Artista Quattro","Electronic","Album D", "2022", "5"},
+            {"Canzone Epsilon", "Artista Cinque", "Classical", "Album E", "2018", "9"},
+        };
+        for (String[] d : demoData) {
+            Track t = new Track(d[0], d[1], Integer.parseInt(d[4]), d[2], Integer.parseInt(d[5]), d[3], "dummy_" + d[0].replace(" ", "_") + ".wav");
+            t.setAudioSource(new TrackProxy(t.getFilePath()));
+            trackList.addTrack(t);
+        }
     }
 
     /**
@@ -164,9 +179,25 @@ public class MainController {
         playerController.playSong();
     }
 
+    //delega la pausa al playerController che gestisce il toggle pausa/ripresa
+    @FXML
+    public void pauseSong() {
+        playerController.pauseSong();
+    }
+
     @FXML
     public void sequentialRip(ActionEvent ev) {
         playerController.sequentialRip(ev);
+    }
+
+    @FXML
+    public void loopRip(ActionEvent ev) {
+        playerController.loopRip(ev);
+    }
+
+    @FXML
+    public void shuffleRip(ActionEvent ev) {
+        playerController.shuffleRip(ev);
     }
 
     @FXML

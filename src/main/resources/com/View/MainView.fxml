@@ -234,6 +234,11 @@
                   <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playSong" prefHeight="40.0" prefWidth="80.0" text="▶ Play">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
+                  <Button fx:id="btnPause" mnemonicParsing="false" onAction="#pauseSong" prefHeight="40.0" prefWidth="80.0" text="|| Pause">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
                   <!-- <Button fx:id="btnPause" mnemonicParsing="false" prefHeight="40.0" prefWidth="80.0" text="⏸ Pausa">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button> -->
@@ -241,6 +246,16 @@
                      <font><Font size="14.0" /></font>
                   </Button>
                   <Button fx:id="btnSeq" mnemonicParsing="false" onAction="#sequentialRip" prefHeight="40.0" prefWidth="84.0" text="Seq.">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnLoop" mnemonicParsing="false" onAction="#loopRip" prefHeight="40.0" prefWidth="84.0" text="Loop">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnShuffle" mnemonicParsing="false" onAction="#shuffleRip" prefHeight="40.0" prefWidth="84.0" text="Shuffle">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>

@@ -26,6 +26,16 @@ public interface IAudioTrack {
     void stopPlayback();
 
     /**
+     * @brief Mette in pausa il brano preservando la posizione corrente nel file.
+     */
+    void pausePlayback();
+
+    /**
+     * @brief Riprende la riproduzione dal punto in cui era stata messa in pausa.
+     */
+    void resumePlayback();
+
+    /**
      * @brief Verifica lo stato della riproduzione.
      * @return boolean True se il brano sta suonando in questo momento, False altrimenti.
      */

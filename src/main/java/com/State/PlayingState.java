@@ -24,8 +24,11 @@ public class PlayingState implements IPlayerState {
         System.out.println("Playing: " + track.getTitle());
     }
 
+    //ho implementato pause() che prima era vuoto: cambia lo stato corrente a PausedState
+    //così tutte le operazioni successive vengono delegate allo stato di pausa
     @Override
     public void pause() {
+        context.setState(context.getPausedState());
     }
 
     @Override
@@ -40,6 +43,7 @@ public class PlayingState implements IPlayerState {
             play(nextTrack);
         } else {
             System.out.println("No next track available.");
+            context.setCurrentTrack(null);
             stop();
         }
     }
@@ -52,6 +56,7 @@ public class PlayingState implements IPlayerState {
             play(previousTrack);
         } else {
             System.out.println("No previous track available.");
+            context.setCurrentTrack(null);
             stop();
         }
     }

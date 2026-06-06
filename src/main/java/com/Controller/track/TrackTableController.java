@@ -58,6 +58,13 @@ public class TrackTableController {
         trackTable.getSelectionModel().clearSelection();
     }
 
+    //ho aggiunto questo metodo per aggiornare la selezione visiva nella tabella quando si preme
+    //next o prev, così la riga evidenziata corrisponde sempre alla traccia in riproduzione
+    //senza questo, premere loop o shuffle dopo una navigazione avrebbe usato la traccia sbagliata
+    public void selectTrack(Track track) {
+        trackTable.getSelectionModel().select(track);
+    }
+
     private void updateDetailPanel(Track track) {
         if (track == null) {
             detailPanel.setVisible(false);
