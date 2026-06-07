@@ -48,7 +48,8 @@ public class Library {
     }
 
     /**
-     * @brief Inserisce un nuovo brano in una posizione specifica all'interno della libreria musicale.
+     * @brief Inserisce un nuovo brano in una posizione specifica all'interno della
+     *        libreria musicale.
      * 
      * @param index La posizione in cui inserire il brano.
      * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
@@ -56,6 +57,7 @@ public class Library {
     public void addTrack(int index, Track track) {
         this.library.add(index, track);
     }
+
     /**
      * @brief Rimuove un brano specifico dalla libreria musicale.
      *
@@ -74,17 +76,19 @@ public class Library {
 
     /**
      * @brief Aggiorna i dati di un brano esistente nella libreria.
-     * Rimpiazza l'oggetto nella lista osservabile per forzare l'aggiornamento automatico della UI.
-     * * @param track Il brano originale da modificare.
-     * @param title Il nuovo titolo da assegnare.
-     * @param author Il nuovo autore da assegnare.
-     * @param year Il nuovo anno da assegnare.
-     * @param genre Il nuovo genere da assegnare.
+     *        Rimpiazza l'oggetto nella lista osservabile per forzare
+     *        l'aggiornamento automatico della UI.
+     *        * @param track Il brano originale da modificare.
+     * @param title    Il nuovo titolo da assegnare.
+     * @param author   Il nuovo autore da assegnare.
+     * @param year     Il nuovo anno da assegnare.
+     * @param genre    Il nuovo genere da assegnare.
      * @param duration La nuova durata da assegnare.
-     * @param album Il nuovo album da assegnare.
+     * @param album    Il nuovo album da assegnare.
      * @param filePath Il nuovo percorso del file audio.
      */
-    public void updateTrack(Track track, String title, String author, int year, String genre, int duration, String album, String filePath) {
+    public void updateTrack(Track track, String title, String author, int year, String genre, int duration,
+            String album, String filePath) {
         int index = this.library.indexOf(track);
 
         track.setTitle(title);
@@ -94,7 +98,7 @@ public class Library {
         track.setDuration(duration);
         track.setAlbum(album);
 
-        if(filePath != null && !filePath.equals(track.getFilePath())) {
+        if (filePath != null && !filePath.equals(track.getFilePath())) {
             track.setFilePath(filePath);
             track.setAudioSource(new TrackProxy(filePath));
         }
