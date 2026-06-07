@@ -14,17 +14,25 @@
       <children>
          <Button fx:id="btnBack" mnemonicParsing="false" onAction="#handleBackToLibrary" text="Indietro" StackPane.alignment="CENTER_LEFT">
             <StackPane.margin>
-               <Insets left="10.0" />
+               <Insets left="10.0" top="5.0" />
             </StackPane.margin></Button>
           <Label fx:id="lblPlaylist" alignment="CENTER" contentDisplay="CENTER" text="Nome della Playlist" StackPane.alignment="CENTER">
               <font>
                   <Font name="System Bold" size="20.0" />
               </font>
+            <StackPane.margin>
+               <Insets top="5.0" />
+            </StackPane.margin>
           </Label>
+         <Button fx:id="btnAddToPlaylist" mnemonicParsing="false" onAction="#handleAddToPlaylist" text="Aggiungi brano" StackPane.alignment="CENTER_RIGHT">
+            <StackPane.margin>
+               <Insets right="10.0" top="5.0" />
+            </StackPane.margin>
+         </Button>
       </children>
    </StackPane>
     
-    <TableView fx:id="playlistTrackTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="playlistTrackList" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="colTitle" prefWidth="250.0" text="Titolo" />
             <TableColumn fx:id="colAuthor" prefWidth="200.0" text="Autore" />

@@ -1,13 +1,13 @@
 package com.Command;
 
-import com.Model.Library;
+import com.Model.ITrackContainer;
 import com.Model.Track;
 
 public class AddTrack implements ICommand {
-    private final Library receiver;
+    private final ITrackContainer receiver;
     private Track track;
 
-    public AddTrack(Library receiver, Track track) {
+    public AddTrack(ITrackContainer receiver, Track track) {
         this.receiver = receiver;
         this.track = track;
     }

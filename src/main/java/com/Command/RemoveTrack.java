@@ -1,7 +1,7 @@
 package com.Command;
 
 import com.Model.Track;
-import com.Model.Library;
+import com.Model.ITrackContainer;
 
 /**
  * @brief Rappresenta un ConcretoCommand che incapsula l'operazione di rimozione
@@ -10,18 +10,19 @@ import com.Model.Library;
  * reinserire in caso di undo.
  */
 public class RemoveTrack implements ICommand {
-    private final Library receiver;
+    private final ITrackContainer receiver;
     private final Track track;
-    private int index;
+    private final int savedIndex;
 
     /**
      * @brief Costruttore che inizializza la rimozione di una traccia.
      * @param library lista osservabile che rappresenta la libreria da cui rimuovere la traccia.
      * @param track la traccia da rimuovere.
      */
-    public RemoveTrack(Library receiver, Track track) {
+    public RemoveTrack(ITrackContainer receiver, Track track) {
         this.receiver = receiver;
         this.track = track;
+        this.savedIndex = receiver.indexOf(track);
     }
 
     /**
@@ -30,9 +31,7 @@ public class RemoveTrack implements ICommand {
      */
     @Override
     public void execute() {
-        this.index = this.receiver.getLibrary().indexOf(track);
-        if(index != -1)
-            this.receiver.removeTrack(track);
+        this.receiver.removeTrack(track);
     }
 
     /**
@@ -41,7 +40,10 @@ public class RemoveTrack implements ICommand {
      */
     @Override
     public void undo() {
-        this.receiver.addTrack(index, track);
+        if(this.savedIndex >= 0){
+            this.receiver.addTrack(this.savedIndex, this.track);
+        }else{
+            this.receiver.addTrack(this.track);
+        }
     }
-    
 }

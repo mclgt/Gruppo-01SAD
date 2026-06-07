@@ -7,6 +7,7 @@ import java.util.Deque;
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
+import com.Controller.playlist.AddTrackToPlaylistController;
 import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
@@ -14,6 +15,7 @@ import com.Controller.util.WindowManager;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.Playlist;
+import com.Model.PlaylistCatalog;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -23,6 +25,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -31,6 +35,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * @brief Controller principale dell'applicazione, gestisce la schermata
@@ -56,6 +61,9 @@ public class MainController {
     @FXML
     private Button btnUndo;
     @FXML
+    private Button btnAddToPlaylist;
+
+    @FXML
     private TableView<Playlist> playlistList;
     @FXML
     private TableColumn<Playlist, String> nameCol;
@@ -63,15 +71,15 @@ public class MainController {
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
 
-    private final PlaylistTableController playlistListController = new PlaylistTableController();
-
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
+    private final PlaylistCatalog playlistCatalog = new PlaylistCatalog();
+    private final PlaylistTableController playlistTableController = new PlaylistTableController();
     private final Deque<Boolean> deletedPlayingStack = new ArrayDeque<>();
     private final PlaybackTimerManager timerManager = new PlaybackTimerManager();
     private WindowManager windowManager = new WindowManager(this);
+
     private Library trackList = new Library();
-    private ObservableList<Playlist> userPlaylists = FXCollections.observableArrayList();
 
     /***
      * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
@@ -88,7 +96,7 @@ public class MainController {
         trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
                 lblAlbum, lblGenre, lblDuration, lblYear);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
-        playlistListController.init(this, playlistList, nameCol);
+        playlistTableController.init(this, playlistList, nameCol);
     }
 
     /**
@@ -100,6 +108,10 @@ public class MainController {
         return trackList;
     }
 
+    public Button getBtnAddToPlaylist(){
+        return btnAddToPlaylist;
+    }
+
     /**
      * @brief Fornisce il riferimento all'Invoker del sistema per la gestione
      *        dell'Undo list.
@@ -107,6 +119,14 @@ public class MainController {
      */
     public UndoManager getUndoManager() {
         return undoManager;
+    }
+
+    public PlaylistCatalog getPlaylistCatalog(){
+        return playlistCatalog;
+    }
+
+    public PlaylistTableController getPlaylistTableController(){
+        return playlistTableController;
     }
 
     public PlayerContext getPlayerContext() {
@@ -131,10 +151,6 @@ public class MainController {
 
     public PlayerController getPlayerController() {
         return playerController;
-    }
-
-    public ObservableList<Playlist> getUserPlaylists(){
-        return userPlaylists;
     }
 
     public void addTrackMainTable(Track track) {
@@ -191,7 +207,7 @@ public class MainController {
 
     @FXML
     public void openAddPlaylistView(ActionEvent ev){
-        windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null);
+        windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
     public void openPlaylistView(Playlist selectedPlaylist){
@@ -207,6 +223,33 @@ public class MainController {
             centerContentArea.getChildren().add(playlistViewNode);
         }catch(IOException e){
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void openAddTrackToPlaylistView(){
+        Playlist selectedPlaylist = playlistTableController.getSelectedPlaylist();
+        openAddTrackToPlaylistView(selectedPlaylist);
+    }
+
+    public void openAddTrackToPlaylistView(Playlist selectedPlaylist){
+        if(selectedPlaylist != null){
+            try{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
+                Parent root = loader.load();
+
+                AddTrackToPlaylistController controller = loader.getController();
+                controller.initData(this, selectedPlaylist);
+
+                Stage stage = new Stage();
+                stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
+                stage.setScene(new Scene(root));
+                stage.show();
+            }catch(Exception ex){
+                ex.printStackTrace();
+            }
+        }else{
+            System.out.println("Nessuna playlist selezionata!");
         }
     }
 
@@ -229,12 +272,12 @@ public class MainController {
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
         trackTableController.clearSelection();
-        playlistListController.clearSelection();
+        playlistTableController.clearSelection();
     }
 
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
-        playlistListController.openModPlaylistView(ev);
+        playlistTableController.openModPlaylistView(ev);
     }
 
 }

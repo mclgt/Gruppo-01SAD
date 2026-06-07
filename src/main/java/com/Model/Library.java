@@ -19,7 +19,7 @@ import javafx.collections.ObservableList;
  *        l'accoppiamento con il Controller.
  *        * @author Rebecca
  */
-public class Library {
+public class Library implements ITrackContainer{
     /**
      * @brief Lista osservabile interna contenente gli oggetti di tipo Track
      *        presenti nella libreria.
@@ -43,6 +43,7 @@ public class Library {
      *
      * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
      */
+    @Override
     public void addTrack(Track track) {
         this.library.add(track);
     }
@@ -54,6 +55,7 @@ public class Library {
      * @param index La posizione in cui inserire il brano.
      * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
      */
+    @Override
     public void addTrack(int index, Track track) {
         this.library.add(index, track);
     }
@@ -67,11 +69,16 @@ public class Library {
      *        di aggiornamento automatico sulla UI.
      *
      * @param track L'oggetto Track da eliminare dalla collezione
-     * @return L'oggetto Track che è stato rimosso.
+     * @return True se il brano è stato rimosso, false altrimenti
      */
-    public Track removeTrack(Track track) {
-        this.library.remove(track);
-        return track;
+    @Override
+    public boolean removeTrack(Track track) {
+        return this.library.remove(track);
+    }
+
+    @Override
+    public int indexOf(Track track){
+        return this.library.indexOf(track);
     }
 
     /**
