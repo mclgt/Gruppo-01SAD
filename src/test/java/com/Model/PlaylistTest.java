@@ -2,7 +2,6 @@ package com.Model;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -43,9 +42,9 @@ public class PlaylistTest {
         playlist.addTrack(t1);
         assertEquals(1, playlist.getTracksCount());
 
-        Track rimosso = playlist.removeTrack(t1);
+        boolean rimosso = playlist.removeTrack(t1);
 
-        assertNotNull(rimosso, "Il metodo deve restituire il brano rimosso");
+        assertTrue(rimosso, "Il metodo deve restituire true");
         assertTrue(playlist.getTracks().isEmpty(), "La playlist deve essere di nuovo vuota");
         assertEquals(0, playlist.getTotalDuration());
     }
