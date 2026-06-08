@@ -1,13 +1,12 @@
 package com.Command;
 
-import com.Model.Track;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
+import com.Model.Track;
 
 /**
  * @brief Rappresenta un ConcretoCommand che incapsula l'operazione di rimozione
@@ -52,7 +51,7 @@ public class RemoveTrack implements ICommand {
     @Override
     public void execute() {
         this.receiver.removeTrack(track);
-
+    
         for(Playlist p : this.savedPlaylistIndicies.keySet()){
             p.removeTrack(this.track);
         }
