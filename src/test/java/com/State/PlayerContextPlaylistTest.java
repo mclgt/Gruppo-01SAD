@@ -11,12 +11,24 @@ import com.Model.Track;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
+/**
+ * @class PlayerContextPlaylistTest
+ * @brief Classe di test per verificare la logica di riproduzione per le
+ *        Playlist. Verifica che il PlayerContext interagisca correttamente con
+ *        la Playlist utilizzando la giusta strategia di riproduzione e
+ *        assicurando il corretto avanzamento tra i brani.
+ */
+
 public class PlayerContextPlaylistTest {
     private PlayerContext context;
     private Playlist testPlaylist;
     private Track track1;
     private Track track2;
 
+    /**
+     * @brief Configura gli elementi utili per i test: contesto di riproduzione e
+     *        una playlist popolata com delle tracce.
+     */
     @BeforeEach
     void setUp() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
@@ -29,6 +41,10 @@ public class PlayerContextPlaylistTest {
 
     }
 
+    /**
+     * @brief Verifica che l'avvio della riproduzione da una playlist vuota (o dallo
+     *        stato iniziale) carichi correttamente il primo brano disponibile
+     */
     @Test
     void testInitialPlayUpdateState() {
         context.setCurrentTrack(null);
@@ -42,6 +58,11 @@ public class PlayerContextPlaylistTest {
 
     }
 
+    /**
+     * @brief Verifica che, data una traccia in riproduzione, il comando 'next'
+     *        aggiorni correttamente la traccia corrente alla successiva nella
+     *        playlist.
+     */
     @Test
     void testSequentialNextUpdateTrack() {
         context.setCurrentTrack(track1);
@@ -53,6 +74,11 @@ public class PlayerContextPlaylistTest {
 
     }
 
+    /**
+     * @brief Verifica il comportamento alla fine della playlist in modalità
+     *        sequenziale. Assicura che il player non esegua il loop automatico alla
+     *        prima traccia, rimanendo bloccato sull'ultima.
+     */
     @Test
     void testEndOfPlaylistSequential() {
         context.setCurrentTrack(track2);

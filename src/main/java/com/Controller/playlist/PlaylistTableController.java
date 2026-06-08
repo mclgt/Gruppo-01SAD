@@ -8,6 +8,15 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 
+/**
+ * @class PlaylistTableController
+ * @brief Controller dedicato alla gestione della tabella delle playlist.
+ *        Gestisce l'interazione con l'elenco delle playlist visualizzato nel
+ *        pannello laterale, incluse le operazioni di selezione, apertura
+ *        tramite doppio click e sincronizzazione con gli altri componenti
+ *        tramite il MainController.
+ */
+
 public class PlaylistTableController {
     private MainController mainController;
 
@@ -42,7 +51,7 @@ public class PlaylistTableController {
             }
         });
 
-        // Disattiva il pulsante "Aggiungi brano" se non c'è selezione
+        // Aggiorna Ui e deseleziona altri componenti
         playlistList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (mainController.getBtnAddToPlaylist() != null) {
                 mainController.getBtnAddToPlaylist().setDisable(newVal == null);
@@ -56,6 +65,11 @@ public class PlaylistTableController {
         });
     }
 
+    /**
+     * @brief Gestisce l'apertura della finestra per la modifica di una playlist
+     *        esistente.
+     * @param ev evento di pressione del pulsante modifica
+     */
     public void openModPlaylistView(ActionEvent ev) {
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if (selectedPlaylist != null) {
@@ -76,6 +90,12 @@ public class PlaylistTableController {
         }
     }
 
+    /**
+     * @brief recupera la playlist selezionata dall'utente in quel determinato
+     *        istante
+     * @return oggetto playlist selezionato, o null se nessuna playlist è stata
+     *         selezionata
+     */
     public Playlist getSelectedPlaylist() {
         return playlistList.getSelectionModel().getSelectedItem();
     }

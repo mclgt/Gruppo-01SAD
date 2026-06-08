@@ -9,11 +9,24 @@ import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
 import com.Model.Track;
 
+/**
+ * @class ModifyPlaylistTest
+ * 
+ * @brief Classe di test per verificare il funzionamento del comando di
+ *        modifica. Si assicura che l'operazione di modifica del nome di una
+ *        playlist sia eseguibile correttamente e reversibile tramite il
+ *        meccanismo di Undo, rispettando il Command Pattern.
+ */
 public class ModifyPlaylistTest {
     PlaylistCatalog catalog;
     private Playlist playlistTest;
     private Track t;
 
+    /**
+     * @brief Configura il test prima di ogni esecuzione. Crea un nuovo catalogo,
+     *        una playlist di test, la aggiunge al catalogo e prepara una traccia da
+     *        associare alla playlist.
+     */
     @BeforeEach
     public void setUp() {
         catalog = new PlaylistCatalog();
@@ -23,6 +36,12 @@ public class ModifyPlaylistTest {
         playlistTest.addTrack(t);
     }
 
+    /**
+     * @brief Verifica l'esecuzione del comando di modifica e la sua reversibilità.
+     *        Si modifica il noma della plylist, si verifica l'avvenuta modifica, si
+     *        invoca 'undo()' e ci si assicura che il nome sia tornato allo stato
+     *        originale.
+     */
     @Test
     public void testUpdatePlaylist_executeAndUndo() {
         ICommand updateCommand = new ModifyPlaylist(catalog, playlistTest, "nuovo test");
