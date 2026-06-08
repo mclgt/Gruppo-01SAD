@@ -1,5 +1,7 @@
 package com.Controller.playlist;
 
+import java.util.Optional;
+
 import com.Command.ICommand;
 import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
@@ -9,6 +11,7 @@ import com.Model.Track;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -62,6 +65,12 @@ public class PlaylistController {
         }
     }
 
+    /**
+     * @brief Rimuove la traccia selezionata dalla playlist, mostrando una finestra di conferma 
+     * prima di procedere. Se la traccia rimossa è quella attualmente in riproduzione, 
+     * ferma la riproduzione e aggiorna il player di conseguenza. 
+     * @param ev
+     */
     @FXML
     public void handleRemoveFromPlaylist(ActionEvent ev){
         Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
@@ -70,24 +79,21 @@ public class PlaylistController {
             mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona prima una traccia da rimuovere dalla playlist");
             return;
         }
-
-        ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
-
-        boolean wasPlaying = mainController.getPlayerContext().isPlaying()
-                && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
-
-        mainController.getDeletedPlayingStack().push(wasPlaying);
-        if(wasPlaying){
-            mainController.getTimerManager().stop();
-        }
-
-        int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
-
-        mainController.getUndoManager().executeCommand(removeCommand);
-        playlistTrackList.getSelectionModel().clearSelection();
-
-        if(wasPlaying){
-            mainController.getPlayerController().handleTrackRemoval(idx);
+        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Rimuovi brano", "Rimozione brano da playlist", "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\" dalla playlist \"" + currentPlaylist.getName() + "\"?", null);
+        if(result.isPresent() && result.get().getText().equals("OK")){
+            ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
+            boolean wasPlaying = mainController.getPlayerContext().isPlaying()
+                    && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+            mainController.getDeletedPlayingStack().push(wasPlaying);
+            if(wasPlaying){
+                mainController.getTimerManager().stop();
+            }
+            int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
+            mainController.getUndoManager().executeCommand(removeCommand);
+            playlistTrackList.getSelectionModel().clearSelection();
+            if(wasPlaying){
+                mainController.getPlayerController().handleTrackRemoval(idx);
+            }
         }
     }
 }

@@ -97,7 +97,7 @@ public class TrackTableController {
             mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona una traccia dalla tabella da rimuovere.");
             return;
         }
-        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione", "Rimozione dalla libreria e da tutte le playlist", "Sei sicuro di voler rimuovere"+ selectedTrack.getTitle()+"?", null);
+        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione", "Rimozione dalla libreria e da tutte le playlist", "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\"?", null);
 
         if(result.isPresent() && result.get() == ButtonType.OK){
             ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack, mainController.getPlaylistCatalog());
