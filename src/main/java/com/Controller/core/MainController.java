@@ -20,8 +20,6 @@ import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
