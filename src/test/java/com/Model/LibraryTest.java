@@ -42,7 +42,7 @@ public class LibraryTest {
     public void testAddTrack_success() {
         l.addTrack(t);
         assertEquals(1, l.getTracksCount(), "La libreria dovrebbe contenere 1 brano");
-        assertTrue(l.getLibrary().contains(t), "La libreria dovrebbe contenre il brano");
+        assertTrue(l.getTracks().contains(t), "La libreria dovrebbe contenre il brano");
     }
 
     /**
@@ -57,7 +57,7 @@ public class LibraryTest {
         l.addTrack(track3); // dim=3
         l.removeTrack(track1);
         assertEquals(2, l.getTracksCount());
-        assertTrue(!l.getLibrary().contains(track1), "La libreria non dovrebbe contenere più il brano");
+        assertTrue(!l.getTracks().contains(track1), "La libreria non dovrebbe contenere più il brano");
     }
 
     /**

@@ -27,13 +27,14 @@ public class PlaylistTest {
         playlist.addTrack(t1);
         playlist.addTrack(0, t2);
         List<Track> tracks = playlist.getTracks();
-        
+
         assertEquals(2, playlist.getTracksCount(), "La playlist deve contenere 2 brani");
         assertEquals(t2, tracks.get(0), "Il brano 2 dovrebbe trovarsi all'indice 0");
         assertEquals(150, playlist.getTotalDuration(), "La durata totale deve essere la somma esatta (150s)");
         assertEquals("02:30", playlist.getFormattedTotalDuration(), "La formattazione del tempo deve essere 02:30");
     }
 
+<<<<<<< HEAD
     @Test
     public void testRemoveTrack() {
         Playlist playlist = new Playlist("Test Remove");
@@ -55,6 +56,33 @@ public class PlaylistTest {
         playlist.setName("Pop anni 2000");
         assertEquals("Pop anni 2000", playlist.getName());
     }
+=======
+    /*
+     * @Test
+     * public void testRemoveTrack() {
+     * Playlist playlist = new Playlist("Test Remove");
+     * Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album",
+     * "path1.wav");
+     * 
+     * playlist.addTrack(t1);
+     * assertEquals(1, playlist.getTracksCount());
+     * 
+     * Track removed = playlist.removeTrack(t1);
+     * 
+     * assertNotNull(rimosso, "Il metodo deve restituire il brano rimosso");
+     * assertTrue(playlist.getTracks().isEmpty(),
+     * "La playlist deve essere di nuovo vuota");
+     * assertEquals(0, playlist.getTotalDuration());
+     * }
+     * 
+     * @Test
+     * public void testPlaylistSetter_success() {
+     * Playlist playlist = new Playlist("Rock Anni 90");
+     * playlist.setName("Pop anni 2000");
+     * assertEquals("Pop anni 2000", playlist.getName());
+     * }
+     */
+>>>>>>> main
 
     @Test
     public void testPlaylistSetter_noName() {

@@ -19,7 +19,7 @@ import javafx.collections.ObservableList;
  *        l'accoppiamento con il Controller.
  *      
  */
-public class Library implements ITrackContainer{
+public class Library implements ITrackContainer {
     /**
      * @brief Lista osservabile interna contenente gli oggetti di tipo Track
      *        presenti nella libreria.
@@ -77,7 +77,7 @@ public class Library implements ITrackContainer{
     }
 
     @Override
-    public int indexOf(Track track){
+    public int indexOf(Track track) {
         return this.library.indexOf(track);
     }
 
@@ -124,7 +124,7 @@ public class Library implements ITrackContainer{
      * @return Un oggetto ObservableList di tipo Track contenente tutti i brani in
      *         libreria.
      */
-    public ObservableList<Track> getLibrary() {
+    public ObservableList<Track> getTracks() {
         return library;
     }
 
