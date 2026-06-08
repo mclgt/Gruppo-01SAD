@@ -60,6 +60,8 @@ public class MainController {
     private Button btnUndo;
     @FXML
     private Button btnAddToPlaylist;
+    @FXML
+    private Button btnPlay;
 
     @FXML
     private TableView<Playlist> playlistList;
@@ -193,21 +195,31 @@ public class MainController {
     }
 
     /**
-     * @brief Avvia la riproduzione del brano o della playlist selezionata.
-     *        Delega la logica a @ref PlayerController#playSong().
+     * @brief Pulsante unico play/pausa.
+     *        Se non c'è un brano attivo (o è terminato) avvia la riproduzione;
+     *        se il brano è in riproduzione lo mette in pausa;
+     *        se è in pausa lo riprende dal punto in cui era stato fermato.
+     *        Il testo del pulsante viene aggiornato da @ref updatePlayPauseButton.
      */
     @FXML
-    public void playSong() {
-        playerController.playSong();
+    public void togglePlayPause() {
+        Track current = playerContext.getCurrentTrack();
+        if (current != null && !playerController.isTrackFinished()) {
+            playerController.pauseSong();
+        } else {
+            playerController.playSong();
+        }
     }
 
     /**
-     * @brief Toggle pausa/ripresa della riproduzione corrente.
-     *        Delega la logica a @ref PlayerController#pauseSong().
+     * @brief Aggiorna il testo del pulsante play/pausa in base allo stato.
+     *        Chiamato da @ref PlayerController ogni volta che lo stato cambia.
+     * @param playing {@code true} mostra "⏸ Pause", {@code false} mostra "▶ Play".
      */
-    @FXML
-    public void pauseSong() {
-        playerController.pauseSong();
+    public void updatePlayPauseButton(boolean playing) {
+        if (btnPlay != null) {
+            btnPlay.setText(playing ? "⏸ Pause" : "▶ Play");
+        }
     }
 
     @FXML

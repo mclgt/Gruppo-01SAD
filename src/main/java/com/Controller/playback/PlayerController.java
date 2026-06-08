@@ -68,6 +68,14 @@ public class PlayerController {
     }
 
     /**
+     * @brief Restituisce true se il brano corrente è terminato naturalmente.
+     * @return {@code true} se trackFinished, {@code false} altrimenti.
+     */
+    public boolean isTrackFinished() {
+        return trackFinished;
+    }
+
+    /**
      * @brief Gestisce l'avvio della riproduzione per il brano o la playlist
      *        selezionata
      */
@@ -272,6 +280,7 @@ public class PlayerController {
      */
     private void startTrackPlayback(Track track) {
         mainController.getPlayerContext().play(track);
+        mainController.updatePlayPauseButton(true);
         updateNowPlaying();
 
         PlaybackTimerManager timer = mainController.getTimerManager();
@@ -306,6 +315,7 @@ public class PlayerController {
                 current.getAudioSource().pausePlayback();
             }
             lblNowPlaying.setText("⏸ " + current.getTitle() + " - " + current.getAuthor());
+            mainController.updatePlayPauseButton(false);
         } else if (mainController.getPlayerContext().isPaused()) {
             mainController.getPlayerContext().setState(mainController.getPlayerContext().getPlayingState());
             mainController.getTimerManager().resume();
@@ -313,6 +323,7 @@ public class PlayerController {
                 current.getAudioSource().resumePlayback();
             }
             updateNowPlaying();
+            mainController.updatePlayPauseButton(true);
         }
     }
 
@@ -331,6 +342,7 @@ public class PlayerController {
             trackFinished = true;
             resetUI();
             lblNowPlaying.setText("Canzone terminata");
+            mainController.updatePlayPauseButton(false);
             return;
         }
         handleNext(null);
@@ -361,6 +373,7 @@ public class PlayerController {
             mainController.getPlayerContext().setCurrentTrack(null);
             lblNowPlaying.setText("Canzone terminata");
             resetUI();
+            mainController.updatePlayPauseButton(false);
         }
     }
 
@@ -397,6 +410,7 @@ public class PlayerController {
             lblNowPlaying.setText("Nessuna traccia in riproduzione");
             mainController.getPlayerContext().stop();
             mainController.getPlayerContext().setCurrentTrack(null);
+            mainController.updatePlayPauseButton(false);
         }
     }
 

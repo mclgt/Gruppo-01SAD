@@ -231,17 +231,9 @@
                   <Button fx:id="btnPrev" mnemonicParsing="false" onAction="#handlePrev" prefHeight="35.0" prefWidth="45.0" text="⏮">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playSong" prefHeight="40.0" prefWidth="80.0" text="▶ Play">
+                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#togglePlayPause" prefHeight="40.0" prefWidth="80.0" text="▶ Play">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
-                  <Button fx:id="btnPause" mnemonicParsing="false" onAction="#pauseSong" prefHeight="40.0" prefWidth="80.0" text="|| Pause">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Button>
-                  <!-- <Button fx:id="btnPause" mnemonicParsing="false" prefHeight="40.0" prefWidth="80.0" text="⏸ Pausa">
-                     <font><Font name="System Bold" size="14.0" /></font>
-                  </Button> -->
                   <Button fx:id="btnNext" mnemonicParsing="false" onAction="#handleNext" prefHeight="35.0" prefWidth="45.0" text="⏭">
                      <font><Font size="14.0" /></font>
                   </Button>
