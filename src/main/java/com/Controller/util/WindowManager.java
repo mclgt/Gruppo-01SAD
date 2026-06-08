@@ -115,4 +115,19 @@ public class WindowManager {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    /**
+     * @brief Mostra un alert di errore all'utente: è una finestra di dialogo che
+     *        notifica all'utente l'errore avvenuto. Blocca l'interfaccia finché non
+     *        si chiude la finestra.
+     * @param title titlo da visualizzare nella barra in alto
+     * @param content   messaggio di errore
+     */
+    public void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }
