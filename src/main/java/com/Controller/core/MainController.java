@@ -347,8 +347,9 @@ public class MainController {
             detailPanel.setVisible(true);
         }
     }
+
     /**
-     * @brief Gestisce l'evento di eliminazione di una playlist. 
+     * @brief Gestisce l'evento di eliminazione di una playlist.
      * @param ev
      */
     @FXML
