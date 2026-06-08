@@ -3,27 +3,28 @@ package com.Controller.core;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
-
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
+import com.Controller.playlist.AddTrackToPlaylistController;
 import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.DataLayer.TrackProxy;
 import com.Model.Library;
-import com.Model.Track;
 import com.Model.Playlist;
+import com.Model.PlaylistCatalog;
+import com.Model.Track;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -32,6 +33,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 /**
  * @brief Controller principale dell'applicazione, gestisce la schermata
@@ -57,28 +59,33 @@ public class MainController {
     @FXML
     private Button btnUndo;
     @FXML
+    private Button btnAddToPlaylist;
+
+    @FXML
     private TableView<Playlist> playlistList;
     @FXML
     private TableColumn<Playlist, String> nameCol;
+    private PlaylistController activePlaylistController;
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
 
-    private final PlaylistTableController playlistListController = new PlaylistTableController();
-
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
+    private final PlaylistCatalog playlistCatalog = new PlaylistCatalog();
+    private final PlaylistTableController playlistTableController = new PlaylistTableController();
     private final Deque<Boolean> deletedPlayingStack = new ArrayDeque<>();
     private final PlaybackTimerManager timerManager = new PlaybackTimerManager();
     private WindowManager windowManager = new WindowManager(this);
-    private Library trackList = new Library();
-    private ObservableList<Playlist> userPlaylists = FXCollections.observableArrayList();
 
-    /***
-     * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
-     *        tra le colonne della tabella e le StringProperty del modello Track,
-     *        sfruttando il pattern Observer per consentire l'aggiornamento in tempo
-     *        reale.
+    private Library trackList = new Library();
+
+    /**
+     * @brief Inizializza i componenti dell'interfaccia grafica e i sotto-controller.
+     *        Crea il @ref PlayerContext con strategia sequenziale di default, inizializza
+     *        @ref TrackTableController, @ref PlayerController e @ref PlaylistTableController
+     *        passando i riferimenti ai componenti FXML. Carica inoltre un set di brani
+     *        demo nella libreria per facilitare i test sull'interfaccia.
      */
     @FXML
     public void initialize() {
@@ -86,21 +93,20 @@ public class MainController {
         btnUndo.disableProperty().bind(undoManager.undoDisabledProperty());
 
         // Inizialzzazione dei sotto-controller
-        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
-                lblAlbum, lblGenre, lblDuration, lblYear);
+        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
-        playlistListController.init(this, playlistList, nameCol);
+        playlistTableController.init(this, playlistList, nameCol);
 
-        // Playlist hardcoded creata solo per facilitare le prove di loop e shuffle
         String[][] demoData = {
-            {"Canzone Alpha",   "Artista Uno",   "Rock",      "Album A", "2020", "7"},
-            {"Canzone Beta",    "Artista Due",   "Pop",       "Album B", "2021", "6"},
-            {"Canzone Gamma",   "Artista Tre",   "Jazz",      "Album C", "2019", "8"},
-            {"Canzone Delta",   "Artista Quattro","Electronic","Album D", "2022", "5"},
-            {"Canzone Epsilon", "Artista Cinque", "Classical", "Album E", "2018", "9"},
+            {"Bohemian Rhapsody", "Queen",        "1975", "Rock",       "354", "A Night at the Opera"},
+            {"Blinding Lights",  "The Weeknd",    "2019", "Synthpop",   "200", "After Hours"},
+            {"Smells Like Teen", "Nirvana",       "1991", "Grunge",     "301", "Nevermind"},
+            {"Billie Jean",      "Michael Jackson","1982", "Pop",       "294", "Thriller"},
+            {"Hotel California", "Eagles",        "1977", "Rock",       "391", "Hell Freezes Over"},
         };
         for (String[] d : demoData) {
-            Track t = new Track(d[0], d[1], Integer.parseInt(d[4]), d[2], Integer.parseInt(d[5]), d[3], "dummy_" + d[0].replace(" ", "_") + ".wav");
+            Track t = new Track(d[0], d[1], Integer.parseInt(d[2]), d[3], Integer.parseInt(d[4]), d[5],
+                    "demo_" + d[0].replace(" ", "_") + ".wav");
             t.setAudioSource(new TrackProxy(t.getFilePath()));
             trackList.addTrack(t);
         }
@@ -115,6 +121,10 @@ public class MainController {
         return trackList;
     }
 
+    public Button getBtnAddToPlaylist() {
+        return btnAddToPlaylist;
+    }
+
     /**
      * @brief Fornisce il riferimento all'Invoker del sistema per la gestione
      *        dell'Undo list.
@@ -124,12 +134,24 @@ public class MainController {
         return undoManager;
     }
 
+    public PlaylistCatalog getPlaylistCatalog() {
+        return playlistCatalog;
+    }
+
+    public PlaylistTableController getPlaylistTableController() {
+        return playlistTableController;
+    }
+
     public PlayerContext getPlayerContext() {
         return playerContext;
     }
 
     public PlaybackTimerManager getTimerManager() {
         return timerManager;
+    }
+
+    public PlaylistController getPlaylistController() {
+        return activePlaylistController;
     }
 
     public Deque<Boolean> getDeletedPlayingStack() {
@@ -147,11 +169,7 @@ public class MainController {
     public PlayerController getPlayerController() {
         return playerController;
     }
-
-    public ObservableList<Playlist> getUserPlaylists(){
-        return userPlaylists;
-    }
-
+    
     public void addTrackMainTable(Track track) {
         trackList.addTrack(track);
     }
@@ -174,12 +192,19 @@ public class MainController {
         }
     }
 
+    /**
+     * @brief Avvia la riproduzione del brano o della playlist selezionata.
+     *        Delega la logica a @ref PlayerController#playSong().
+     */
     @FXML
     public void playSong() {
         playerController.playSong();
     }
 
-    //delega la pausa al playerController che gestisce il toggle pausa/ripresa
+    /**
+     * @brief Toggle pausa/ripresa della riproduzione corrente.
+     *        Delega la logica a @ref PlayerController#pauseSong().
+     */
     @FXML
     public void pauseSong() {
         playerController.pauseSong();
@@ -221,34 +246,64 @@ public class MainController {
     }
 
     @FXML
-    public void openAddPlaylistView(ActionEvent ev){
-        windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null);
+    public void openAddPlaylistView(ActionEvent ev) {
+        windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
-    public void openPlaylistView(Playlist selectedPlaylist){
-        try{
+    public void openPlaylistView(Playlist selectedPlaylist) {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
             PlaylistController playlistController = loader.getController();
             playlistController.setMainController(this);
             playlistController.setPlaylistData(selectedPlaylist);
+            this.activePlaylistController = playlistController;
 
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(playlistViewNode);
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    @FXML
+    public void openAddTrackToPlaylistView() {
+        Playlist selectedPlaylist = playlistTableController.getSelectedPlaylist();
+        openAddTrackToPlaylistView(selectedPlaylist);
+    }
+
+    public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
+        if (selectedPlaylist != null) {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
+                Parent root = loader.load();
+
+                AddTrackToPlaylistController controller = loader.getController();
+                controller.initData(this, selectedPlaylist);
+
+                Stage stage = new Stage();
+                stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
+                stage.setScene(new Scene(root));
+                stage.show();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            System.out.println("Nessuna playlist selezionata!");
+        }
+    }
+
     /**
-     * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
-     * chiudendo di fatto la vista della playlist.
+     * @brief Ripristina la visualizzazione della libreria globale nell'area
+     *        centrale,
+     *        chiudendo di fatto la vista della playlist.
      */
-    public void restoreMainLibraryView(){
-        if(centerContentArea != null && trackTable != null){
+    public void restoreMainLibraryView() {
+        if (centerContentArea != null && trackTable != null) {
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);
+            this.activePlaylistController = null;
         }
     }
 
@@ -259,13 +314,46 @@ public class MainController {
 
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
-        trackTableController.clearSelection();
-        playlistListController.clearSelection();
+        if (trackTableController != null) {
+            trackTableController.clearSelection();
+        }
+        if (playlistTableController != null) {
+            playlistTableController.clearSelection();
+        }
+        if (getPlaylistController() != null) {
+            getPlaylistController().clearSelection();
+        }
+        updateDetailPanel(null);
     }
 
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
-        playlistListController.openModPlaylistView(ev);
+        playlistTableController.openModPlaylistView(ev);
+    }
+
+    public void updateDetailPanel(Track track) {
+        if (track == null) {
+            detailPanel.setVisible(false);
+        } else {
+            lblTitle.setText(track.getTitle());
+            lblAuthor.setText(track.getAuthor());
+            String album = track.getAlbum();
+            lblAlbum.setText((album == null || album.trim().isEmpty()) ? "-" : track.getAlbum());
+            String genre = track.getGenre();
+            lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : track.getGenre());
+            lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
+            lblDuration.setText(track.getFormattedDuration());
+
+            detailPanel.setVisible(true);
+        }
+    }
+    /**
+     * @brief Gestisce l'evento di eliminazione di una playlist. 
+     * @param ev
+     */
+    @FXML
+    public void handleDeletePlaylist(ActionEvent ev) {
+        playlistTableController.handleDeletePlaylist(ev);
     }
 
 }

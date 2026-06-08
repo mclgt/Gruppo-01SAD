@@ -1,17 +1,19 @@
 package com.Controller.util;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.Controller.core.MainController;
-import com.Controller.track.AddModTrackController;
 import com.Controller.playlist.AddModPlaylistController;
-import com.Model.Track;
+import com.Controller.track.AddModTrackController;
 import com.Model.Playlist;
+import com.Model.Track;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -69,15 +71,15 @@ public class WindowManager {
      * @param title            titolo da assegnare alla finestra
      * @param playlistToModify playlist da modificare
      */
-    public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify) {
+    public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify, MainController mc) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent p = loader.load();
             AddModPlaylistController controller = loader.getController();
-            controller.setMainController(mainController);
-            if (playlistToModify != null) {
-                controller.setPlaylist(playlistToModify);
-            }
+            controller.setMainController(mc);
+
+            controller.setPlaylist(playlistToModify);
+
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -129,5 +131,12 @@ public class WindowManager {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public Optional<ButtonType> showConfirmation(String title, String content, Runnable onConfirm) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        return alert.showAndWait();
     }
 }

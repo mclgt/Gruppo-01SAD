@@ -1,7 +1,12 @@
 package com.Controller.playback;
 
 import com.Controller.core.MainController;
+import com.Controller.playlist.PlaylistController;
+import com.Model.ITrackContainer;
+import com.Model.Playlist;
 import com.Model.Track;
+
+import java.util.List;
 import com.Strategy.LoopStrategy;
 import com.Strategy.SequentialStrategy;
 import com.Strategy.ShuffleStrategy;
@@ -10,15 +15,39 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 
+/**
+ * @class PlayerController
+ * 
+ * @brief Gestisce la logica della riproduzione audio, il timer e l'interazione
+ *        con l'interfaccia. La classe funge da controller per il sistema di
+ *        riproduzione. Gestisce il flusso audio e coordina l'aggiornamento
+ *        dell'interfaccia grafica in base allo stato del context e dela
+ *        strategia di riproduzione selezionata.
+ */
 public class PlayerController {
     private MainController mainController;
 
     private Label lblNowPlaying, lblCurrentTime, lblTotalTime;
     private Slider progressSlider;
 
+    /** @brief True se l'auto-avanzamento sequenziale/shuffle è attivo. */
     private boolean sequentialMode = false;
+    /** @brief True se la riproduzione in loop del brano corrente è attiva. */
+    private boolean loopMode = false;
+    /** @brief True se il brano corrente è terminato naturalmente. */
     private boolean trackFinished = false;
+    /** @brief Container attivo (libreria o playlist) su cui opera la riproduzione. */
+    private ITrackContainer activeContainer;
 
+    /**
+     * @brief Inizializza i riferimenti ai componenti grafici e al controller
+     *        principale
+     * @param mainController controller principale
+     * @param lblNowPlaying  label che mostra il brano in riproduzione
+     * @param lblCurrentTime label che mostra il tempo trascorso
+     * @param lblTotalTime   label che mostra il tempo totale
+     * @param progressSlider slider che rappresenta l'avanzamento del brano
+     */
     public void init(MainController mainController, Label lblNowPlaying, Label lblCurrentTime, Label lblTotalTime,
             Slider progressSlider) {
         this.mainController = mainController;
@@ -28,107 +57,219 @@ public class PlayerController {
         this.progressSlider = progressSlider;
     }
 
+    /**
+     * @brief Imposta lo stato di terminazione del brano corrente.
+     * @param finished {@code true} se il brano è terminato, {@code false} altrimenti.
+     */
     // quando termina la traccia deve modificare il valore di trackFinished così da
     // poter resettare la UI co nun altro metodo
     public void setTrackFinished(boolean finished) {
         this.trackFinished = finished;
     }
 
-    // questa è la riproduzione singola e controlla che io abbia selezionato un
-    // brano e se il brano già sia in esecuzion
+    /**
+     * @brief Gestisce l'avvio della riproduzione per il brano o la playlist
+     *        selezionata
+     */
     public void playSong() {
-        Track selected = mainController.getTrackTableController().getSelectedTrack();
-        if (selected == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
-                    "Seleziona una traccia dalla lista per riprodurla.");
-            return;
-        }
+        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
+        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
 
-        if (mainController.getPlayerContext().isPlaying()
-                && selected == mainController.getPlayerContext().getCurrentTrack() && !trackFinished) {
-            mainController.getWindowManager().showInfo("Già in riproduzione", "Sto già eseguendo questo brano.");
-            return;
-        }
-
-        // Modifica successiva: se il brano è in pausa e si preme Play
-        // sulla stessa traccia, riprende dal punto in cui era stata messa in pausa
-        // anziché ricominciare dall'inizio
-        // ovviamente è un tipo di controllo che si può modificare in futuro
-        if (mainController.getPlayerContext().isPaused()
-                && selected == mainController.getPlayerContext().getCurrentTrack()) {
-            mainController.getPlayerContext().setState(mainController.getPlayerContext().getPlayingState());
-            mainController.getTimerManager().resume();
-            if (selected.getAudioSource() != null) {
-                selected.getAudioSource().resumePlayback();
+        if (selectedTrack != null) {
+            if (mainController.getPlayerContext().isPlaying()
+                    && selectedTrack == mainController.getPlayerContext().getCurrentTrack() && !trackFinished) {
+                mainController.getWindowManager().showInfo("Già in riproduzione",
+                        "Brano selezionato già in riproduzione");
+                return;
             }
-            updateNowPlaying();
+            activeContainer = mainController.getLibrary();
+            trackFinished = false;
+            sequentialMode = false;
+            loopMode = false;
+            startTrackPlayback(selectedTrack);
             return;
         }
-
-        trackFinished = false;
-        sequentialMode = false;
-        startTrackPlayback(selected);
+        Track playlistViewTrack = getPlaylistViewSelectedTrack();
+        if (playlistViewTrack != null) {
+            if (mainController.getPlayerContext().isPlaying()
+                    && playlistViewTrack == mainController.getPlayerContext().getCurrentTrack() && !trackFinished) {
+                mainController.getWindowManager().showInfo("Già in riproduzione",
+                        "Brano selezionato già in riproduzione");
+                return;
+            }
+            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
+            trackFinished = false;
+            sequentialMode = false;
+            loopMode = false;
+            startTrackPlayback(playlistViewTrack);
+            return;
+        }
+        if (selectedPlaylist != null) {
+            if (selectedPlaylist.getTracksCount() == 0) {
+                mainController.getWindowManager().showWarning("Playlist vuota",
+                        "La playlist selezionata non ha brani.");
+                return;
+            }
+            activeContainer = selectedPlaylist;
+            trackFinished = false;
+            sequentialMode = false;
+            loopMode = false;
+            mainController.getPlayerContext().setCurrentTrack(null);
+            mainController.getPlayerContext().next(activeContainer.getTracks(), null);
+            Track firstTrack = mainController.getPlayerContext().getCurrentTrack();
+            if (firstTrack != null) {
+                startTrackPlayback(firstTrack);
+            }
+            return;
+        }
+        mainController.getWindowManager().showWarning("Nessuna selezione",
+                "Seleziona una traccia dalla lista per riprodurla.");
     }
 
+    /**
+     * @brief Avvia la riproduzione in modalità sequenziale
+     * @param event pressione del pulsante
+     */
     // Questi tre metodi sono simili ma cambia solamente la strategy utilizzata per
     // riprodurre i brani, i controlli sono uguali in quanto devo conoscere il brano
     // corrente per poter determinare quale brano devo proprorre all'utente
     public void sequentialRip(ActionEvent event) {
-        Track selected = mainController.getTrackTableController().getSelectedTrack();
-        if (selected == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
-                    "Seleziona una traccia dalla lista per avviare la riproduzione sequenziale.");
+        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
+        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
+        if (selectedTrack != null) {
+            activeContainer = mainController.getLibrary();
+            trackFinished = false;
+            sequentialMode = true;
+            loopMode = false;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+            startTrackPlayback(selectedTrack);
             return;
         }
+        Track playlistViewTrack = getPlaylistViewSelectedTrack();
+        if (playlistViewTrack != null) {
+            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
+            trackFinished = false;
+            sequentialMode = true;
+            loopMode = false;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+            startTrackPlayback(playlistViewTrack);
+            return;
+        }
+        if (selectedPlaylist != null) {
+            if (selectedPlaylist.getTracksCount() == 0) {
+                mainController.getWindowManager().showWarning("Playlist vuota",
+                        "La playlist selezionata non ha brani.");
+                return;
+            }
+            activeContainer = selectedPlaylist;
+            trackFinished = false;
+            sequentialMode = true;
+            loopMode = false;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+            Track firstTrack = activeContainer.getTracks().get(0);
+            startTrackPlayback(firstTrack);
+            return;
+        }
+        mainController.getWindowManager().showWarning("Nessuna selezione",
+                "Seleziona una traccia dalla lista per avviare la riproduzione sequenziale.");
+        return;
 
-        //ho aggiunto il set esplicito della SequentialStrategy perché senza questo, se prima avevo
-        //attivato shuffle o loop, la strategy rimaneva quella precedente anche premendo il tasto sequenziale
-        mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
-        trackFinished = false;
-        sequentialMode = true;
-        startTrackPlayback(selected);
     }
 
-    // questo metodo, poichè si occupa del loop ha gli stessi contorlli del metodo
-    // precedente
-    // alla fine delego al playbackcontext che setta la strategy a LoopStrategy che
-    // direttamente lavora per selezionare
-    // la prossima traccia da proporre all'utente(in questo caso la stessa siccome è
-    // un loop)
+    /**
+     * @brief Avvia la riproduzione in modalità loop (stesso brano ripetuto)
+     * @param event pressione del pulsante
+     */
     public void loopRip(ActionEvent event) {
-        Track selected = mainController.getTrackTableController().getSelectedTrack();
-        if (selected == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
-                    "Seleziona una traccia dalla lista per avviare il loop.");
+        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
+        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
+        if (selectedTrack != null) {
+            activeContainer = mainController.getLibrary();
+            trackFinished = false;
+            sequentialMode = false;
+            loopMode = true;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+            startTrackPlayback(selectedTrack);
             return;
         }
-
-        mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
-        trackFinished = false;
-        sequentialMode = true;
-        startTrackPlayback(selected);
+        Track playlistViewTrack = getPlaylistViewSelectedTrack();
+        if (playlistViewTrack != null) {
+            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
+            trackFinished = false;
+            sequentialMode = false;
+            loopMode = true;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+            startTrackPlayback(playlistViewTrack);
+            return;
+        }
+        if (selectedPlaylist != null) {
+            if (selectedPlaylist.getTracksCount() == 0) {
+                mainController.getWindowManager().showWarning("Playlist vuota",
+                        "La playlist selezionata non ha brani.");
+                return;
+            }
+            activeContainer = selectedPlaylist;
+            trackFinished = false;
+            sequentialMode = false;
+            loopMode = true;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+            Track firstTrack = activeContainer.getTracks().get(0);
+            startTrackPlayback(firstTrack);
+            return;
+        }
+        mainController.getWindowManager().showWarning("Nessuna selezione",
+                "Seleziona una traccia dalla lista per avviare la riproduzione in loop.");
     }
 
-    //shuffle funziona come loop e sequential, imposta la strategy a ShuffleStrategy che sceglie
-    //una traccia casuale diversa da quella corrente ogni volta che viene chiamata nextTrack
+    /**
+     * @brief Avvia la riproduzione in modalità shuffle (ordine casuale)
+     * @param event pressione del pulsante
+     */
     public void shuffleRip(ActionEvent event) {
-        Track selected = mainController.getTrackTableController().getSelectedTrack();
-        if (selected == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
-                    "Seleziona una traccia dalla lista per avviare lo shuffle.");
+        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
+        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
+        if (selectedTrack != null) {
+            activeContainer = mainController.getLibrary();
+            trackFinished = false;
+            sequentialMode = true;
+            loopMode = false;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
+            startTrackPlayback(selectedTrack);
             return;
         }
-
-        mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
-        trackFinished = false;
-        sequentialMode = true;
-        startTrackPlayback(selected);
+        Track playlistViewTrack = getPlaylistViewSelectedTrack();
+        if (playlistViewTrack != null) {
+            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
+            trackFinished = false;
+            sequentialMode = true;
+            loopMode = false;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
+            startTrackPlayback(playlistViewTrack);
+            return;
+        }
+        if (selectedPlaylist != null) {
+            if (selectedPlaylist.getTracksCount() == 0) {
+                mainController.getWindowManager().showWarning("Playlist vuota",
+                        "La playlist selezionata non ha brani.");
+                return;
+            }
+            activeContainer = selectedPlaylist;
+            trackFinished = false;
+            sequentialMode = true;
+            loopMode = false;
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
+            Track firstTrack = activeContainer.getTracks().get(0);
+            startTrackPlayback(firstTrack);
+            return;
+        }
+        mainController.getWindowManager().showWarning("Nessuna selezione",
+                "Seleziona una traccia dalla lista per avviare la riproduzione casuale.");
     }
 
-    // questo metodo ha il compito di settare le label dello slider per rendere
-    // l'interfaccia utente dinamica, inoltre gli devo passare la canzone attuale
-    // altrimenti non sa la durata e non sa il titolo e l'autore con cui modificare
-    // le label grafiche
+    /**
+     * @brief Avvia l'effettivo processo di riproduzione del brano selezionato
+     * @param track traccia da riprodurre
+     */
     private void startTrackPlayback(Track track) {
         mainController.getPlayerContext().play(track);
         updateNowPlaying();
@@ -147,17 +288,18 @@ public class PlayerController {
                 this::handlePlaybackFinished);
     }
 
-    //questo metodo funge da toggle per la pausa: se il player sta suonando mette in pausa,
-    //se è già in pausa riprende dal punto esatto in cui era stato fermato
-    //il timer JavaFX viene congelato così le label e lo slider non si resettano
-    //anche l'audio viene fermato/ripreso preservando la posizione nel file
+    /**
+     * @brief Toggle pausa/ripresa della riproduzione corrente.
+     *        Se il player è in riproduzione, transisce a @ref PausedState e
+     *        congela timer e audio. Se è già in pausa, riprende esattamente
+     *        dal punto in cui era stato fermato senza azzerare slider e label.
+     */
     public void pauseSong() {
         Track current = mainController.getPlayerContext().getCurrentTrack();
         if (current == null)
             return;
 
         if (mainController.getPlayerContext().isPlaying()) {
-            //transizione allo stato PausedState, congelo timer e audio
             mainController.getPlayerContext().pause();
             mainController.getTimerManager().pause();
             if (current.getAudioSource() != null) {
@@ -165,7 +307,6 @@ public class PlayerController {
             }
             lblNowPlaying.setText("⏸ " + current.getTitle() + " - " + current.getAuthor());
         } else if (mainController.getPlayerContext().isPaused()) {
-            //torno a PlayingState e riprendo timer e audio da dove erano
             mainController.getPlayerContext().setState(mainController.getPlayerContext().getPlayingState());
             mainController.getTimerManager().resume();
             if (current.getAudioSource() != null) {
@@ -175,7 +316,17 @@ public class PlayerController {
         }
     }
 
+    /**
+     * @brief Gestisce la logica da eseguire al termine di un brano
+     */
     private void handlePlaybackFinished() {
+        if (loopMode) {
+            Track current = mainController.getPlayerContext().getCurrentTrack();
+            if (current != null) {
+                startTrackPlayback(current);
+            }
+            return;
+        }
         if (!sequentialMode) {
             trackFinished = true;
             resetUI();
@@ -190,19 +341,22 @@ public class PlayerController {
     //ho aggiunto sequentialMode = true così la traccia che parte continua ad auto-avanzare quando finisce.
     //ho aggiunto selectTrack così la selezione nella tabella segue la canzone in riproduzione,
     //in questo modo se premo loop o shuffle subito dopo, parte dalla traccia corretta e non da quella precedente
+    /**
+     * @brief Passa al brano successivo nel container attivo
+     * @param event pressione sul pulsante
+     */
     public void handleNext(ActionEvent event) {
         mainController.getTimerManager().stop();
-        sequentialMode = true;
-        Track current = mainController.getPlayerContext().getCurrentTrack();
-        Track next = mainController.getPlayerContext().getPlaybackContext()
-                .nextTrack(mainController.getLibrary().getLibrary(), current);
+        Track before = mainController.getPlayerContext().getCurrentTrack();
+        mainController.getPlayerContext().next(getActiveQueue(), before);
+        Track after = mainController.getPlayerContext().getCurrentTrack();
 
-        if (next != null) {
-            mainController.getTrackTableController().selectTrack(next);
-            startTrackPlayback(next);
+        if (after != null && (after != before || loopMode)) {
+            selectTrackInUI(after);
+            startTrackPlayback(after);
         } else {
-            if (current != null && current.getAudioSource() != null) {
-                current.getAudioSource().stopPlayback();
+            if (before != null && before.getAudioSource() != null) {
+                before.getAudioSource().stopPlayback();
             }
             mainController.getPlayerContext().setCurrentTrack(null);
             lblNowPlaying.setText("Canzone terminata");
@@ -210,24 +364,33 @@ public class PlayerController {
         }
     }
 
-    //stesso ragionamento di handleNext ma per la traccia precedente
+    /**
+     * @brief Torna al brano precedente nel container attivo
+     * @param event pressione sul pulsante
+     */
     public void handlePrev(ActionEvent event) {
         mainController.getTimerManager().stop();
         sequentialMode = true;
-        Track current = mainController.getPlayerContext().getCurrentTrack();
-        Track prev = mainController.getPlayerContext().getPlaybackContext()
-                .previousTrack(mainController.getLibrary().getLibrary(), current);
+        loopMode = false;
+        Track before = mainController.getPlayerContext().getCurrentTrack();
+        mainController.getPlayerContext().previous(getActiveQueue(), before);
+        Track after = mainController.getPlayerContext().getCurrentTrack();
 
-        if (prev != null) {
-            mainController.getTrackTableController().selectTrack(prev);
-            startTrackPlayback(prev);
+        if (after != null && after != before) {
+            selectTrackInUI(after);
+            startTrackPlayback(after);
         }
     }
 
+    /**
+     * @brief Aggiorna l'interfaccia nel caso in cui la traccia venga rimossa dalla
+     *        libreria.
+     * @param removedIdx indice della traccia rimossa
+     */
     public void handleTrackRemoval(int removedIdx) {
-        if (!mainController.getLibrary().getLibrary().isEmpty()) {
-            int nextIdx = Math.min(removedIdx, mainController.getLibrary().getLibrary().size() - 1);
-            Track nextTrack = mainController.getLibrary().getLibrary().get(nextIdx);
+        if (!mainController.getLibrary().getTracks().isEmpty()) {
+            int nextIdx = Math.min(removedIdx, mainController.getLibrary().getTracks().size() - 1);
+            Track nextTrack = mainController.getLibrary().getTracks().get(nextIdx);
             startTrackPlayback(nextTrack);
         } else {
             resetUI();
@@ -237,12 +400,19 @@ public class PlayerController {
         }
     }
 
+    /**
+     * @brief Reset dei componenti grafici della riproduzione (slider e label del
+     *        tempo)
+     */
     public void resetUI() {
         progressSlider.setValue(0);
         lblCurrentTime.setText("00:00");
         lblTotalTime.setText("00:00");
     }
 
+    /**
+     * @brief Aggiorna la label "Now Playing" in base allo stato del player
+     */
     private void updateNowPlaying() {
         Track track = mainController.getPlayerContext().getCurrentTrack();
         if (mainController.getPlayerContext().isPlaying() && track != null) {
@@ -253,5 +423,41 @@ public class PlayerController {
             mainController.getTimerManager().stop();
             resetUI();
         }
+    }
+
+    /**
+     * @brief Restituisce il brano selezionato nella vista playlist aperta, se presente.
+     *        Interroga il @ref PlaylistController attivo; restituisce {@code null}
+     *        se nessuna vista playlist è aperta o nessun brano è selezionato.
+     * @return La @ref Track selezionata nella vista playlist, o {@code null}.
+     */
+    private Track getPlaylistViewSelectedTrack() {
+        PlaylistController pc = mainController.getPlaylistController();
+        return pc != null ? pc.getSelectedTrack() : null;
+    }
+
+    /**
+     * @brief Seleziona visivamente un brano nella tabella corretta.
+     *        Se il container attivo è una @ref Playlist, aggiorna la selezione
+     *        nella vista playlist; altrimenti aggiorna la tabella della libreria.
+     * @param track Il @ref Track da evidenziare nell'interfaccia.
+     */
+    private void selectTrackInUI(Track track) {
+        if (activeContainer instanceof Playlist) {
+            PlaylistController pc = mainController.getPlaylistController();
+            if (pc != null) pc.selectTrack(track);
+        } else {
+            mainController.getTrackTableController().selectTrack(track);
+        }
+    }
+
+    /**
+     * @brief Restituisce la lista di brani del container attivo.
+     *        Se nessun container è stato impostato, utilizza la libreria globale
+     *        come fallback.
+     * @return La @ref List di @ref Track su cui operano next, prev e auto-avanzamento.
+     */
+    private List<Track> getActiveQueue() {
+        return activeContainer != null ? activeContainer.getTracks() : mainController.getLibrary().getTracks();
     }
 }
