@@ -8,14 +8,14 @@ import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
 import com.Controller.playlist.AddTrackToPlaylistController;
-import com.Controller.playlist.PlaylistListController;
+import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.Model.Library;
 import com.Model.Playlist;
-import com.Model.Track;
 import com.Model.PlaylistCatalog;
+import com.Model.Track;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -69,7 +69,7 @@ public class MainController {
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
 
-    private final PlaylistListController playlistListController = new PlaylistListController();
+    private final PlaylistController playlistListController = new PlaylistController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -215,7 +215,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
-            PlaylistListController playlistController = loader.getController();
+            PlaylistController playlistController = loader.getController();
             playlistController.setMainController(this);
             playlistController.setPlaylistData(selectedPlaylist);
 
@@ -273,17 +273,21 @@ public class MainController {
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
         trackTableController.clearSelection();
-        playlistListController.clearSelection();
+        playlistTableController.clearSelection();
     }
 
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
-        playlistListController.openModPlaylistView(ev);
+        playlistTableController.openModPlaylistView(ev);
     }
 
+    /**
+     * @brief Gestisce l'evento di eliminazione di una playlist. 
+     * @param ev
+     */
     @FXML
     public void handleDeletePlaylist(ActionEvent ev) {
-        playlistListController.handleDeletePlaylist(ev);
+        playlistTableController.handleDeletePlaylist(ev);
     }
 
 }
