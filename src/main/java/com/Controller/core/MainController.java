@@ -210,8 +210,8 @@ public class MainController {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
-    public void openPlaylistView(Playlist selectedPlaylist){
-        try{
+    public void openPlaylistView(Playlist selectedPlaylist) {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
@@ -221,7 +221,7 @@ public class MainController {
 
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(playlistViewNode);
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -254,11 +254,12 @@ public class MainController {
     }
 
     /**
-     * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
-     * chiudendo di fatto la vista della playlist.
+     * @brief Ripristina la visualizzazione della libreria globale nell'area
+     *        centrale,
+     *        chiudendo di fatto la vista della playlist.
      */
-    public void restoreMainLibraryView(){
-        if(centerContentArea != null && trackTable != null){
+    public void restoreMainLibraryView() {
+        if (centerContentArea != null && trackTable != null) {
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);
         }
