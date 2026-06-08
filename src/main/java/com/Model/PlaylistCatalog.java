@@ -20,8 +20,8 @@ public class PlaylistCatalog {
         playlists.add(index, playlist);
     }
 
-    public boolean removePlaylist(Playlist playlist){
-        return this.playlists.remove(playlist);
+    public void removePlaylist(Playlist playlist){
+        this.playlists.remove(playlist);
     }
 
     public void updatePlaylist(Playlist playlist, String name){

@@ -2,6 +2,10 @@ package com.Controller.playlist;
 
 import com.Controller.core.MainController;
 import com.Model.Playlist;
+import com.Command.ICommand;
+import com.Command.RemovePlaylist;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.TableColumn;
@@ -70,5 +74,27 @@ public class PlaylistTableController {
 
     public Playlist getSelectedPlaylist(){
         return playlistList.getSelectionModel().getSelectedItem();
+    }
+
+    /**
+     * @brief Gestisce l'evento di eliminazione di una playlist. Se è stata
+     *        selezionata una playlist, viene mostrata una finestra di conferma.
+     *        Se l'utente conferma, viene eseguito il comando di rimozione della
+     *        playlist e aggiornata la vista principale. In caso contrario, viene
+     *        mostrato un messaggio di avviso.
+     * @param ev evento di pressione del pulsante di eliminazione.
+    } */
+    public void handleDeletePlaylist(ActionEvent ev){
+        Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
+        if(selectedPlaylist != null){
+            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
+            if(result.isPresent() && result.get() == ButtonType.OK){
+                ICommand removeCmd = new RemovePlaylist(mainController.getPlaylistCatalog(), selectedPlaylist);
+                mainController.getUndoManager().executeCommand(removeCmd);
+                mainController.restoreMainLibraryView();
+            }
+        }else{
+            mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da eliminare");
+        }
     }
 }

@@ -59,4 +59,6 @@ public class PlaylistController {
             mainController.restoreMainLibraryView();
         }
     }
+
+
 }
