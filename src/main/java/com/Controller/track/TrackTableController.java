@@ -23,30 +23,27 @@ public class TrackTableController {
 
     private TableView<Track> trackTable;
     private VBox detailPanel;
-    private Label lblTitle, lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear;
 
     public void init(MainController mainController, TableView<Track> trackTable, TableColumn<Track, String> titleCol,
-                     TableColumn<Track, String> authorCol, TableColumn<Track, String> genreCol, VBox detailPanel,
-                     Label lblTitle, Label lblAuthor, Label lblAlbum, Label lblGenre, Label lblDuration, Label lblYear) {
+            TableColumn<Track, String> authorCol, TableColumn<Track, String> genreCol, VBox detailPanel) {
         this.mainController = mainController;
         this.trackTable = trackTable;
         this.detailPanel = detailPanel;
-        this.lblTitle = lblTitle;
-        this.lblAuthor = lblAuthor;
-        this.lblAlbum = lblAlbum;
-        this.lblGenre = lblGenre;
-        this.lblDuration = lblDuration;
-        this.lblYear = lblYear;
-
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
-        trackTable.setItems(mainController.getLibrary().getLibrary());
+        trackTable.setItems(mainController.getLibrary().getTracks());
         detailPanel.setVisible(false);
 
         trackTable.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
-            updateDetailPanel(newVal);
+            if (mainController != null && newVal != null) {
+                mainController.updateDetailPanel(newVal);
+                if (mainController.getPlaylistTableController() != null) {
+                    mainController.getPlaylistTableController().clearSelection();
+                }
+
+            }
         });
     }
 
@@ -58,44 +55,32 @@ public class TrackTableController {
         trackTable.getSelectionModel().clearSelection();
     }
 
-    private void updateDetailPanel(Track track) {
-        if (track == null) {
-            detailPanel.setVisible(false);
-        }else{
-            lblTitle.setText(track.getTitle());
-            lblAuthor.setText(track.getAuthor());
-            lblAlbum.setText(track.getAlbum().trim().isEmpty() ? "-" : track.getAlbum());
-            lblGenre.setText(track.getGenre().trim().isEmpty() ? "-" : track.getGenre());
-            lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
-            lblDuration.setText(track.getFormattedDuration());
-
-            detailPanel.setVisible(true);
-        }
-    }
-
     @FXML
     public void handleBckgroundClick(MouseEvent ev) {
         clearSelection();
     }
 
-    public void openAddTrackWindow(ActionEvent ev){
+    public void openAddTrackWindow(ActionEvent ev) {
         mainController.getWindowManager().openWindow("/com/View/AddTrackView.fxml", "Aggiungi nuovo brano", null);
     }
 
-    public void openModifyTrackView(ActionEvent ev){
+    public void openModifyTrackView(ActionEvent ev) {
         Track selectedTrack = getSelectedTrack();
-        if(selectedTrack == null){
-            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona una traccia dalla tabella da modificare.");
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione",
+                    "Seleziona una traccia dalla tabella da modificare.");
             return;
         }
 
-        mainController.getWindowManager().openWindow("/com/View/ModifyTrackView.fxml", "Modifica Brano - " + selectedTrack.getTitle(), selectedTrack);
+        mainController.getWindowManager().openWindow("/com/View/ModifyTrackView.fxml",
+                "Modifica Brano - " + selectedTrack.getTitle(), selectedTrack);
     }
 
-    public void handleRemoveTrack(ActionEvent ev){
+    public void handleRemoveTrack(ActionEvent ev) {
         Track selectedTrack = getSelectedTrack();
-        if(selectedTrack == null){
-            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona una traccia dalla tabella da rimuovere.");
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione",
+                    "Seleziona una traccia dalla tabella da rimuovere.");
             return;
         }
 
@@ -105,20 +90,21 @@ public class TrackTableController {
         alert.setContentText(selectedTrack.getTitle());
         Optional<ButtonType> result = alert.showAndWait();
 
-        if(result.isPresent() && result.get() == ButtonType.OK){
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack);
-            boolean wasPlaying = mainController.getPlayerContext().isPlaying() && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+            boolean wasPlaying = mainController.getPlayerContext().isPlaying()
+                    && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
 
             mainController.getDeletedPlayingStack().push(wasPlaying);
-            if(wasPlaying){
+            if (wasPlaying) {
                 mainController.getTimerManager().stop();
             }
 
-            int idx = mainController.getLibrary().getLibrary().indexOf(selectedTrack);
+            int idx = mainController.getLibrary().getTracks().indexOf(selectedTrack);
             mainController.getUndoManager().executeCommand(removeCommand);
             clearSelection();
 
-            if(wasPlaying){
+            if (wasPlaying) {
                 mainController.getPlayerController().handleTrackRemoval(idx);
             }
         }

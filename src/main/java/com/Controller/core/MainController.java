@@ -3,6 +3,7 @@ package com.Controller.core;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import com.Controller.playlist.PlaylistController;
 
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
@@ -67,6 +68,7 @@ public class MainController {
     private TableView<Playlist> playlistList;
     @FXML
     private TableColumn<Playlist, String> nameCol;
+    private PlaylistController activePlaylistController;
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
@@ -93,8 +95,7 @@ public class MainController {
         btnUndo.disableProperty().bind(undoManager.undoDisabledProperty());
 
         // Inizialzzazione dei sotto-controller
-        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
-                lblAlbum, lblGenre, lblDuration, lblYear);
+        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
     }
@@ -108,7 +109,7 @@ public class MainController {
         return trackList;
     }
 
-    public Button getBtnAddToPlaylist(){
+    public Button getBtnAddToPlaylist() {
         return btnAddToPlaylist;
     }
 
@@ -121,11 +122,11 @@ public class MainController {
         return undoManager;
     }
 
-    public PlaylistCatalog getPlaylistCatalog(){
+    public PlaylistCatalog getPlaylistCatalog() {
         return playlistCatalog;
     }
 
-    public PlaylistTableController getPlaylistTableController(){
+    public PlaylistTableController getPlaylistTableController() {
         return playlistTableController;
     }
 
@@ -135,6 +136,10 @@ public class MainController {
 
     public PlaybackTimerManager getTimerManager() {
         return timerManager;
+    }
+
+    public PlaylistController getPlaylistController() {
+        return activePlaylistController;
     }
 
     public Deque<Boolean> getDeletedPlayingStack() {
@@ -206,7 +211,7 @@ public class MainController {
     }
 
     @FXML
-    public void openAddPlaylistView(ActionEvent ev){
+    public void openAddPlaylistView(ActionEvent ev) {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
@@ -218,6 +223,7 @@ public class MainController {
             PlaylistController playlistController = loader.getController();
             playlistController.setMainController(this);
             playlistController.setPlaylistData(selectedPlaylist);
+            this.activePlaylistController = playlistController;
 
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(playlistViewNode);
@@ -227,14 +233,14 @@ public class MainController {
     }
 
     @FXML
-    public void openAddTrackToPlaylistView(){
+    public void openAddTrackToPlaylistView() {
         Playlist selectedPlaylist = playlistTableController.getSelectedPlaylist();
         openAddTrackToPlaylistView(selectedPlaylist);
     }
 
-    public void openAddTrackToPlaylistView(Playlist selectedPlaylist){
-        if(selectedPlaylist != null){
-            try{
+    public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
+        if (selectedPlaylist != null) {
+            try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
                 Parent root = loader.load();
 
@@ -245,10 +251,10 @@ public class MainController {
                 stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
                 stage.setScene(new Scene(root));
                 stage.show();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }else{
+        } else {
             System.out.println("Nessuna playlist selezionata!");
         }
     }
@@ -262,6 +268,7 @@ public class MainController {
         if (centerContentArea != null && trackTable != null) {
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);
+            this.activePlaylistController = null;
         }
     }
 
@@ -272,13 +279,38 @@ public class MainController {
 
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
-        trackTableController.clearSelection();
-        playlistTableController.clearSelection();
+        if (trackTableController != null) {
+            trackTableController.clearSelection();
+        }
+        if (playlistTableController != null) {
+            playlistTableController.clearSelection();
+        }
+        if (getPlaylistController() != null) {
+            getPlaylistController().clearSelection();
+        }
+        updateDetailPanel(null);
     }
 
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
         playlistTableController.openModPlaylistView(ev);
+    }
+
+    public void updateDetailPanel(Track track) {
+        if (track == null) {
+            detailPanel.setVisible(false);
+        } else {
+            lblTitle.setText(track.getTitle());
+            lblAuthor.setText(track.getAuthor());
+            String album = track.getAlbum();
+            lblAlbum.setText((album == null || album.trim().isEmpty()) ? "-" : track.getAlbum());
+            String genre = track.getGenre();
+            lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : track.getGenre());
+            lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
+            lblDuration.setText(track.getFormattedDuration());
+
+            detailPanel.setVisible(true);
+        }
     }
 
 }
