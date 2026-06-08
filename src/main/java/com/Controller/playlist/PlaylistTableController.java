@@ -87,7 +87,7 @@ public class PlaylistTableController {
     public void handleDeletePlaylist(ActionEvent ev){
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if(selectedPlaylist != null){
-            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
+            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Eliminazione della playlist", "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
             if(result.isPresent() && result.get() == ButtonType.OK){
                 ICommand removeCmd = new RemovePlaylist(mainController.getPlaylistCatalog(), selectedPlaylist);
                 mainController.getUndoManager().executeCommand(removeCmd);
