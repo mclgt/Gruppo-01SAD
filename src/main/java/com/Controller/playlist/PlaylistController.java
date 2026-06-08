@@ -4,6 +4,7 @@ import com.Controller.core.MainController;
 import com.Model.Playlist;
 import com.Model.Track;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,7 +16,7 @@ public class PlaylistController {
     @FXML
     private Label lblPlaylist;
     @FXML
-    private TableView<Track> playlistTrackTable;
+    private TableView<Track> playlistTrackList;
 
     @FXML
     private TableColumn<Track, String> colTitle, colAuthor, colDuration;
@@ -41,7 +42,12 @@ public class PlaylistController {
     public void setPlaylistData(Playlist playlist) {
         this.currentPlaylist = playlist;
         lblPlaylist.setText(playlist.getName());
-        playlistTrackTable.setItems(playlist.getTracks());
+        playlistTrackList.setItems(playlist.getTracks());
+    }
+
+    @FXML
+    public void handleAddToPlaylist(ActionEvent ev){
+        mainController.openAddTrackToPlaylistView(this.currentPlaylist);
     }
 
     /**
