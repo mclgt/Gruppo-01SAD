@@ -69,15 +69,15 @@ public class WindowManager {
      * @param title            titolo da assegnare alla finestra
      * @param playlistToModify playlist da modificare
      */
-    public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify) {
+    public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify, MainController mc) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent p = loader.load();
             AddModPlaylistController controller = loader.getController();
-            controller.setMainController(mainController);
-            if (playlistToModify != null) {
-                controller.setPlaylist(playlistToModify);
-            }
+            controller.setMainController(mc);
+
+            controller.setPlaylist(playlistToModify);
+
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);

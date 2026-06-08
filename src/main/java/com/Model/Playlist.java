@@ -12,7 +12,7 @@ import javafx.collections.ObservableList;
  *        "osservare" i cambiameti e aggiornarsi in tempo reale automaticamente
  *        quando i dettagli cambiano.
  */
-public class Playlist {
+public class Playlist implements ITrackContainer {
     private StringProperty name = new SimpleStringProperty();
     private ObservableList<Track> tracks;
 
@@ -60,6 +60,7 @@ public class Playlist {
      *        nullo e se non è presente nella lista.
      * @param track oggetto track da aggiungere.
      */
+    @Override
     public void addTrack(Track track) {
         if (track != null && !tracks.contains(track)) {
             tracks.add(track);
@@ -72,6 +73,7 @@ public class Playlist {
      * @param track oggetto track da aggiungere.
      * @param index la posizione nella quale inserire il brano all'interno della playlist.
      */
+    @Override
     public void addTrack(int index, Track track){
         if(track != null && !tracks.contains(track)){
             tracks.add(index, track);
@@ -82,27 +84,16 @@ public class Playlist {
      * @brief Rimuove un brano specifico dalla playlist tramite il riferimento
      *        all'oggetto.
      * @param track traccia da rimuovere
-     * @return brano rimosso se l'operazione ha successo, altrimenti null
+     * @return true se il brano è stato rimosso, false altrimenti
      */
-    public Track removeTrack(Track track) {
-        if (tracks.remove(track)) {
-            return track;
-        }
-
-        return null;
+    @Override
+    public boolean removeTrack(Track track) {
+        return this.tracks.remove(track);
     }
 
-    /**
-     * @brief Rimuove un brano dalla playlist in base alla sua posizione.
-     *        Effettua un controllo sui limiti della lista per evitare errori.
-     * @param index posizione del brano da rimuovere (partendo da 0)
-     * @return brano rimosso se l'indice è valido, altrimenti null
-     */
-    public Track removeTrack(int index) {
-        if (index >= 0 && index < tracks.size()) {
-            return tracks.remove(index);
-        }
-        return null;
+    @Override
+    public int indexOf(Track track){
+        return this.tracks.indexOf(track);
     }
 
     /**

@@ -11,7 +11,7 @@ import javafx.scene.input.MouseEvent;
 public class PlaylistTableController {
     private MainController mainController;
 
-    private TableView<Playlist> playlistTable;
+    private TableView<Playlist> playlistList;
 
     /**
      * @brief Inizializza il controller, impostando i riferimenti necessari e
@@ -23,28 +23,36 @@ public class PlaylistTableController {
      * @param playlistTable riferimento al componente TableView definito
      * @param nameCol      riferimento alla colonna contenente i nomi delle playlist
      */
-    public void init(MainController controller, TableView<Playlist> playlistTable,
+    public void init(MainController controller, TableView<Playlist> playlistList,
             TableColumn<Playlist, String> nameCol) {
         this.mainController = controller;
-        this.playlistTable = playlistTable;
+        this.playlistList = playlistList;
 
         nameCol.setCellValueFactory(cellData -> cellData.getValue().getNameProperty());
-        playlistTable.setItems(mainController.getUserPlaylists());
+        playlistList.setItems(mainController.getPlaylistCatalog().getPlaylists());
 
-        playlistTable.setOnMouseClicked((MouseEvent ev) -> {
+        //Apertura con doppio click
+        playlistList.setOnMouseClicked((MouseEvent ev) -> {
             if(ev.getClickCount() == 2){
-                Playlist selectedPlaylist = playlistTable.getSelectionModel().getSelectedItem();
+                Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
                 if(selectedPlaylist != null){
                     mainController.openPlaylistView(selectedPlaylist);
                 }
             }
         });
+
+        //Disattiva il pulsante "Aggiungi brano" se non c'è selezione
+        playlistList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if(mainController.getBtnAddToPlaylist() != null){
+                mainController.getBtnAddToPlaylist().setDisable(newVal == null);
+            }
+        });
     }
 
     public void openModPlaylistView(ActionEvent ev){
-        Playlist selectedPlaylist = playlistTable.getSelectionModel().getSelectedItem();
+        Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if(selectedPlaylist != null){
-            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml", "Modifica Playlist", selectedPlaylist);
+            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml", "Modifica Playlist", selectedPlaylist, mainController);
         }else{
             mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da modificare");
         }
@@ -55,12 +63,12 @@ public class PlaylistTableController {
      *        playlist.
      */
     public void clearSelection() {
-        if (playlistTable != null) {
-            playlistTable.getSelectionModel().clearSelection();
+        if (playlistList != null) {
+            playlistList.getSelectionModel().clearSelection();
         }
     }
 
     public Playlist getSelectedPlaylist(){
-        return playlistTable.getSelectionModel().getSelectedItem();
+        return playlistList.getSelectionModel().getSelectedItem();
     }
 }
