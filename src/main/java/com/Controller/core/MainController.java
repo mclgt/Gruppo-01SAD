@@ -133,7 +133,11 @@ public class MainController {
         return playerController;
     }
 
-    public ObservableList<Playlist> getUserPlaylists(){
+    public PlaylistTableController getPlaylistController() {
+        return playlistListController;
+    }
+
+    public ObservableList<Playlist> getUserPlaylists() {
         return userPlaylists;
     }
 
@@ -190,12 +194,12 @@ public class MainController {
     }
 
     @FXML
-    public void openAddPlaylistView(ActionEvent ev){
+    public void openAddPlaylistView(ActionEvent ev) {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null);
     }
 
-    public void openPlaylistView(Playlist selectedPlaylist){
-        try{
+    public void openPlaylistView(Playlist selectedPlaylist) {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
@@ -205,17 +209,18 @@ public class MainController {
 
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(playlistViewNode);
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
-     * chiudendo di fatto la vista della playlist.
+     * @brief Ripristina la visualizzazione della libreria globale nell'area
+     *        centrale,
+     *        chiudendo di fatto la vista della playlist.
      */
-    public void restoreMainLibraryView(){
-        if(centerContentArea != null && trackTable != null){
+    public void restoreMainLibraryView() {
+        if (centerContentArea != null && trackTable != null) {
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);
         }
