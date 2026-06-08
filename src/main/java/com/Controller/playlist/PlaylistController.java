@@ -35,14 +35,6 @@ public class PlaylistController {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("formattedDuration"));
-        playlistTrackList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (mainController != null && newVal != null) {
-                mainController.updateDetailPanel(newVal);
-                if (mainController.getTrackTableController() != null) {
-                    mainController.getTrackTableController().clearSelection();
-                }
-            }
-        });
     }
 
     public void setMainController(MainController mainController) {
@@ -56,7 +48,7 @@ public class PlaylistController {
     }
 
     @FXML
-    public void handleAddToPlaylist(ActionEvent ev) {
+    public void handleAddToPlaylist(ActionEvent ev){
         mainController.openAddTrackToPlaylistView(this.currentPlaylist);
     }
 
@@ -64,28 +56,15 @@ public class PlaylistController {
      * @brief Torna alla libreria principale invocando il metodo del MainController.
      */
     @FXML
-    public void handleBackToLibrary() {
-        if (mainController != null) {
+    public void handleBackToLibrary(){
+        if(mainController != null){
             mainController.restoreMainLibraryView();
-            mainController.updateDetailPanel(null);
         }
     }
 
     @FXML
     public void handleRemoveFromPlaylist(ActionEvent ev){
         Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
-    public void clearSelection() {
-        if (playlistTrackList != null) {
-            playlistTrackList.getSelectionModel().clearSelection();
-        }
-    }
-
-    public Track getSelectedTrack() {
-        if (playlistTrackList != null) {
-            return playlistTrackList.getSelectionModel().getSelectedItem();
-        }
-        return null;
-    }
 
         if (selectedTrack == null) {
             mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona prima una traccia da rimuovere dalla playlist");

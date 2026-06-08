@@ -30,11 +30,11 @@ public class AddTrackTest {
         // Fase di execute
         addCommand.execute();
         assertEquals(1, l.getTracksCount());
-        assertTrue(l.getTracks().contains(t));
+        assertTrue(l.getLibrary().contains(t));
 
         // Fase di undo
         addCommand.undo();
         assertEquals(0, l.getTracksCount());
-        assertFalse(l.getTracks().contains(t));
+        assertFalse(l.getLibrary().contains(t));
     }
 }
