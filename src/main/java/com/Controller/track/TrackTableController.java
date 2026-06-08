@@ -9,7 +9,6 @@ import com.Model.Track;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -129,11 +128,7 @@ public class TrackTableController {
             return;
         }
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Conferma rimozione");
-        alert.setContentText("Sei sicuro di voler rimuovere la traccia selezionata?");
-        alert.setContentText(selectedTrack.getTitle());
-        Optional<ButtonType> result = alert.showAndWait();
+        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Sei sicuro di voler eliminare il brano \"" + selectedTrack.getTitle() + "\"?", null);
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack);

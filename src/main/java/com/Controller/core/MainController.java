@@ -14,15 +14,13 @@ import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.Model.Library;
-import com.Model.Track;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
+import com.Model.Track;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -72,6 +70,8 @@ public class MainController {
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
+
+    private final PlaylistController playlistListController = new PlaylistController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -311,6 +311,14 @@ public class MainController {
 
             detailPanel.setVisible(true);
         }
+      
+    /**
+     * @brief Gestisce l'evento di eliminazione di una playlist. 
+     * @param ev
+     */
+    @FXML
+    public void handleDeletePlaylist(ActionEvent ev) {
+        playlistTableController.handleDeletePlaylist(ev);
     }
 
 }
