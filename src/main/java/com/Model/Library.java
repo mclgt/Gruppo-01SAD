@@ -19,7 +19,7 @@ import javafx.collections.ObservableList;
  *        l'accoppiamento con il Controller.
  *      
  */
-public class Library {
+public class Library implements ITrackContainer{
     /**
      * @brief Lista osservabile interna contenente gli oggetti di tipo Track
      *        presenti nella libreria.
@@ -43,19 +43,23 @@ public class Library {
      *
      * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
      */
+    @Override
     public void addTrack(Track track) {
         this.library.add(track);
     }
 
     /**
-     * @brief Inserisce un nuovo brano in una posizione specifica all'interno della libreria musicale.
+     * @brief Inserisce un nuovo brano in una posizione specifica all'interno della
+     *        libreria musicale.
      * 
      * @param index La posizione in cui inserire il brano.
      * @param track L'oggetto Track (brano musicale) da aggiungere alla collezione.
      */
+    @Override
     public void addTrack(int index, Track track) {
         this.library.add(index, track);
     }
+
     /**
      * @brief Rimuove un brano specifico dalla libreria musicale.
      *
@@ -65,26 +69,33 @@ public class Library {
      *        di aggiornamento automatico sulla UI.
      *
      * @param track L'oggetto Track da eliminare dalla collezione
-     * @return L'oggetto Track che è stato rimosso.
+     * @return True se il brano è stato rimosso, false altrimenti
      */
-    public Track removeTrack(Track track) {
-        this.library.remove(track);
-        return track;
+    @Override
+    public boolean removeTrack(Track track) {
+        return this.library.remove(track);
+    }
+
+    @Override
+    public int indexOf(Track track){
+        return this.library.indexOf(track);
     }
 
     /**
      * @brief Aggiorna i dati di un brano esistente nella libreria.
-     * Rimpiazza l'oggetto nella lista osservabile per forzare l'aggiornamento automatico della UI.
-     * * @param track Il brano originale da modificare.
-     * @param title Il nuovo titolo da assegnare.
-     * @param author Il nuovo autore da assegnare.
-     * @param year Il nuovo anno da assegnare.
-     * @param genre Il nuovo genere da assegnare.
+     *        Rimpiazza l'oggetto nella lista osservabile per forzare
+     *        l'aggiornamento automatico della UI.
+     *        * @param track Il brano originale da modificare.
+     * @param title    Il nuovo titolo da assegnare.
+     * @param author   Il nuovo autore da assegnare.
+     * @param year     Il nuovo anno da assegnare.
+     * @param genre    Il nuovo genere da assegnare.
      * @param duration La nuova durata da assegnare.
-     * @param album Il nuovo album da assegnare.
+     * @param album    Il nuovo album da assegnare.
      * @param filePath Il nuovo percorso del file audio.
      */
-    public void updateTrack(Track track, String title, String author, int year, String genre, int duration, String album, String filePath) {
+    public void updateTrack(Track track, String title, String author, int year, String genre, int duration,
+            String album, String filePath) {
         int index = this.library.indexOf(track);
 
         track.setTitle(title);
@@ -94,7 +105,7 @@ public class Library {
         track.setDuration(duration);
         track.setAlbum(album);
 
-        if(filePath != null && !filePath.equals(track.getFilePath())) {
+        if (filePath != null && !filePath.equals(track.getFilePath())) {
             track.setFilePath(filePath);
             track.setAudioSource(new TrackProxy(filePath));
         }

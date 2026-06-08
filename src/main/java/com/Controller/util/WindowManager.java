@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 /**
  * @brief Classe per la gestione delle finestre e dei popup di sistema.
  *        Gestisce il caricamento dei file FXML, l'inizializzazione dei
@@ -70,15 +71,15 @@ public class WindowManager {
      * @param title            titolo da assegnare alla finestra
      * @param playlistToModify playlist da modificare
      */
-    public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify) {
+    public void openPlaylistWindow(String fxmlPath, String title, Playlist playlistToModify, MainController mc) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent p = loader.load();
             AddModPlaylistController controller = loader.getController();
-            controller.setMainController(mainController);
-            if (playlistToModify != null) {
-                controller.setPlaylist(playlistToModify);
-            }
+            controller.setMainController(mc);
+
+            controller.setPlaylist(playlistToModify);
+
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -111,6 +112,21 @@ public class WindowManager {
      */
     public void showInfo(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    /**
+     * @brief Mostra un alert di errore all'utente: è una finestra di dialogo che
+     *        notifica all'utente l'errore avvenuto. Blocca l'interfaccia finché non
+     *        si chiude la finestra.
+     * @param title titlo da visualizzare nella barra in alto
+     * @param content   messaggio di errore
+     */
+    public void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);

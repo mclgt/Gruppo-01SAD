@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.List;
+
 public class PlaylistTest {
 
     @Test
@@ -24,9 +26,11 @@ public class PlaylistTest {
         Track t2 = new Track("Brano 2", "Autore", 2021, "Rock", 50, "Album 2", "path2.wav");
 
         playlist.addTrack(t1);
-        playlist.addTrack(t2);
-
-        assertEquals(2, playlist.getTracks().size(), "La playlist deve contenere 2 brani");
+        playlist.addTrack(0, t2);
+        List<Track> tracks = playlist.getTracks();
+        
+        assertEquals(2, playlist.getTracksCount(), "La playlist deve contenere 2 brani");
+        assertEquals(t2, tracks.get(0), "Il brano 2 dovrebbe trovarsi all'indice 0");
         assertEquals(150, playlist.getTotalDuration(), "La durata totale deve essere la somma esatta (150s)");
         assertEquals("02:30", playlist.getFormattedTotalDuration(), "La formattazione del tempo deve essere 02:30");
     }
@@ -37,7 +41,7 @@ public class PlaylistTest {
         Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album", "path1.wav");
 
         playlist.addTrack(t1);
-        assertEquals(1, playlist.getTracks().size());
+        assertEquals(1, playlist.getTracksCount());
 
         Track rimosso = playlist.removeTrack(t1);
 

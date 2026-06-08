@@ -16,7 +16,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
@@ -142,10 +141,9 @@ public class AddModTrackController implements ITrackImporter {
             }
             closeWindow();
         } catch (NumberFormatException ex) {
-            viewError("Errore nell'inserimento dei dati numerici",
-                    "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
+            mainController.getWindowManager().showError("Errore nell'inserimento dei dati numerici", "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
         } catch (IllegalArgumentException ex) {
-            viewError("Dati non vallidi", ex.getMessage());
+            mainController.getWindowManager().showError("Dati non vallidi", ex.getMessage());
         }
     }
 
@@ -194,21 +192,6 @@ public class AddModTrackController implements ITrackImporter {
     private void closeWindow() {
         Stage stage = (Stage) btnDelete.getScene().getWindow();
         stage.close();
-    }
-
-    /**
-     * @brief Mostra un alert di errore all'utente: è una finestra di dialogo che
-     *        notifica all'utente l'errore avvenuto. Blocca l'interfaccia finché non
-     *        si chiude la finestra.
-     * @param title titlo da visualizzare nella barra in alto
-     * @param msg   messaggio di errore
-     */
-    private void viewError(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
     }
 
     /**

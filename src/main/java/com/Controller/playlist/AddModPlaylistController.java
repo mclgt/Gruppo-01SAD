@@ -1,9 +1,12 @@
 package com.Controller.playlist;
 
 import com.Model.Playlist;
-
+import com.Command.AddPlaylist;
+import com.Command.ICommand;
+import com.Command.ModifyPlaylist;
 import com.Controller.core.MainController;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,8 +25,11 @@ public class AddModPlaylistController {
     private Button btnDelete;
     @FXML
     private Button btnSave;
+
     private MainController mainController;
+
     private Playlist currentPlaylist;
+    private boolean isEditMode = false;
 
     /**
      * @brief Imposta il riferimento al controller principale necessario per
@@ -36,13 +42,16 @@ public class AddModPlaylistController {
 
     /**
      * @brief Imposta la playlist da modificara. Se viene passata una playlist
-     *        esistente, il campo biene aggiornato con il suo nome attuale.
+     *        esistente, il campo viene aggiornato con il suo nome attuale.
      * @param playlist oggetto da modificare
      */
     public void setPlaylist(Playlist playlist) {
         this.currentPlaylist = playlist;
         if (playlist != null) {
+            this.isEditMode = true;
             txtPlaylistName.setText(playlist.getName());
+        } else {
+            this.isEditMode = false;
         }
     }
 
@@ -52,13 +61,39 @@ public class AddModPlaylistController {
      * @param ev evento di pressione del pulsante.
      */
     @FXML
-    public void handleSave(ActionEvent ev) {
-        String name = txtPlaylistName.getText().trim();
+    public void handleSave(ActionEvent e) {
         try {
-            currentPlaylist.setName(name);
+            String name = txtPlaylistName.getText().trim();
+
+            ObservableList<Playlist> existingPlaylists = mainController.getPlaylistCatalog().getPlaylists();
+
+            for (Playlist p : existingPlaylists) {
+                boolean isSamePlaylist = isEditMode && p.equals(currentPlaylist);
+                if (!isSamePlaylist && p.getName().equalsIgnoreCase(name)) {
+                    throw new IllegalArgumentException("Esiste già una playlist chiamata '" + name + "'. Scegli un altro nome.");
+                }
+            }
+
+            if (isEditMode) {
+                ICommand modifyCommand = new ModifyPlaylist(mainController.getPlaylistCatalog(), currentPlaylist, name);
+
+                if(mainController != null){
+                    mainController.getUndoManager().executeCommand(modifyCommand);
+                }
+
+                mainController.openPlaylistView(currentPlaylist);
+            } else {
+                Playlist newPlaylist = new Playlist(name);
+
+                ICommand addCommand = new AddPlaylist(mainController.getPlaylistCatalog(), newPlaylist);
+                mainController.getUndoManager().executeCommand(addCommand);
+
+                mainController.openPlaylistView(newPlaylist);
+            }
+
             closeWindow();
-        } catch (IllegalArgumentException e) {
-            mainController.getWindowManager().showWarning("Attenzione", e.getMessage());
+        } catch (IllegalArgumentException ex) {
+            mainController.getWindowManager().showWarning("Dati non validi", ex.getMessage());
         }
     }
 
@@ -79,5 +114,4 @@ public class AddModPlaylistController {
         Stage stage = (Stage) btnSave.getScene().getWindow();
         stage.close();
     }
-
 }
