@@ -1,5 +1,7 @@
 package com.Controller.playlist;
 
+import com.Command.ICommand;
+import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Playlist;
 import com.Model.Track;
@@ -57,6 +59,35 @@ public class PlaylistController {
     public void handleBackToLibrary(){
         if(mainController != null){
             mainController.restoreMainLibraryView();
+        }
+    }
+
+    @FXML
+    public void handleRemoveFromPlaylist(ActionEvent ev){
+        Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
+
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona prima una traccia da rimuovere dalla playlist");
+            return;
+        }
+
+        ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
+
+        boolean wasPlaying = mainController.getPlayerContext().isPlaying()
+                && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+
+        mainController.getDeletedPlayingStack().push(wasPlaying);
+        if(wasPlaying){
+            mainController.getTimerManager().stop();
+        }
+
+        int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
+
+        mainController.getUndoManager().executeCommand(removeCommand);
+        playlistTrackList.getSelectionModel().clearSelection();
+
+        if(wasPlaying){
+            mainController.getPlayerController().handleTrackRemoval(idx);
         }
     }
 }

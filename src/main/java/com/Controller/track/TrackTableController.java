@@ -101,12 +101,14 @@ public class TrackTableController {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Conferma rimozione");
+        alert.setHeaderText("Rimozione dalla libreria e da tutte le playlist");
         alert.setContentText("Sei sicuro di voler rimuovere la traccia selezionata?");
         alert.setContentText(selectedTrack.getTitle());
         Optional<ButtonType> result = alert.showAndWait();
 
         if(result.isPresent() && result.get() == ButtonType.OK){
-            ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack);
+            ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack, mainController.getPlaylistCatalog());
+
             boolean wasPlaying = mainController.getPlayerContext().isPlaying() && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
 
             mainController.getDeletedPlayingStack().push(wasPlaying);

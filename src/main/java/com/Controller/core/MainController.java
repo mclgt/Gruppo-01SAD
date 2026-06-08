@@ -60,6 +60,8 @@ public class MainController {
     private Button btnUndo;
     @FXML
     private Button btnAddToPlaylist;
+    @FXML
+    private Button btnAddTrack, btnEditTrack, btnRemoveTrack;
 
     @FXML
     private TableView<Playlist> playlistList;
@@ -151,6 +153,17 @@ public class MainController {
         return playerController;
     }
 
+    public void setTrackManagementButtonVisible(boolean visible){
+        btnAddTrack.setVisible(visible);
+        btnAddTrack.setManaged(visible);
+
+        btnEditTrack.setVisible(visible);
+        btnEditTrack.setManaged(visible);
+
+        btnRemoveTrack.setVisible(visible);
+        btnRemoveTrack.setManaged(visible);
+    }
+
     public void addTrackMainTable(Track track) {
         trackList.addTrack(track);
     }
@@ -210,6 +223,7 @@ public class MainController {
 
     public void openPlaylistView(Playlist selectedPlaylist){
         try{
+            setTrackManagementButtonVisible(false);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
@@ -256,6 +270,7 @@ public class MainController {
      * chiudendo di fatto la vista della playlist.
      */
     public void restoreMainLibraryView(){
+        setTrackManagementButtonVisible(true);
         if(centerContentArea != null && trackTable != null){
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);

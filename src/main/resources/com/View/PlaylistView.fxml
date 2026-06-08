@@ -21,12 +21,17 @@
                   <Font name="System Bold" size="20.0" />
               </font>
             <StackPane.margin>
-               <Insets top="5.0" />
+               <Insets right="30.0" top="5.0" />
             </StackPane.margin>
           </Label>
          <Button fx:id="btnAddToPlaylist" mnemonicParsing="false" onAction="#handleAddToPlaylist" text="Aggiungi brano" StackPane.alignment="CENTER_RIGHT">
             <StackPane.margin>
                <Insets right="10.0" top="5.0" />
+            </StackPane.margin>
+         </Button>
+         <Button fx:id="btnRemoveFromPlaylist" mnemonicParsing="false" onAction="#handleRemoveFromPlaylist" text="Rimuovi brano" StackPane.alignment="CENTER_RIGHT">
+            <StackPane.margin>
+               <Insets right="110.0" top="5.0" />
             </StackPane.margin>
          </Button>
       </children>
