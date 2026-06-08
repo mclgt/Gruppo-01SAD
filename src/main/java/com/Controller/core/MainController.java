@@ -13,9 +13,9 @@ import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
 import com.Model.Library;
-import com.Model.Track;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
+import com.Model.Track;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -70,6 +70,8 @@ public class MainController {
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
+
+    private final PlaylistController playlistListController = new PlaylistController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -233,7 +235,7 @@ public class MainController {
 
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(playlistViewNode);
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -266,8 +268,9 @@ public class MainController {
     }
 
     /**
-     * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
-     * chiudendo di fatto la vista della playlist.
+     * @brief Ripristina la visualizzazione della libreria globale nell'area
+     *        centrale,
+     *        chiudendo di fatto la vista della playlist.
      */
     public void restoreMainLibraryView(){
         setTrackManagementButtonVisible(true);
@@ -291,6 +294,15 @@ public class MainController {
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
         playlistTableController.openModPlaylistView(ev);
+    }
+
+    /**
+     * @brief Gestisce l'evento di eliminazione di una playlist. 
+     * @param ev
+     */
+    @FXML
+    public void handleDeletePlaylist(ActionEvent ev) {
+        playlistTableController.handleDeletePlaylist(ev);
     }
 
 }

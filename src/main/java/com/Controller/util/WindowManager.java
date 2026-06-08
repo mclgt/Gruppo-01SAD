@@ -1,17 +1,19 @@
 package com.Controller.util;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.Controller.core.MainController;
-import com.Controller.track.AddModTrackController;
 import com.Controller.playlist.AddModPlaylistController;
-import com.Model.Track;
+import com.Controller.track.AddModTrackController;
 import com.Model.Playlist;
+import com.Model.Track;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -129,5 +131,12 @@ public class WindowManager {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public Optional<ButtonType> showConfirmation(String title, String content, Runnable onConfirm) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        return alert.showAndWait();
     }
 }
