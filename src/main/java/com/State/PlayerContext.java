@@ -22,9 +22,7 @@ import java.util.List;
  */
 public class PlayerContext {
 
-    /**
-     * @brief Stato "in riproduzione"; usato come riferimento fisso per isPlaying().
-     */
+    /** @brief Stato "in riproduzione"; usato come riferimento fisso per isPlaying(). */
     private IPlayerState playingState;
 
     /** @brief Stato attualmente attivo; le operazioni vengono delegate a questo. */
@@ -37,10 +35,8 @@ public class PlayerContext {
     private Track currentTrack;
 
     /**
-     * @brief Costruisce il context inizializzando lo stato corrente a @ref
-     *        PlayingState.
-     * @param playbackContext Il context della strategia di riproduzione da
-     *                        utilizzare.
+     * @brief Costruisce il context inizializzando lo stato corrente a @ref PlayingState.
+     * @param playbackContext Il context della strategia di riproduzione da utilizzare.
      */
     public PlayerContext(PlaybackContext playbackContext) {
         this.playbackContext = playbackContext;
@@ -82,8 +78,7 @@ public class PlayerContext {
 
     /**
      * @brief Restituisce la traccia attualmente impostata come corrente.
-     * @return La @ref Track corrente, o {@code null} se nessuna traccia è stata
-     *         impostata.
+     * @return La @ref Track corrente, o {@code null} se nessuna traccia è stata impostata.
      */
     public Track getCurrentTrack() {
         return currentTrack;
@@ -91,16 +86,14 @@ public class PlayerContext {
 
     /**
      * @brief Indica se il player si trova nello stato di riproduzione attiva.
-     * @return {@code true} se lo stato corrente è @ref PlayingState, {@code false}
-     *         altrimenti.
+     * @return {@code true} se lo stato corrente è @ref PlayingState, {@code false} altrimenti.
      */
     public boolean isPlaying() {
         return currentState == playingState;
     }
 
     /**
-     * @brief Avvia la riproduzione della traccia specificata delegando allo stato
-     *        corrente.
+     * @brief Avvia la riproduzione della traccia specificata delegando allo stato corrente.
      * @param track La traccia da riprodurre.
      */
     public void play(Track track) {
@@ -127,13 +120,7 @@ public class PlayerContext {
      * @param current La traccia attualmente in riproduzione.
      */
     public void next(List<Track> queue, Track current) {
-        Track nexTrack = this.playbackContext.nextTrack(queue, current);
-        if (nexTrack != null) {
-            this.setCurrentTrack(nexTrack);
-        }
-        if (currentState != null) {
-            currentState.next(queue, current);
-        }
+        currentState.next(queue, current);
     }
 
     /**
@@ -142,10 +129,6 @@ public class PlayerContext {
      * @param current La traccia attualmente in riproduzione.
      */
     public void previous(List<Track> queue, Track current) {
-        Track prevTrack = this.playbackContext.previousTrack(queue, current);
-        if (prevTrack != null) {
-            this.setCurrentTrack(prevTrack);
-        }
         currentState.previous(queue, current);
     }
 }

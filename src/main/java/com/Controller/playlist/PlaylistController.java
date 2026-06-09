@@ -1,5 +1,7 @@
 package com.Controller.playlist;
 
+import com.Command.ICommand;
+import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Playlist;
 import com.Model.Track;
@@ -33,14 +35,6 @@ public class PlaylistController {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("formattedDuration"));
-        playlistTrackList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (mainController != null && newVal != null) {
-                mainController.updateDetailPanel(newVal);
-                if (mainController.getTrackTableController() != null) {
-                    mainController.getTrackTableController().clearSelection();
-                }
-            }
-        });
     }
 
     public void setMainController(MainController mainController) {
@@ -54,7 +48,7 @@ public class PlaylistController {
     }
 
     @FXML
-    public void handleAddToPlaylist(ActionEvent ev) {
+    public void handleAddToPlaylist(ActionEvent ev){
         mainController.openAddTrackToPlaylistView(this.currentPlaylist);
     }
 
@@ -62,24 +56,38 @@ public class PlaylistController {
      * @brief Torna alla libreria principale invocando il metodo del MainController.
      */
     @FXML
-    public void handleBackToLibrary() {
-        if (mainController != null) {
+    public void handleBackToLibrary(){
+        if(mainController != null){
             mainController.restoreMainLibraryView();
-            mainController.updateDetailPanel(null);
         }
     }
 
-    public void clearSelection() {
-        if (playlistTrackList != null) {
-            playlistTrackList.getSelectionModel().clearSelection();
+    @FXML
+    public void handleRemoveFromPlaylist(ActionEvent ev){
+        Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
+
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona prima una traccia da rimuovere dalla playlist");
+            return;
+        }
+
+        ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
+
+        boolean wasPlaying = mainController.getPlayerContext().isPlaying()
+                && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+
+        mainController.getDeletedPlayingStack().push(wasPlaying);
+        if(wasPlaying){
+            mainController.getTimerManager().stop();
+        }
+
+        int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
+
+        mainController.getUndoManager().executeCommand(removeCommand);
+        playlistTrackList.getSelectionModel().clearSelection();
+
+        if(wasPlaying){
+            mainController.getPlayerController().handleTrackRemoval(idx);
         }
     }
-
-    public Track getSelectedTrack() {
-        if (playlistTrackList != null) {
-            return playlistTrackList.getSelectionModel().getSelectedItem();
-        }
-        return null;
-    }
-
 }
