@@ -1,5 +1,7 @@
 package com.Controller.playlist;
 
+import com.Command.ICommand;
+import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Playlist;
 import com.Model.Track;
@@ -33,8 +35,6 @@ public class PlaylistController {
     @FXML
     private TableColumn<Track, String> colTitle, colAuthor, colDuration;
     @FXML
-    private Button btnPlay;
-    @FXML
     private Button btnRemoveFromPlaylist;
 
     private Playlist currentPlaylist;
@@ -51,14 +51,6 @@ public class PlaylistController {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("formattedDuration"));
-        playlistTrackList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (mainController != null && newVal != null) {
-                mainController.updateDetailPanel(newVal);
-                if (mainController.getTrackTableController() != null) {
-                    mainController.getTrackTableController().clearSelection();
-                }
-            }
-        });
     }
 
     /**
@@ -85,7 +77,7 @@ public class PlaylistController {
      * @param ev Evento di pressione del pulsante.
      */
     @FXML
-    public void handleAddToPlaylist(ActionEvent ev) {
+    public void handleAddToPlaylist(ActionEvent ev){
         mainController.openAddTrackToPlaylistView(this.currentPlaylist);
     }
 
@@ -93,51 +85,50 @@ public class PlaylistController {
      * @brief Torna alla libreria principale invocando il metodo del MainController.
      */
     @FXML
-    public void handleBackToLibrary() {
-        if (mainController != null) {
+    public void handleBackToLibrary(){
+        if(mainController != null){
             mainController.restoreMainLibraryView();
-            mainController.updateDetailPanel(null);
         }
     }
 
-    /**
-     * @brief Rimuove la selezione corrente dalla tabella della playlist.
-     */
-    public void clearSelection() {
-        if (playlistTrackList != null) {
-            playlistTrackList.getSelectionModel().clearSelection();
-        }
-    }
-
-    /**
-     * @brief Restituisce il brano attualmente selezionato nella tabella.
-     * @return La @ref Track selezionata, o {@code null} se nessuna selezione è attiva.
-     */
-    public Track getSelectedTrack() {
-        if (playlistTrackList != null) {
-            return playlistTrackList.getSelectionModel().getSelectedItem();
-        }
-        return null;
-    }
-
-    /**
-     * @brief Restituisce la playlist attualmente visualizzata.
-     * @return La @ref Playlist corrente gestita da questo controller.
-     */
     public Playlist getCurrentPlaylist() {
         return currentPlaylist;
     }
 
-    /**
-     * @brief Seleziona visivamente un brano nella tabella della playlist.
-     *        Usato da @ref PlayerController per sincronizzare la riga evidenziata
-     *        con il brano in riproduzione durante la navigazione next/prev.
-     * @param track Il @ref Track da selezionare nella tabella.
-     */
-    public void selectTrack(Track track) {
-        if (playlistTrackList != null) {
-            playlistTrackList.getSelectionModel().select(track);
-        }
+    public Track getSelectedTrack() {
+        return playlistTrackList.getSelectionModel().getSelectedItem();
     }
 
+    public void selectTrack(Track track) {
+        playlistTrackList.getSelectionModel().select(track);
+    }
+
+    @FXML
+    public void handleRemoveFromPlaylist(ActionEvent ev){
+        Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
+
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona prima una traccia da rimuovere dalla playlist");
+            return;
+        }
+
+        ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
+
+        boolean wasPlaying = mainController.getPlayerContext().isPlaying()
+                && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+
+        mainController.getDeletedPlayingStack().push(wasPlaying);
+        if(wasPlaying){
+            mainController.getTimerManager().stop();
+        }
+
+        int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
+
+        mainController.getUndoManager().executeCommand(removeCommand);
+        playlistTrackList.getSelectionModel().clearSelection();
+
+        if(wasPlaying){
+            mainController.getPlayerController().handleTrackRemoval(idx);
+        }
+    }
 }

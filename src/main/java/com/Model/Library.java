@@ -17,7 +17,7 @@ import javafx.collections.ObservableList;
  *        sincronizzarsi e aggiornarsi
  *        in tempo reale in seguito ad aggiunte o rimozioni, riducendo
  *        l'accoppiamento con il Controller.
- *      
+ * 
  */
 public class Library implements ITrackContainer {
     /**

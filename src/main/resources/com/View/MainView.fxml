@@ -28,7 +28,17 @@
             </MenuBar>
             <ToolBar prefHeight="40.0">
               <items>
-                <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#openAddTrackWindow" text="Aggiungi Brano">
+                  <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#handleUndo" prefHeight="27.0" prefWidth="100.0" text="Annulla ">
+                     <graphic>
+                        <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@undo.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  
+                  <Button fx:id="btnAddTrack" mnemonicParsing="false" onAction="#openAddTrackWindow" text="Aggiungi Brano">
                      <graphic>
                         <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -52,15 +62,6 @@
                            </image>
                         </ImageView>
                      </graphic></Button>
-                  <Button fx:id="btnUndo" mnemonicParsing="false" onAction="#handleUndo" prefHeight="27.0" prefWidth="100.0" text="Annulla ">
-                     <graphic>
-                        <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@undo.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
               </items>
             </ToolBar>
          </children>
@@ -132,9 +133,9 @@
          <children>
             <TableView fx:id="trackTable" prefHeight="200.0" prefWidth="200.0">
                <columns>
-                 <TableColumn fx:id="titleCol" prefWidth="250.0" text="Titolo" />
-                 <TableColumn fx:id="authorCol" prefWidth="200.0" text="Autore" />
-                 <TableColumn fx:id="genreCol" prefWidth="150.0" text="Genere" />
+                  <TableColumn fx:id="titleCol" prefWidth="250.0" text="Titolo" />
+                  <TableColumn fx:id="authorCol" prefWidth="200.0" text="Autore" />
+                  <TableColumn fx:id="genreCol" prefWidth="150.0" text="Genere" />
                </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

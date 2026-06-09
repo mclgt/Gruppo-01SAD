@@ -3,6 +3,7 @@ package com.Controller.core;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
@@ -57,17 +58,20 @@ public class MainController {
     @FXML
     private Slider progressSlider;
     @FXML
+    private Button btnPlay;
+    @FXML
     private Button btnUndo;
     @FXML
     private Button btnAddToPlaylist;
     @FXML
-    private Button btnPlay;
+    private Button btnAddTrack, btnEditTrack, btnRemoveTrack;
 
     @FXML
     private TableView<Playlist> playlistList;
     @FXML
     private TableColumn<Playlist, String> nameCol;
-    private PlaylistController activePlaylistController;
+
+    private PlaylistController playlistController;
 
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
@@ -95,7 +99,8 @@ public class MainController {
         btnUndo.disableProperty().bind(undoManager.undoDisabledProperty());
 
         // Inizialzzazione dei sotto-controller
-        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel);
+        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
+                lblAlbum, lblGenre, lblDuration, lblYear);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
 
@@ -123,7 +128,7 @@ public class MainController {
         return trackList;
     }
 
-    public Button getBtnAddToPlaylist() {
+    public Button getBtnAddToPlaylist(){
         return btnAddToPlaylist;
     }
 
@@ -136,11 +141,11 @@ public class MainController {
         return undoManager;
     }
 
-    public PlaylistCatalog getPlaylistCatalog() {
+    public PlaylistCatalog getPlaylistCatalog(){
         return playlistCatalog;
     }
 
-    public PlaylistTableController getPlaylistTableController() {
+    public PlaylistTableController getPlaylistTableController(){
         return playlistTableController;
     }
 
@@ -150,10 +155,6 @@ public class MainController {
 
     public PlaybackTimerManager getTimerManager() {
         return timerManager;
-    }
-
-    public PlaylistController getPlaylistController() {
-        return activePlaylistController;
     }
 
     public Deque<Boolean> getDeletedPlayingStack() {
@@ -171,7 +172,18 @@ public class MainController {
     public PlayerController getPlayerController() {
         return playerController;
     }
-    
+
+    public void setTrackManagementButtonVisible(boolean visible){
+        btnAddTrack.setVisible(visible);
+        btnAddTrack.setManaged(visible);
+
+        btnEditTrack.setVisible(visible);
+        btnEditTrack.setManaged(visible);
+
+        btnRemoveTrack.setVisible(visible);
+        btnRemoveTrack.setManaged(visible);
+    }
+
     public void addTrackMainTable(Track track) {
         trackList.addTrack(track);
     }
@@ -258,19 +270,19 @@ public class MainController {
     }
 
     @FXML
-    public void openAddPlaylistView(ActionEvent ev) {
+    public void openAddPlaylistView(ActionEvent ev){
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
-    public void openPlaylistView(Playlist selectedPlaylist) {
-        try {
+    public void openPlaylistView(Playlist selectedPlaylist){
+        try{
+            setTrackManagementButtonVisible(false);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
-            PlaylistController playlistController = loader.getController();
+            playlistController = loader.getController();
             playlistController.setMainController(this);
             playlistController.setPlaylistData(selectedPlaylist);
-            this.activePlaylistController = playlistController;
 
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(playlistViewNode);
@@ -280,14 +292,14 @@ public class MainController {
     }
 
     @FXML
-    public void openAddTrackToPlaylistView() {
+    public void openAddTrackToPlaylistView(){
         Playlist selectedPlaylist = playlistTableController.getSelectedPlaylist();
         openAddTrackToPlaylistView(selectedPlaylist);
     }
 
-    public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
-        if (selectedPlaylist != null) {
-            try {
+    public void openAddTrackToPlaylistView(Playlist selectedPlaylist){
+        if(selectedPlaylist != null){
+            try{
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
                 Parent root = loader.load();
 
@@ -298,10 +310,10 @@ public class MainController {
                 stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
                 stage.setScene(new Scene(root));
                 stage.show();
-            } catch (Exception ex) {
+            }catch(Exception ex){
                 ex.printStackTrace();
             }
-        } else {
+        }else{
             System.out.println("Nessuna playlist selezionata!");
         }
     }
@@ -311,11 +323,16 @@ public class MainController {
      *        centrale,
      *        chiudendo di fatto la vista della playlist.
      */
-    public void restoreMainLibraryView() {
-        if (centerContentArea != null && trackTable != null) {
+    public PlaylistController getPlaylistController() {
+        return playlistController;
+    }
+
+    public void restoreMainLibraryView(){
+        playlistController = null;
+        setTrackManagementButtonVisible(true);
+        if(centerContentArea != null && trackTable != null){
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);
-            this.activePlaylistController = null;
         }
     }
 
@@ -326,16 +343,8 @@ public class MainController {
 
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
-        if (trackTableController != null) {
-            trackTableController.clearSelection();
-        }
-        if (playlistTableController != null) {
-            playlistTableController.clearSelection();
-        }
-        if (getPlaylistController() != null) {
-            getPlaylistController().clearSelection();
-        }
-        updateDetailPanel(null);
+        trackTableController.clearSelection();
+        playlistTableController.clearSelection();
     }
 
     @FXML

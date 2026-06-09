@@ -16,14 +16,29 @@ public class ShuffleStrategy implements IPlaybackStrategy {
 
     private final Random random = new Random();
 
+    /**
+     * @brief Restituisce un brano casuale dalla coda, escludendo il brano corrente.
+     *
+     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
+     * @param current Brano attualmente in riproduzione.
+     * @return Un @ref Track scelto casualmente, o {@code null} se la coda è vuota.
+     */
     @Override
     public Track nextTrack(List<Track> queue, Track current) {
         if (queue.isEmpty()) return null;
         if (queue.size() == 1) return queue.get(0);
-        //richiamo pickRandomIndex per ottenere un indice casuale diverso da quello del brano corrente
         return queue.get(pickRandomIndex(queue, queue.indexOf(current)));
     }
 
+    /**
+     * @brief Equivalente a {@link #nextTrack}: restituisce un brano casuale.
+     *        Non esiste una storia della riproduzione casuale, quindi "precedente"
+     *        si comporta come "successivo".
+     *
+     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
+     * @param current Brano attualmente in riproduzione.
+     * @return Un @ref Track scelto casualmente.
+     */
     @Override
     public Track previousTrack(List<Track> queue, Track current) {
         return nextTrack(queue, current);

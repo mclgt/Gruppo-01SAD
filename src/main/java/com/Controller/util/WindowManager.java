@@ -133,9 +133,10 @@ public class WindowManager {
         alert.showAndWait();
     }
 
-    public Optional<ButtonType> showConfirmation(String title, String content, Runnable onConfirm) {
+    public Optional<ButtonType> showConfirmation(String title, String header, String content, Runnable onConfirm) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(title);
+        alert.setHeaderText(header);
         alert.setContentText(content);
         return alert.showAndWait();
     }
