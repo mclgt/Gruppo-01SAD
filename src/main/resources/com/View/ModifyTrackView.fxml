@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.control.ComboBox?>
 
 <VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.track.AddModTrackController">
    <padding>
@@ -58,6 +59,8 @@
             <TextField fx:id="txtGenre"  GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label text="Anno:" GridPane.rowIndex="2" />
             <TextField fx:id="txtYear" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Tag: " GridPane.rowIndex="7" />
+            <ComboBox fx:id="tagCombo" prefHeight="25.0" prefWidth="135.0" promptText="Seleziona un tag" GridPane.columnIndex="1" GridPane.rowIndex="7" />
          </children>
       </GridPane>
       

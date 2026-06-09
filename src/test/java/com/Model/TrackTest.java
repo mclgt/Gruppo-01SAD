@@ -14,7 +14,7 @@ public class TrackTest {
     @Test
     public void testTrackConstructorAndGetters() {
         Track track = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
-                "C:/audio.wav", null);
+                "C:/audio.wav", TrackTag.FAVOURITE);
 
         assertEquals("Bohemian Rhapsody", track.getTitle());
         assertEquals("Queen", track.getAuthor());
@@ -23,6 +23,7 @@ public class TrackTest {
         assertEquals(355, track.getDuration());
         assertEquals("A Night at the Opera", track.getAlbum());
         assertEquals("C:/audio.wav", track.getFilePath());
+        assertEquals(TrackTag.FAVOURITE, track.getTag());
     }
 
     @Test
@@ -36,6 +37,7 @@ public class TrackTest {
         track.setDuration(238);
         track.setAlbum("Pablo Honey");
         track.setFilePath("C:/audio.wav");
+        track.setTag(TrackTag.NEW_RELEASE);
 
         assertEquals("Creep", track.getTitle(), "Il titolo dovrebbe essere modificato");
         assertEquals("Radiohead", track.getAuthor(), "L'Autore dovrebbe essere modificato");
@@ -44,6 +46,7 @@ public class TrackTest {
         assertEquals(238, track.getDuration(), "La durata dovrebbe essere modificato");
         assertEquals("Pablo Honey", track.getAlbum(), "L'album dovrebbe essere modificato");
         assertEquals("C:/audio.wav", track.getFilePath(), "Il path dovrebbe essere modificato");
+        assertEquals(TrackTag.NEW_RELEASE, track.getTag(), "Il tag dovrebbe essere modificato");
     }
 
     /**

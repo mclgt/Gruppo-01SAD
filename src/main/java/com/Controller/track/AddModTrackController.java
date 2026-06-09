@@ -1,26 +1,27 @@
 package com.Controller.track;
 
-import com.Model.Track;
+import java.io.File;
+
 import com.Command.AddTrack;
 import com.Command.ICommand;
 import com.Command.ModifyTrack;
 import com.Controller.core.MainController;
 import com.DataLayer.TrackProxy;
-
-import java.io.File;
-import com.Model.TrackTag;
 import com.Factory.TrackFactory;
+import com.Model.Track;
+import com.Model.TrackTag;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.StringConverter;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ComboBox;
-import javafx.collections.FXCollections;
 /**
  * @brief Controller unico per l'Aggiunta e la Modifica di un brano.
  *        Gestisce l'interazione dell'utente con il form per aggiungere una
@@ -45,7 +46,7 @@ public class AddModTrackController implements ITrackImporter {
     @FXML
     private TextField txtFilePath;
     @FXML
-    private ComboBox<TrackTag> tagTrack;
+    private ComboBox<TrackTag> tagCombo;
     @FXML
     private Button btnDelete;
     @FXML
@@ -68,19 +69,9 @@ public class AddModTrackController implements ITrackImporter {
     
     @FXML
     public void initialize() {  
-        if(tagTrack != null) {
-            tagTrack.setItems(FXCollections.observableArrayList(TrackTag.values()));
-            tagTrack.setConverter(new StringConverter<TrackTag>() {
-                @Override
-                public String toString(TrackTag tag) {
-                    return tag == null || tag == TrackTag.NONE ? " " : tag.name();
-                }
-                @Override
-                public TrackTag fromString(String string) {
-                    return null;
-                }
-            });
-        }
+        ObservableList<TrackTag> tags = FXCollections.observableArrayList(TrackTag.values());
+        tagCombo.setItems(tags);
+        tagCombo.setPromptText("Seleziona un tag...");
     }
     /**
      * @brief Consente di inizializzare il form in modalità "Aggiunta" o "Modifica"
@@ -102,12 +93,12 @@ public class AddModTrackController implements ITrackImporter {
             txtYear.setText(track.getYear() == 0 ? "" : String.valueOf(track.getYear()));
             txtDuration.setText(track.getDuration() == 0 ? "" : (String.valueOf(track.getFormattedDuration())));
             if(track.getTag() != null) {
-                tagTrack.getSelectionModel().select((track.getTag() != null) ? track.getTag() : TrackTag.NONE);
+                tagCombo.getSelectionModel().select((track.getTag() != null) ? track.getTag() : TrackTag.NONE);
             }
         } else {
             this.isEditMode = false;
-            if(tagTrack != null) {
-                tagTrack.getSelectionModel().select(TrackTag.NONE);
+            if(tagCombo != null) {
+                tagCombo.getSelectionModel().select(TrackTag.NONE);
             }
         }
     }
@@ -140,7 +131,7 @@ public class AddModTrackController implements ITrackImporter {
             String genre = txtGenre.getText();
             String album = txtAlbum.getText();
             String filePath = txtFilePath.getText();
-            TrackTag tag = (tagTrack != null) ? tagTrack.getSelectionModel().getSelectedItem() : TrackTag.NONE;
+            TrackTag tag = (tagCombo != null) ? tagCombo.getValue() : TrackTag.NONE;
             int duration = 0;
             if (txtDuration.getText() != null && !txtDuration.getText().isEmpty()) {
                 duration = convertSeconds(txtDuration.getText());

@@ -27,7 +27,7 @@ public class PlaylistTest {
         playlist.addTrack(t1);
         playlist.addTrack(0, t2);
         List<Track> tracks = playlist.getTracks();
-
+        
         assertEquals(2, playlist.getTracksCount(), "La playlist deve contenere 2 brani");
         assertEquals(t2, tracks.get(0), "Il brano 2 dovrebbe trovarsi all'indice 0");
         assertEquals(150, playlist.getTotalDuration(), "La durata totale deve essere la somma esatta (150s)");

@@ -61,7 +61,7 @@
             <Label text="Album:" GridPane.rowIndex="4" />
             <TextField fx:id="txtAlbum" promptText="Es. A Night at the Opera" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label text="Tag: " GridPane.rowIndex="7" />
-            <ComboBox prefHeight="25.0" prefWidth="135.0" promptText="Seleziona un tag" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+            <ComboBox fx:id="tagCombo" prefHeight="25.0" prefWidth="135.0" promptText="Seleziona un tag" GridPane.columnIndex="1" GridPane.rowIndex="7" />
          </children>
       </GridPane>
       

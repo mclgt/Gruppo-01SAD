@@ -54,7 +54,7 @@ public class Track {
         setDuration(duration);
         setAlbum(album);
         setFilePath(filePath);
-        setTag(tag != null ? tag : TrackTag.NONE);
+        setTag(tag);
     }
 
     // Getter e setter classici

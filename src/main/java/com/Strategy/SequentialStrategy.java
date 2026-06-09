@@ -7,16 +7,16 @@ import java.util.List;
  * @class SequentialStrategy
  * @brief Strategia di riproduzione sequenziale.
  *
- *        Riproduce i brani nell'ordine della coda senza ripetizioni.
- *        La riproduzione si arresta alla fine (o all'inizio) della coda.
+ * Riproduce i brani nell'ordine della coda senza ripetizioni.
+ * La riproduzione si arresta alla fine (o all'inizio) della coda.
  */
 public class SequentialStrategy implements IPlaybackStrategy {
 
     /**
      * @brief Restituisce il brano successivo nella coda.
      *
-     *        Se il brano corrente è l'ultimo (o non trovato),
-     *        restituisce {@code null} per segnalare la fine della riproduzione.
+     * Se il brano corrente è l'ultimo (o non trovato),
+     * restituisce {@code null} per segnalare la fine della riproduzione.
      *
      * @param queue   Lista ordinata dei brani nella coda di riproduzione.
      * @param current Brano attualmente in riproduzione.
@@ -24,12 +24,6 @@ public class SequentialStrategy implements IPlaybackStrategy {
      */
     @Override
     public Track nextTrack(List<Track> queue, Track current) {
-        if (queue == null || queue.isEmpty()) {
-            return null;
-        }
-        if (current == null) {
-            return queue.get(0);
-        }
         int currentIndex = queue.indexOf(current);
         if (currentIndex == -1 || currentIndex == queue.size() - 1) {
             return null;
@@ -40,8 +34,8 @@ public class SequentialStrategy implements IPlaybackStrategy {
     /**
      * @brief Restituisce il brano precedente nella coda.
      *
-     *        Se il brano corrente è il primo (o non trovato),
-     *        restituisce {@code null} per segnalare l'inizio della riproduzione.
+     * Se il brano corrente è il primo (o non trovato),
+     * restituisce {@code null} per segnalare l'inizio della riproduzione.
      *
      * @param queue   Lista ordinata dei brani nella coda di riproduzione.
      * @param current Brano attualmente in riproduzione.
