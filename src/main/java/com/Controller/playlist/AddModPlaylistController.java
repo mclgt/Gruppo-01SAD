@@ -1,10 +1,10 @@
 package com.Controller.playlist;
 
-import com.Model.Playlist;
 import com.Command.AddPlaylist;
 import com.Command.ICommand;
 import com.Command.ModifyPlaylist;
 import com.Controller.core.MainController;
+import com.Model.Playlist;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -39,7 +39,7 @@ public class AddModPlaylistController {
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
-
+    
     /**
      * @brief Imposta la playlist da modificara. Se viene passata una playlist
      *        esistente, il campo viene aggiornato con il suo nome attuale.

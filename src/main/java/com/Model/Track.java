@@ -1,7 +1,13 @@
 package com.Model;
 
 import com.DataLayer.IAudioTrack;
-import javafx.beans.property.*;
+
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 /**
  * @brief Rappresenta l'entità del singolo brano musicale.
@@ -21,7 +27,7 @@ public class Track {
     private final IntegerProperty duration = new SimpleIntegerProperty();
     private final StringProperty album = new SimpleStringProperty();
     private final StringProperty filePath = new SimpleStringProperty();
-
+    private final ObjectProperty<TrackTag> tag = new SimpleObjectProperty<>(TrackTag.NONE);
     private IAudioTrack audioSource;
 
     /**
@@ -38,8 +44,9 @@ public class Track {
      * @param duration durata fisica del brano espressa in secondi
      * @param album    Album di appartenenza del brano
      * @param filePath Percorso del file audio da inserire
+     * @param tag      Tag associato al brano, se presente. Se null, viene impostato a TrackTag.NONE
      */
-    public Track(String title, String author, int year, String genre, int duration, String album, String filePath) {
+    public Track(String title, String author, int year, String genre, int duration, String album, String filePath, TrackTag tag) {
         setTitle(title);
         setAuthor(author);
         setGenre(genre);
@@ -47,6 +54,7 @@ public class Track {
         setDuration(duration);
         setAlbum(album);
         setFilePath(filePath);
+        setTag(tag);
     }
 
     // Getter e setter classici
@@ -76,6 +84,10 @@ public class Track {
 
     public String getFilePath() {
         return filePath.get();
+    }
+
+    public TrackTag getTag() {
+        return tag.get();
     }
 
     public void setTitle(String title) {
@@ -121,6 +133,9 @@ public class Track {
         this.filePath.set(filePath);
     }
 
+    public void setTag(TrackTag tag) {
+        this.tag.set(tag != null ? tag : TrackTag.NONE);
+    }
     // getter per il binding grafico
 
     public StringProperty titleProperty() {
@@ -151,6 +166,9 @@ public class Track {
         return filePath;
     }
 
+    public ObjectProperty<TrackTag> tagProperty() {
+        return tag;
+    }
     /**
      * @brief Imposta la sorgente audio (Proxy) associata a questo brano.
      * @param audioSource L'oggetto che implementa la gestione audio.

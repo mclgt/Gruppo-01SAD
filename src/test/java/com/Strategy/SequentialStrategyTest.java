@@ -1,13 +1,14 @@
 package com.Strategy;
 
-import com.Model.Track;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.Model.Track;
 
 /***
  * @brief Classe di test per SequentialStrategy.
@@ -27,9 +28,9 @@ public class SequentialStrategyTest {
     public void setUp() {
         strategy = new SequentialStrategy();
 
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3");
-        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3");
-        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3");
+        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",null);
+        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3",null);
+        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3",null);
 
         queue = Arrays.asList(track1, track2, track3);
     }
@@ -53,7 +54,7 @@ public class SequentialStrategyTest {
 
     @Test
     public void testNextTrack_trackNotInQueue_returnsNull() {
-        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy4.mp3");
+        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy4.mp3",null);
         assertNull(strategy.nextTrack(queue, outsider));
     }
 
@@ -77,7 +78,7 @@ public class SequentialStrategyTest {
 
     @Test
     public void testPreviousTrack_trackNotInQueue_returnsNull() {
-        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy4.mp3");
+        Track outsider = new Track("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy4.mp3",null);
         assertNull(strategy.previousTrack(queue, outsider));
     }
 }

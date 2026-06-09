@@ -168,6 +168,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label text="Titolo:" GridPane.halignment="RIGHT">
@@ -194,6 +195,10 @@
                      <font><Font name="System Bold" size="12.0" /></font>
                      <GridPane.margin><Insets right="5.0" /></GridPane.margin>
                   </Label>
+                  <Label fx:id="lblTagTitle" text="Tag:" GridPane.halignment="RIGHT" GridPane.rowIndex="6">
+                     <font><Font name="System Bold" size="12.0" /></font>
+                     <GridPane.margin><Insets right="5.0" /></GridPane.margin>
+                  </Label>
 
                   <Label fx:id="lblTitle" text="-" wrapText="true" GridPane.columnIndex="1" />
                   <Label fx:id="lblAuthor" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -201,6 +206,7 @@
                   <Label fx:id="lblGenre" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <Label fx:id="lblYear" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Label fx:id="lblDuration" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <Label fx:id="lblTag" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                </children>
             </GridPane>
          </children>
@@ -232,13 +238,23 @@
                   <Button fx:id="btnPrev" mnemonicParsing="false" onAction="#handlePrev" prefHeight="35.0" prefWidth="45.0" text="⏮">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#playSong" prefHeight="40.0" prefWidth="80.0" text="▶ Play">
+                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#togglePlayPause" prefHeight="40.0" prefWidth="80.0" text="▶ Play">
                      <font><Font name="System Bold" size="14.0" /></font>
                   </Button>
                   <Button fx:id="btnNext" mnemonicParsing="false" onAction="#handleNext" prefHeight="35.0" prefWidth="45.0" text="⏭">
                      <font><Font size="14.0" /></font>
                   </Button>
                   <Button fx:id="btnSeq" mnemonicParsing="false" onAction="#sequentialRip" prefHeight="40.0" prefWidth="84.0" text="Seq.">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnLoop" mnemonicParsing="false" onAction="#loopRip" prefHeight="40.0" prefWidth="84.0" text="Loop">
+                     <font>
+                        <Font name="System Bold" size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnShuffle" mnemonicParsing="false" onAction="#shuffleRip" prefHeight="40.0" prefWidth="84.0" text="Shuffle">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>

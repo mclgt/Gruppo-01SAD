@@ -1,11 +1,11 @@
 package com.Model;
 
-import org.junit.jupiter.api.Test;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.List;
+import org.junit.jupiter.api.Test;
 
 public class PlaylistTest {
 
@@ -21,8 +21,8 @@ public class PlaylistTest {
     @Test
     public void testAddTrackAndDuration() {
         Playlist playlist = new Playlist("Preferite");
-        Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album 1", "path1.wav");
-        Track t2 = new Track("Brano 2", "Autore", 2021, "Rock", 50, "Album 2", "path2.wav");
+        Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album 1", "path1.wav", null);
+        Track t2 = new Track("Brano 2", "Autore", 2021, "Rock", 50, "Album 2", "path2.wav", null);
 
         playlist.addTrack(t1);
         playlist.addTrack(0, t2);
@@ -37,7 +37,7 @@ public class PlaylistTest {
     @Test
     public void testRemoveTrack() {
         Playlist playlist = new Playlist("Test Remove");
-        Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album", "path1.wav");
+        Track t1 = new Track("Brano 1", "Autore", 2020, "Pop", 100, "Album", "path1.wav", null);
 
         playlist.addTrack(t1);
         assertEquals(1, playlist.getTracksCount());

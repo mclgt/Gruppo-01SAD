@@ -13,7 +13,7 @@ public class RemovePlaylist implements ICommand {
     
     private PlaylistCatalog playlistList;
     private Playlist playlist;
-    int index;
+    private int index;
 
     /**
      * @brief Costruttore che inizializza il comando di rimozione di una playlist.

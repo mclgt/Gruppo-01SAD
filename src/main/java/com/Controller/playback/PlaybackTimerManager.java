@@ -40,6 +40,28 @@ public class PlaybackTimerManager {
         }
     }
 
+    //congela entrambi i timer JavaFX senza resettarli: lo slider e le label rimangono
+    //esattamente al secondo in cui si è premuto pausa
+    public void pause() {
+        if (playbackTimer != null) {
+            playbackTimer.pause();
+        }
+        if (progressTimeline != null) {
+            progressTimeline.pause();
+        }
+    }
+
+    //riprende i timer dal punto esatto in cui erano stati congelati con pause(),
+    //il conteggio continua da dove era rimasto
+    public void resume() {
+        if (playbackTimer != null) {
+            playbackTimer.play();
+        }
+        if (progressTimeline != null) {
+            progressTimeline.play();
+        }
+    }
+
     public String getFormattedTime(int totalSeconds){
         int minutes = totalSeconds / 60;
         int seconds = totalSeconds % 60;

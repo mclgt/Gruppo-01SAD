@@ -6,27 +6,28 @@ import com.Command.ICommand;
 import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Track;
+import com.Model.TrackTag;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-
 public class TrackTableController {
     private MainController mainController;
-
+    @FXML
+    private Label lblTagTitle;
     private TableView<Track> trackTable;
     private VBox detailPanel;
     private Label lblTitle, lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear;
+    @FXML
+    private Label lblTag;
 
     public void init(MainController mainController, TableView<Track> trackTable, TableColumn<Track, String> titleCol,
-            TableColumn<Track, String> authorCol, TableColumn<Track, String> genreCol, VBox detailPanel,
-            Label lblTitle, Label lblAuthor, Label lblAlbum, Label lblGenre, Label lblDuration, Label lblYear) {
+                     TableColumn<Track, String> authorCol, TableColumn<Track, String> genreCol, VBox detailPanel,
+                     Label lblTitle, Label lblAuthor, Label lblAlbum, Label lblGenre, Label lblDuration, Label lblYear, Label lblTagTitle, Label lblTag) {
         this.mainController = mainController;
         this.trackTable = trackTable;
         this.detailPanel = detailPanel;
@@ -36,7 +37,8 @@ public class TrackTableController {
         this.lblGenre = lblGenre;
         this.lblDuration = lblDuration;
         this.lblYear = lblYear;
-
+        this.lblTagTitle = lblTagTitle;
+        this.lblTag=lblTag;
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
@@ -57,24 +59,36 @@ public class TrackTableController {
         trackTable.getSelectionModel().clearSelection();
     }
 
+    // aggiorna la selezione visiva nella tabella quando si preme next o prev,
+    // così la riga evidenziata corrisponde sempre alla traccia in riproduzione
+    public void selectTrack(Track track) {
+        trackTable.getSelectionModel().select(track);
+    }
+
     private void updateDetailPanel(Track track) {
         if (track == null) {
             detailPanel.setVisible(false);
         } else {
             lblTitle.setText(track.getTitle());
             lblAuthor.setText(track.getAuthor());
-            lblAlbum.setText(track.getAlbum().trim().isEmpty() ? "-" : track.getAlbum());
-            lblGenre.setText(track.getGenre().trim().isEmpty() ? "-" : track.getGenre());
+            String album = track.getAlbum();
+            lblAlbum.setText((album == null || album.trim().isEmpty()) ? "-" : album);
+            String genre = track.getGenre();
+            lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : genre);
             lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
             lblDuration.setText(track.getFormattedDuration());
-
+            if(track.getTag() == null || track.getTag() == TrackTag.NONE){
+                lblTagTitle.setVisible(false);
+                lblTag.setVisible(false);
+            }
+            else{
+                lblTagTitle.setVisible(true);
+                lblTag.setVisible(true);
+                lblTag.setText(track.getTag().toString());
+            }
+           
             detailPanel.setVisible(true);
         }
-    }
-
-    @FXML
-    public void handleBckgroundClick(MouseEvent ev) {
-        clearSelection();
     }
 
     public void openAddTrackWindow(ActionEvent ev) {
@@ -100,9 +114,7 @@ public class TrackTableController {
                     "Seleziona una traccia dalla tabella da rimuovere.");
             return;
         }
-        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione",
-                "Rimozione dalla libreria e da tutte le playlist",
-                "Sei sicuro di voler rimuovere" + selectedTrack.getTitle() + "?", null);
+        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione", "Rimozione dalla libreria e da tutte le playlist", "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\"?", null);
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack,

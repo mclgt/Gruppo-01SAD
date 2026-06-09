@@ -2,7 +2,6 @@ package com.State;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +33,8 @@ public class PlayerContextPlaylistTest {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
         context = new PlayerContext(playbackContext);
         testPlaylist = new Playlist("Playlist Test");
-        track1 = new Track("A", "B", 2010, "C", 100, "D", "E");
-        track2 = new Track("F", "G", 2010, "H", 100, "I", "J");
+        track1 = new Track("A", "B", 2010, "C", 100, "D", "E", null);
+        track2 = new Track("F", "G", 2010, "H", 100, "I", "J", null);
         testPlaylist.addTrack(track1);
         testPlaylist.addTrack(track2);
 
