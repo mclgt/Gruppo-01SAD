@@ -23,9 +23,9 @@ class ShuffleStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new ShuffleStrategy();
-        track1 = new Track("Track 1", "Artista", 2020, "Pop", 180, "Album", "/path/1.mp3");
-        track2 = new Track("Track 2", "Artista", 2021, "Pop", 200, "Album", "/path/2.mp3");
-        track3 = new Track("Track 3", "Artista", 2022, "Pop", 210, "Album", "/path/3.mp3");
+        track1 = new Track("Track 1", "Artista", 2020, "Pop", 180, "Album", "/path/1.mp3", null);
+        track2 = new Track("Track 2", "Artista", 2021, "Pop", 200, "Album", "/path/2.mp3", null);
+        track3 = new Track("Track 3", "Artista", 2022, "Pop", 210, "Album", "/path/3.mp3", null);
     
     }
 

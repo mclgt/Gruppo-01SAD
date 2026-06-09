@@ -12,7 +12,6 @@ import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
-import com.DataLayer.TrackProxy;
 import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
@@ -108,19 +107,6 @@ public class MainController {
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
 
-        String[][] demoData = {
-            {"Bohemian Rhapsody", "Queen",        "1975", "Rock",       "354", "A Night at the Opera"},
-            {"Blinding Lights",  "The Weeknd",    "2019", "Synthpop",   "200", "After Hours"},
-            {"Smells Like Teen", "Nirvana",       "1991", "Grunge",     "301", "Nevermind"},
-            {"Billie Jean",      "Michael Jackson","1982", "Pop",       "294", "Thriller"},
-            {"Hotel California", "Eagles",        "1977", "Rock",       "391", "Hell Freezes Over"},
-        };
-        for (String[] d : demoData) {
-            Track t = new Track(d[0], d[1], Integer.parseInt(d[2]), d[3], Integer.parseInt(d[4]), d[5],
-                    "demo_" + d[0].replace(" ", "_") + ".wav");
-            t.setAudioSource(new TrackProxy(t.getFilePath()));
-            trackList.addTrack(t);
-        }
     }
 
     /**
