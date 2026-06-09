@@ -1,6 +1,7 @@
 package com.Controller.playback;
 
 import com.Controller.core.MainController;
+import com.Model.ITrackContainer;
 import com.Controller.playlist.PlaylistController;
 import com.Model.Track;
 import com.Model.ITrackContainer;
@@ -38,6 +39,8 @@ public class PlayerController {
     private boolean loopMode = false;
     /** @brief True se il brano corrente è terminato naturalmente. */
     private boolean trackFinished = false;
+    private ITrackContainer activeContainer;
+    
 
     /**
      * @brief Inizializza i riferimenti ai componenti grafici e al controller
@@ -478,10 +481,14 @@ public class PlayerController {
      * @param removedIdx indice della traccia rimossa
      */
     public void handleTrackRemoval(int removedIdx) {
-        if (!mainController.getLibrary().getTracks().isEmpty()) {
-            int nextIdx = Math.min(removedIdx, mainController.getLibrary().getTracks().size() - 1);
-            Track nextTrack = mainController.getLibrary().getTracks().get(nextIdx);
-            startTrackPlayback(nextTrack);
+        ITrackContainer container = (activeContainer != null) ? activeContainer : mainController.getLibrary();
+
+        if (container.getTracks() != null && !container.getTracks().isEmpty()) {
+            int nextIdx = Math.min(removedIdx, container.getTracks().size() - 1);
+            if(nextIdx >=0){
+                Track nextTrack = container.getTracks().get(nextIdx);
+                startTrackPlayback(nextTrack);
+            }
         } else {
             resetUI();
             lblNowPlaying.setText("Nessuna traccia in riproduzione");

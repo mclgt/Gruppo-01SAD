@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.DataLayer.TrackProxy;
 import com.Model.Track;
+import com.Model.TrackTag;
 
 /**
  * @brief Classe Factory per la creazione e validazione dei brani
@@ -30,13 +31,13 @@ public class TrackFactory {
      * @param duration Durata del brano espressa in secondi. Deve essere maggiore di
      *                 zero
      * @param filePath Indica il percorso del file da importare
-     * 
+     * @param tag      Tag associato al brano, se presente. Se null, viene impostato a TrackTag.NONE
      * @return Track: Una nuova istanza validata dalla classe
      * @throws IllegalArgumentException se il titolo o l'autore sono vuoto o se la
      *                                  durata è inferiore a zero.
      */
     public static Track createTrack(String title, String author, int year, String genre, int duration, String album,
-            String filePath) {
+            String filePath, TrackTag tag) {
         if (filePath != null && !filePath.trim().isEmpty()) {
             File audioFile = new File(filePath);
 
@@ -48,7 +49,7 @@ public class TrackFactory {
         }
 
         Track track = new Track(title.trim(), author.trim(), year, genre.trim(), duration, album.trim(),
-                filePath.trim());
+                filePath.trim(), tag);
 
         TrackProxy proxy = new TrackProxy(filePath);
         track.setAudioSource(proxy);

@@ -1,15 +1,16 @@
 package com.State;
 
-import com.Model.Track;
-import com.Strategy.IPlaybackStrategy;
-import com.Strategy.PlaybackContext;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.Model.Track;
+import com.Strategy.IPlaybackStrategy;
+import com.Strategy.PlaybackContext;
 
 /**
  * @brief Test per PlayingState: verifica il comportamento dello stato di riproduzione attiva (ovvero una canzone è in riproduzione) del PlayerContext.
@@ -58,9 +59,9 @@ public class PlayingStateTest {
 
     @BeforeEach
     public void setUp() {
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3");
-        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3");
-        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3");
+        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",null);
+        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3",null);
+        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3",null);
         queue = Arrays.asList(track1, track2, track3);
     }
 

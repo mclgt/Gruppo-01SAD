@@ -17,6 +17,7 @@ import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
 import com.Model.Track;
+import com.Model.TrackTag;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -65,7 +66,10 @@ public class MainController {
     private Button btnAddToPlaylist;
     @FXML
     private Button btnAddTrack, btnEditTrack, btnRemoveTrack;
-
+    @FXML
+    private Label lblTagTitle;
+    @FXML
+    private Label lblTag;
     @FXML
     private TableView<Playlist> playlistList;
     @FXML
@@ -100,7 +104,7 @@ public class MainController {
 
         // Inizialzzazione dei sotto-controller
         trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
-                lblAlbum, lblGenre, lblDuration, lblYear);
+                lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
 
@@ -364,7 +368,16 @@ public class MainController {
             lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : track.getGenre());
             lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
             lblDuration.setText(track.getFormattedDuration());
-
+            if(track.getTag() == null || track.getTag() == TrackTag.NONE){
+                lblTagTitle.setVisible(false);
+                lblTag.setVisible(false);
+            }
+            else{
+                lblTagTitle.setVisible(true);
+                lblTag.setVisible(true);
+                lblTag.setText(track.getTag().toString());
+            }
+           
             detailPanel.setVisible(true);
         }
     }

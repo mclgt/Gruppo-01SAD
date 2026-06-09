@@ -1,11 +1,15 @@
 package com.Factory;
 
-import com.Model.Track;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.File;
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+
+import com.Model.Track;
 
 /***
  * @brief Classe di test per la validazione della TrackFactory
@@ -23,7 +27,7 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Track track = TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238,
-                "A Night at the opera", tmpFile.getAbsolutePath());
+                "A Night at the opera", tmpFile.getAbsolutePath(), null);
         assertNotNull(track);
         assertEquals("Creep", track.getTitle());
         assertEquals("Radiohead", track.getAuthor());
@@ -40,7 +44,7 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", tmpFile.getAbsolutePath());
+            TrackFactory.createTrack("", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", tmpFile.getAbsolutePath(),null);
         });
         assertTrue(exc.getMessage().contains("Titolo"));
     }
@@ -51,7 +55,7 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "", 1992, "Alternative Rock", 238, "A Night at the opera", tmpFile.getAbsolutePath());
+            TrackFactory.createTrack("Creep", "", 1992, "Alternative Rock", 238, "A Night at the opera", tmpFile.getAbsolutePath(),null);
         });
         assertTrue(exc.getMessage().contains("Autore"));
     }
@@ -62,7 +66,7 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", -2, "A Night at the opera", tmpFile.getAbsolutePath());
+            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", -2, "A Night at the opera", tmpFile.getAbsolutePath(),null);
         });
         assertTrue(exc.getMessage().contains("Durata"));
     }
@@ -70,7 +74,7 @@ public class TrackFactoryTest {
     @Test
     public void testCreateTrack_notExistentFilePath(){
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", "C:/percorso/test.wav");
+            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", "C:/percorso/test.wav",null);
         });
 
         assertTrue(exc.getMessage().contains("mancante") ||
@@ -80,7 +84,7 @@ public class TrackFactoryTest {
     @Test
     public void testCreateTrack_emptyFilePath(){
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", "");
+            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", "",null);
         });
 
         assertTrue(exc.getMessage().contains("File"));

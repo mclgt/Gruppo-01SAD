@@ -1,7 +1,6 @@
 package com.Model;
 
 import javafx.collections.ObservableList;
-
 public interface ITrackContainer {
     void addTrack(Track track);
 
@@ -10,6 +9,5 @@ public interface ITrackContainer {
     boolean removeTrack(Track track);
 
     int indexOf(Track track);
-
     ObservableList<Track> getTracks();
 }
