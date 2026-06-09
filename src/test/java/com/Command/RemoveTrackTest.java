@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 import com.Model.ITrackContainer;
 import com.Model.Library;
 import com.Model.Track;
+
 /**
  * @brief Definizione della classe di unit test per la rimozione delle tracce.
  */
 public class RemoveTrackTest {
-    
-    private ITrackContainer container;  
-    private UndoManager undoManager; 
+
+    private ITrackContainer container;
+    private UndoManager undoManager;
     private Track track1;
     private Track track2;
     private Track track3;
@@ -39,13 +40,13 @@ public class RemoveTrackTest {
         Library library = (Library) container;
 
         assertEquals(3, library.getTracksCount(), "La libreria dovrebbe contenere 3 tracce");
-        assertEquals(track2, library.getLibrary().get(1), "Il brano track2 dovrebbe essere in posizione 1");
+        assertEquals(track2, library.getTracks().get(1), "Il brano track2 dovrebbe essere in posizione 1");
 
         ICommand removeCommand = new RemoveTrack(container, track2);
         undoManager.executeCommand(removeCommand);
 
         assertEquals(2, library.getTracksCount(), "La libreria dovrebbe contenere 2 tracce dopo la rimozione");
-        assertFalse(library.getLibrary().contains(track2), "La traccia non è stata rimossa dalla libreria");
+        assertFalse(library.getTracks().contains(track2), "La traccia non è stata rimossa dalla libreria");
 
         undoManager.undo();
         assertEquals(3, library.getTracksCount(), "La libreria dovrebbe contenere di nuovo 3 tracce");
