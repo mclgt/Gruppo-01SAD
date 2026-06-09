@@ -93,9 +93,10 @@ public class Library implements ITrackContainer {
      * @param duration La nuova durata da assegnare.
      * @param album    Il nuovo album da assegnare.
      * @param filePath Il nuovo percorso del file audio.
+     * @param tag      Il nuovo tag da assegnare al brano.
      */
     public void updateTrack(Track track, String title, String author, int year, String genre, int duration,
-            String album, String filePath) {
+            String album, String filePath, TrackTag tag) {
         int index = this.library.indexOf(track);
 
         track.setTitle(title);
@@ -108,6 +109,10 @@ public class Library implements ITrackContainer {
         if (filePath != null && !filePath.equals(track.getFilePath())) {
             track.setFilePath(filePath);
             track.setAudioSource(new TrackProxy(filePath));
+        }
+
+        if (tag != null) {
+            track.setTag(tag);
         }
 
         this.library.set(index, track);

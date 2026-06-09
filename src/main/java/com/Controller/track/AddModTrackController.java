@@ -8,17 +8,19 @@ import com.Controller.core.MainController;
 import com.DataLayer.TrackProxy;
 
 import java.io.File;
-
+import com.Model.TrackTag;
 import com.Factory.TrackFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.StringConverter;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-
+import javafx.scene.control.ComboBox;
+import javafx.collections.FXCollections;
 /**
  * @brief Controller unico per l'Aggiunta e la Modifica di un brano.
  *        Gestisce l'interazione dell'utente con il form per aggiungere una
@@ -42,7 +44,8 @@ public class AddModTrackController implements ITrackImporter {
     private TextField txtAlbum;
     @FXML
     private TextField txtFilePath;
-
+    @FXML
+    private ComboBox<TrackTag> tagTrack;
     @FXML
     private Button btnDelete;
     @FXML
@@ -62,6 +65,23 @@ public class AddModTrackController implements ITrackImporter {
         this.mainController = mainController;
     }
 
+    
+    @FXML
+    public void initialize() {  
+        if(tagTrack != null) {
+            tagTrack.setItems(FXCollections.observableArrayList(TrackTag.values()));
+            tagTrack.setConverter(new StringConverter<TrackTag>() {
+                @Override
+                public String toString(TrackTag tag) {
+                    return tag == null || tag == TrackTag.NONE ? " " : tag.name();
+                }
+                @Override
+                public TrackTag fromString(String string) {
+                    return null;
+                }
+            });
+        }
+    }
     /**
      * @brief Consente di inizializzare il form in modalità "Aggiunta" o "Modifica"
      *        Se l'oggetto track passato (oggetto selezionato) è non nullo, allora i
@@ -81,8 +101,14 @@ public class AddModTrackController implements ITrackImporter {
             txtFilePath.setText(track.getFilePath());
             txtYear.setText(track.getYear() == 0 ? "" : String.valueOf(track.getYear()));
             txtDuration.setText(track.getDuration() == 0 ? "" : (String.valueOf(track.getFormattedDuration())));
+            if(track.getTag() != null) {
+                tagTrack.getSelectionModel().select((track.getTag() != null) ? track.getTag() : TrackTag.NONE);
+            }
         } else {
             this.isEditMode = false;
+            if(tagTrack != null) {
+                tagTrack.getSelectionModel().select(TrackTag.NONE);
+            }
         }
     }
 
@@ -114,7 +140,7 @@ public class AddModTrackController implements ITrackImporter {
             String genre = txtGenre.getText();
             String album = txtAlbum.getText();
             String filePath = txtFilePath.getText();
-
+            TrackTag tag = (tagTrack != null) ? tagTrack.getSelectionModel().getSelectedItem() : TrackTag.NONE;
             int duration = 0;
             if (txtDuration.getText() != null && !txtDuration.getText().isEmpty()) {
                 duration = convertSeconds(txtDuration.getText());
@@ -125,13 +151,13 @@ public class AddModTrackController implements ITrackImporter {
             }
 
             if (isEditMode) {
-                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author, year, genre, duration, album, filePath);
+                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author, year, genre, duration, album, filePath,tag);
 
                 if(mainController != null) {
                     mainController.getUndoManager().executeCommand(modifyCommand);
                 }
             } else {
-                Track newTrack = TrackFactory.createTrack(title, author, year, genre, duration, album, filePath);
+                Track newTrack = TrackFactory.createTrack(title, author, year, genre, duration, album, filePath, tag);
                 newTrack.setAudioSource(new TrackProxy(filePath));
 
                 if (mainController != null) {

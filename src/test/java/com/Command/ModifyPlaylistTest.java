@@ -1,7 +1,6 @@
 package com.Command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,7 @@ public class ModifyPlaylistTest {
         catalog = new PlaylistCatalog();
         playlistTest = new Playlist("playlist test");
         catalog.addPlaylist(playlistTest);
-        t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera", "C:/audio.wav");
+        t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera", "C:/audio.wav", null);
         playlistTest.addTrack(t);
     }
 

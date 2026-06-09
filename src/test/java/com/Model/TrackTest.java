@@ -1,7 +1,9 @@
 package com.Model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @brief Test per l'entità Track.
@@ -12,7 +14,7 @@ public class TrackTest {
     @Test
     public void testTrackConstructorAndGetters() {
         Track track = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
-                "C:/audio.wav");
+                "C:/audio.wav", null);
 
         assertEquals("Bohemian Rhapsody", track.getTitle());
         assertEquals("Queen", track.getAuthor());
@@ -25,7 +27,7 @@ public class TrackTest {
 
     @Test
     public void testSetters() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
 
         track.setTitle("Creep");
         track.setAuthor("Radiohead");
@@ -51,7 +53,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_noTitle() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             track.setTitle("  ");
         });
@@ -66,7 +68,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_noAuthor() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             track.setAuthor("  ");
         });
@@ -82,7 +84,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_invalidAuthor() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             track.setAuthor(";");
         });
@@ -97,7 +99,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_negativeDuration() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
         assertThrows(IllegalArgumentException.class, () -> {
             track.setDuration(-4);
         });
@@ -106,7 +108,7 @@ public class TrackTest {
 
     @Test
     public void testModiftyTrack_zeroDuration() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
         assertThrows(IllegalArgumentException.class, () -> {
             track.setDuration(0);
         });
@@ -120,7 +122,7 @@ public class TrackTest {
      */
     @Test
     public void testModifyTrack_noPath() {
-        Track track = new Track("A", "B", 0, "C", 1, "D", "E");
+        Track track = new Track("A", "B", 0, "C", 1, "D", "E", null);
         assertThrows(IllegalArgumentException.class, () -> {
             track.setFilePath("  ");
         });

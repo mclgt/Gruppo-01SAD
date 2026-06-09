@@ -4,8 +4,9 @@ package com.Command;
  * @brief Classe di test per verificare l'aggiunta di un brano 
  */
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ public class AddTrackTest {
     public void setUp() {
         l = new Library();
         t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
-                "C:/audio.wav");
+                "C:/audio.wav", null);
     }
 
     @Test
