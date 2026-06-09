@@ -296,8 +296,25 @@ public class MainController {
         playlistTableController.openModPlaylistView(ev);
     }
 
+    public void updateDetailPanel(Track track) {
+        if (track == null) {
+            detailPanel.setVisible(false);
+        } else {
+            lblTitle.setText(track.getTitle());
+            lblAuthor.setText(track.getAuthor());
+            String album = track.getAlbum();
+            lblAlbum.setText((album == null || album.trim().isEmpty()) ? "-" : track.getAlbum());
+            String genre = track.getGenre();
+            lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : track.getGenre());
+            lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
+            lblDuration.setText(track.getFormattedDuration());
+
+            detailPanel.setVisible(true);
+        }
+    }
+
     /**
-     * @brief Gestisce l'evento di eliminazione di una playlist. 
+     * @brief Gestisce l'evento di eliminazione di una playlist.
      * @param ev
      */
     @FXML
