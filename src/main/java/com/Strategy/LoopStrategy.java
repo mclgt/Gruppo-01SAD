@@ -5,41 +5,35 @@ import java.util.List;
 
 /**
  * @class LoopStrategy
- * @brief Strategia di riproduzione in loop.
+ * @brief Strategia di riproduzione in loop sul brano corrente.
  *
- * Al termine della coda il lettore torna al primo brano;
- * all'inizio della coda torna all'ultimo, garantendo una
- * riproduzione ciclica continua.
+ *        Il brano corrente viene ripetuto indefinitamente: sia il comando
+ *        "successivo" che "precedente" restituiscono sempre lo stesso brano.
  */
 public class LoopStrategy implements IPlaybackStrategy {
 
     /**
-     * @brief Restituisce il brano successivo con wrap-around.
-     *
-     * Se il brano corrente è l'ultimo della coda (o non trovato),
-     * restituisce il primo brano.
+     * @brief Restituisce il brano corrente (loop sul singolo brano).
      *
      * @param queue   Lista ordinata dei brani nella coda di riproduzione.
      * @param current Brano attualmente in riproduzione.
-     * @return Il brano successivo, oppure il primo brano se si è a fine coda.
+     * @return Lo stesso brano corrente.
      */
     @Override
     public Track nextTrack(List<Track> queue, Track current) {
-        return null; // Implementazione da completare
+        return current;
     }
 
     /**
-     * @brief Restituisce il brano precedente con wrap-around.
-     *
-     * Se il brano corrente è il primo della coda (o non trovato),
-     * restituisce l'ultimo brano.
+     * @brief Restituisce il brano corrente (loop sul singolo brano).
      *
      * @param queue   Lista ordinata dei brani nella coda di riproduzione.
      * @param current Brano attualmente in riproduzione.
-     * @return Il brano precedente, oppure l'ultimo brano se si è a inizio coda.
+     * @return Lo stesso brano corrente.
      */
     @Override
     public Track previousTrack(List<Track> queue, Track current) {
-        return null; // Implementazione da completare
+        return current;
     }
+    
 }

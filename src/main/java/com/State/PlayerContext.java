@@ -27,6 +27,10 @@ public class PlayerContext {
      */
     private IPlayerState playingState;
 
+    //ho aggiunto pausedState per supportare la pausa all'interno del pattern State,
+    //prima pause() in PlayingState era vuoto e non cambiava stato
+    private IPlayerState pausedState;
+
     /** @brief Stato attualmente attivo; le operazioni vengono delegate a questo. */
     private IPlayerState currentState;
 
@@ -45,6 +49,7 @@ public class PlayerContext {
     public PlayerContext(PlaybackContext playbackContext) {
         this.playbackContext = playbackContext;
         this.playingState = new PlayingState(this);
+        this.pausedState = new PausedState(this);
         this.currentState = playingState;
     }
 
@@ -62,6 +67,17 @@ public class PlayerContext {
      */
     public IPlayerState getPlayingState() {
         return playingState;
+    }
+
+    //restituisce il riferimento a PausedState, serve a PlayingState per fare la transizione
+    public IPlayerState getPausedState() {
+        return pausedState;
+    }
+
+    //controlla se il player è in pausa confrontando lo stato corrente con pausedState
+    //serve al controller per distinguere pausa da riproduzione e decidere se riprendere o riavviare
+    public boolean isPaused() {
+        return currentState == pausedState;
     }
 
     /**

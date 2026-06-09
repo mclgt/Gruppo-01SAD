@@ -9,13 +9,11 @@ import com.Model.Track;
 import com.Model.TrackTag;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 public class TrackTableController {
     private MainController mainController;
@@ -61,14 +59,22 @@ public class TrackTableController {
         trackTable.getSelectionModel().clearSelection();
     }
 
+    // aggiorna la selezione visiva nella tabella quando si preme next o prev,
+    // così la riga evidenziata corrisponde sempre alla traccia in riproduzione
+    public void selectTrack(Track track) {
+        trackTable.getSelectionModel().select(track);
+    }
+
     private void updateDetailPanel(Track track) {
         if (track == null) {
             detailPanel.setVisible(false);
         } else {
             lblTitle.setText(track.getTitle());
             lblAuthor.setText(track.getAuthor());
-            lblAlbum.setText(track.getAlbum().trim().isEmpty() ? "-" : track.getAlbum());
-            lblGenre.setText(track.getGenre().trim().isEmpty() ? "-" : track.getGenre());
+            String album = track.getAlbum();
+            lblAlbum.setText((album == null || album.trim().isEmpty()) ? "-" : album);
+            String genre = track.getGenre();
+            lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : genre);
             lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
             lblDuration.setText(track.getFormattedDuration());
             if(track.getTag() == null || track.getTag() == TrackTag.NONE){
@@ -83,11 +89,6 @@ public class TrackTableController {
            
             detailPanel.setVisible(true);
         }
-    }
-
-    @FXML
-    public void handleBckgroundClick(MouseEvent ev) {
-        clearSelection();
     }
 
     public void openAddTrackWindow(ActionEvent ev) {

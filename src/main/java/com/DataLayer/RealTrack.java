@@ -62,6 +62,28 @@ public class RealTrack implements IAudioTrack {
     }
 
     /**
+     * @brief Mette in pausa preservando la posizione corrente nel frame buffer.
+     * La Clip di javax.sound.sampled mantiene il frame position dopo stop(),
+     * quindi una start() successiva riprenderà da quel punto.
+     */
+    @Override
+    public void pausePlayback() {
+        if (audioClip != null && audioClip.isRunning()) {
+            audioClip.stop();
+        }
+    }
+
+    /**
+     * @brief Riprende la riproduzione dal frame in cui era stata fermata con pausePlayback().
+     */
+    @Override
+    public void resumePlayback() {
+        if (audioClip != null) {
+            audioClip.start();
+        }
+    }
+
+    /**
      * @brief Controlla se la clip audio sta emettendo suono.
      * @return boolean True se in riproduzione, False altrimenti.
      */

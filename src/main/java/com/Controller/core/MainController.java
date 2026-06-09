@@ -12,6 +12,7 @@ import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
+import com.DataLayer.TrackProxy;
 import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
@@ -58,6 +59,8 @@ public class MainController {
     @FXML
     private Slider progressSlider;
     @FXML
+    private Button btnPlay;
+    @FXML
     private Button btnUndo;
     @FXML
     private Button btnAddToPlaylist;
@@ -72,10 +75,10 @@ public class MainController {
     @FXML
     private TableColumn<Playlist, String> nameCol;
 
+    private PlaylistController playlistController;
+
     private final TrackTableController trackTableController = new TrackTableController();
     private final PlayerController playerController = new PlayerController();
-
-    private final PlaylistController playlistListController = new PlaylistController();
 
     private PlayerContext playerContext;
     private final UndoManager undoManager = new UndoManager();
@@ -87,11 +90,12 @@ public class MainController {
 
     private Library trackList = new Library();
 
-    /***
-     * @brief Inizializza i componenti dell'interfaccia grafica. Effettua il binding
-     *        tra le colonne della tabella e le StringProperty del modello Track,
-     *        sfruttando il pattern Observer per consentire l'aggiornamento in tempo
-     *        reale.
+    /**
+     * @brief Inizializza i componenti dell'interfaccia grafica e i sotto-controller.
+     *        Crea il @ref PlayerContext con strategia sequenziale di default, inizializza
+     *        @ref TrackTableController, @ref PlayerController e @ref PlaylistTableController
+     *        passando i riferimenti ai componenti FXML. Carica inoltre un set di brani
+     *        demo nella libreria per facilitare i test sull'interfaccia.
      */
     @FXML
     public void initialize() {
@@ -103,6 +107,20 @@ public class MainController {
                 lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
+
+        String[][] demoData = {
+            {"Bohemian Rhapsody", "Queen",        "1975", "Rock",       "354", "A Night at the Opera"},
+            {"Blinding Lights",  "The Weeknd",    "2019", "Synthpop",   "200", "After Hours"},
+            {"Smells Like Teen", "Nirvana",       "1991", "Grunge",     "301", "Nevermind"},
+            {"Billie Jean",      "Michael Jackson","1982", "Pop",       "294", "Thriller"},
+            {"Hotel California", "Eagles",        "1977", "Rock",       "391", "Hell Freezes Over"},
+        };
+        for (String[] d : demoData) {
+            Track t = new Track(d[0], d[1], Integer.parseInt(d[2]), d[3], Integer.parseInt(d[4]), d[5],
+                    "demo_" + d[0].replace(" ", "_") + ".wav");
+            t.setAudioSource(new TrackProxy(t.getFilePath()));
+            trackList.addTrack(t);
+        }
     }
 
     /**
@@ -192,14 +210,47 @@ public class MainController {
         }
     }
 
+    /**
+     * @brief Pulsante unico play/pausa.
+     *        Se non c'è un brano attivo (o è terminato) avvia la riproduzione;
+     *        se il brano è in riproduzione lo mette in pausa;
+     *        se è in pausa lo riprende dal punto in cui era stato fermato.
+     *        Il testo del pulsante viene aggiornato da @ref updatePlayPauseButton.
+     */
     @FXML
-    public void playSong() {
-        playerController.playSong();
+    public void togglePlayPause() {
+        Track current = playerContext.getCurrentTrack();
+        if (current != null && !playerController.isTrackFinished()) {
+            playerController.pauseSong();
+        } else {
+            playerController.playSong();
+        }
+    }
+
+    /**
+     * @brief Aggiorna il testo del pulsante play/pausa in base allo stato.
+     *        Chiamato da @ref PlayerController ogni volta che lo stato cambia.
+     * @param playing {@code true} mostra "⏸ Pause", {@code false} mostra "▶ Play".
+     */
+    public void updatePlayPauseButton(boolean playing) {
+        if (btnPlay != null) {
+            btnPlay.setText(playing ? "⏸ Pause" : "▶ Play");
+        }
     }
 
     @FXML
     public void sequentialRip(ActionEvent ev) {
         playerController.sequentialRip(ev);
+    }
+
+    @FXML
+    public void loopRip(ActionEvent ev) {
+        playerController.loopRip(ev);
+    }
+
+    @FXML
+    public void shuffleRip(ActionEvent ev) {
+        playerController.shuffleRip(ev);
     }
 
     @FXML
@@ -233,7 +284,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
 
-            PlaylistController playlistController = loader.getController();
+            playlistController = loader.getController();
             playlistController.setMainController(this);
             playlistController.setPlaylistData(selectedPlaylist);
 
@@ -276,7 +327,12 @@ public class MainController {
      *        centrale,
      *        chiudendo di fatto la vista della playlist.
      */
+    public PlaylistController getPlaylistController() {
+        return playlistController;
+    }
+
     public void restoreMainLibraryView(){
+        playlistController = null;
         setTrackManagementButtonVisible(true);
         if(centerContentArea != null && trackTable != null){
             centerContentArea.getChildren().clear();

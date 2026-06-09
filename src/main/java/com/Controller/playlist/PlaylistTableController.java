@@ -83,7 +83,7 @@ public class PlaylistTableController {
      *        playlist e aggiornata la vista principale. In caso contrario, viene
      *        mostrato un messaggio di avviso.
      * @param ev evento di pressione del pulsante di eliminazione.
-    } */
+     */
     public void handleDeletePlaylist(ActionEvent ev){
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if(selectedPlaylist != null){
