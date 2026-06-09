@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 import com.Model.ITrackContainer;
 import com.Model.Library;
 import com.Model.Track;
+
 /**
  * @brief Definizione della classe di unit test per la rimozione delle tracce.
  */
 public class RemoveTrackTest {
-    
-    private ITrackContainer container;  
-    private UndoManager undoManager; 
+
+    private ITrackContainer container;
+    private UndoManager undoManager;
     private Track track1;
     private Track track2;
     private Track track3;

@@ -64,7 +64,7 @@ public class TrackTableController {
     private void updateDetailPanel(Track track) {
         if (track == null) {
             detailPanel.setVisible(false);
-        }else{
+        } else {
             lblTitle.setText(track.getTitle());
             lblAuthor.setText(track.getAuthor());
             lblAlbum.setText(track.getAlbum().trim().isEmpty() ? "-" : track.getAlbum());
@@ -90,35 +90,40 @@ public class TrackTableController {
         clearSelection();
     }
 
-    public void openAddTrackWindow(ActionEvent ev){
+    public void openAddTrackWindow(ActionEvent ev) {
         mainController.getWindowManager().openWindow("/com/View/AddTrackView.fxml", "Aggiungi nuovo brano", null);
     }
 
-    public void openModifyTrackView(ActionEvent ev){
+    public void openModifyTrackView(ActionEvent ev) {
         Track selectedTrack = getSelectedTrack();
-        if(selectedTrack == null){
-            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona una traccia dalla tabella da modificare.");
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione",
+                    "Seleziona una traccia dalla tabella da modificare.");
             return;
         }
 
-        mainController.getWindowManager().openWindow("/com/View/ModifyTrackView.fxml", "Modifica Brano - " + selectedTrack.getTitle(), selectedTrack);
+        mainController.getWindowManager().openWindow("/com/View/ModifyTrackView.fxml",
+                "Modifica Brano - " + selectedTrack.getTitle(), selectedTrack);
     }
 
-    public void handleRemoveTrack(ActionEvent ev){
+    public void handleRemoveTrack(ActionEvent ev) {
         Track selectedTrack = getSelectedTrack();
-        if(selectedTrack == null){
-            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona una traccia dalla tabella da rimuovere.");
+        if (selectedTrack == null) {
+            mainController.getWindowManager().showWarning("Nessuna selezione",
+                    "Seleziona una traccia dalla tabella da rimuovere.");
             return;
         }
         Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione", "Rimozione dalla libreria e da tutte le playlist", "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\"?", null);
 
-        if(result.isPresent() && result.get() == ButtonType.OK){
-            ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack, mainController.getPlaylistCatalog());
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack,
+                    mainController.getPlaylistCatalog());
 
-            boolean wasPlaying = mainController.getPlayerContext().isPlaying() && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+            boolean wasPlaying = mainController.getPlayerContext().isPlaying()
+                    && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
 
             mainController.getDeletedPlayingStack().push(wasPlaying);
-            if(wasPlaying){
+            if (wasPlaying) {
                 mainController.getTimerManager().stop();
             }
 
@@ -126,7 +131,7 @@ public class TrackTableController {
             mainController.getUndoManager().executeCommand(removeCommand);
             clearSelection();
 
-            if(wasPlaying){
+            if (wasPlaying) {
                 mainController.getPlayerController().handleTrackRemoval(idx);
             }
         }
