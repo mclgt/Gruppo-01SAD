@@ -12,15 +12,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 
-/**
- * @class PlaylistTableController
- * @brief Controller dedicato alla gestione della tabella delle playlist.
- *        Gestisce l'interazione con l'elenco delle playlist visualizzato nel
- *        pannello laterale, incluse le operazioni di selezione, apertura
- *        tramite doppio click e sincronizzazione con gli altri componenti
- *        tramite il MainController.
- */
-
 public class PlaylistTableController {
     private MainController mainController;
 
@@ -31,11 +22,10 @@ public class PlaylistTableController {
      *        configurando l'interfaccia utente. Effettua i binding tra la colonna
      *        visualizzata a schermo e la StringProperty contenuta in Playlist
      *        (nome).
-     * @param controller    rifeirmento al maincontroller per accedere alle
-     *                      funzionalità del WindowManager
+     * @param controller   rifeirmento al maincontroller per accedere alle
+     *                     funzionalità del WindowManager
      * @param playlistTable riferimento al componente TableView definito
-     * @param nameCol       riferimento alla colonna contenente i nomi delle
-     *                      playlist
+     * @param nameCol      riferimento alla colonna contenente i nomi delle playlist
      */
     public void init(MainController controller, TableView<Playlist> playlistList,
             TableColumn<Playlist, String> nameCol) {
@@ -45,41 +35,29 @@ public class PlaylistTableController {
         nameCol.setCellValueFactory(cellData -> cellData.getValue().getNameProperty());
         playlistList.setItems(mainController.getPlaylistCatalog().getPlaylists());
 
-        // Apertura con doppio click
+        //Apertura con doppio click
         playlistList.setOnMouseClicked((MouseEvent ev) -> {
-            if (ev.getClickCount() == 2) {
+            if(ev.getClickCount() == 2){
                 Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
-                if (selectedPlaylist != null) {
+                if(selectedPlaylist != null){
                     mainController.openPlaylistView(selectedPlaylist);
                 }
             }
         });
 
-        // Aggiorna Ui e deseleziona altri componenti
+        //Disattiva il pulsante "Aggiungi brano" se non c'è selezione
         playlistList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (mainController.getBtnAddToPlaylist() != null) {
+            if(mainController.getBtnAddToPlaylist() != null){
                 mainController.getBtnAddToPlaylist().setDisable(newVal == null);
-            }
-            if (newVal != null && mainController != null) {
-                mainController.updateDetailPanel(null);
-                if (mainController.getTrackTableController() != null) {
-                    mainController.getTrackTableController().clearSelection();
-                }
             }
         });
     }
 
-    /**
-     * @brief Gestisce l'apertura della finestra per la modifica di una playlist
-     *        esistente.
-     * @param ev evento di pressione del pulsante modifica
-     */
-    public void openModPlaylistView(ActionEvent ev) {
+    public void openModPlaylistView(ActionEvent ev){
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
-        if (selectedPlaylist != null) {
-            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml",
-                    "Modifica Playlist", selectedPlaylist, mainController);
-        } else {
+        if(selectedPlaylist != null){
+            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml", "Modifica Playlist", selectedPlaylist, mainController);
+        }else{
             mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da modificare");
         }
     }
@@ -94,13 +72,7 @@ public class PlaylistTableController {
         }
     }
 
-    /**
-     * @brief recupera la playlist selezionata dall'utente in quel determinato
-     *        istante
-     * @return oggetto playlist selezionato, o null se nessuna playlist è stata
-     *         selezionata
-     */
-    public Playlist getSelectedPlaylist() {
+    public Playlist getSelectedPlaylist(){
         return playlistList.getSelectionModel().getSelectedItem();
     }
 
@@ -115,7 +87,7 @@ public class PlaylistTableController {
     public void handleDeletePlaylist(ActionEvent ev){
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if(selectedPlaylist != null){
-            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
+            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Eliminazione della playlist", "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
             if(result.isPresent() && result.get() == ButtonType.OK){
                 ICommand removeCmd = new RemovePlaylist(mainController.getPlaylistCatalog(), selectedPlaylist);
                 mainController.getUndoManager().executeCommand(removeCmd);

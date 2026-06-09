@@ -5,32 +5,52 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <VBox spacing="10.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.playlist.PlaylistController">
-   <StackPane>
+   <HBox prefHeight="61.0" prefWidth="573.0">
       <children>
-         <Button fx:id="btnBack" mnemonicParsing="false" onAction="#handleBackToLibrary" text="Indietro" StackPane.alignment="CENTER_LEFT">
-            <StackPane.margin>
-               <Insets left="10.0" top="5.0" />
-            </StackPane.margin></Button>
-          <Label fx:id="lblPlaylist" alignment="CENTER" contentDisplay="CENTER" text="Nome della Playlist" StackPane.alignment="CENTER">
+         <Button fx:id="btnBack" mnemonicParsing="false" onAction="#handleBackToLibrary" prefHeight="23.0" prefWidth="63.0" text="Indietro">
+            <HBox.margin>
+               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </HBox.margin></Button>
+          <Label fx:id="lblPlaylist" alignment="CENTER" contentDisplay="CENTER" prefHeight="30.0" prefWidth="187.0" text="Nome della Playlist">
               <font>
                   <Font name="System Bold" size="20.0" />
               </font>
-            <StackPane.margin>
-               <Insets top="5.0" />
-            </StackPane.margin>
+            <HBox.margin>
+               <Insets bottom="10.0" top="30.0" />
+            </HBox.margin>
           </Label>
-         <Button fx:id="btnAddToPlaylist" mnemonicParsing="false" onAction="#handleAddToPlaylist" text="Aggiungi brano" StackPane.alignment="CENTER_RIGHT">
-            <StackPane.margin>
-               <Insets right="10.0" top="5.0" />
-            </StackPane.margin>
+         <Button fx:id="btnRemoveFromPlaylist" mnemonicParsing="false" onAction="#handleRemoveFromPlaylist" text="Rimuovi brano">
+            <HBox.margin>
+               <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />
+            </HBox.margin>
+            <graphic>
+               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@delete.png" />
+                  </image>
+               </ImageView>
+            </graphic>
+         </Button>
+         <Button fx:id="btnAddToPlaylist" mnemonicParsing="false" onAction="#handleAddToPlaylist" prefHeight="27.0" prefWidth="130.0" text="Aggiungi brano">
+            <HBox.margin>
+               <Insets bottom="20.0" right="20.0" top="30.0" />
+            </HBox.margin>
+            <graphic>
+               <ImageView fitHeight="22.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@add.png" />
+                  </image></ImageView>
+            </graphic>
          </Button>
       </children>
-   </StackPane>
+   </HBox>
     
     <TableView fx:id="playlistTrackList" VBox.vgrow="ALWAYS">
         <columns>
