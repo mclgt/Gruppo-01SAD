@@ -66,8 +66,10 @@ public class PlayingState implements IPlayerState {
 
     /**
      * @brief Avanza alla traccia successiva usando la strategia di riproduzione attiva.
-     *        Se la strategia non restituisce una traccia successiva (fine coda),
-     *        la traccia corrente rimane invariata.
+     *        Aggiorna solo la traccia corrente nel context senza avviare l'audio:
+     *        l'avvio è responsabilità del controller tramite startTrackPlayback().
+     *        In questo modo con LoopTrackStrategy (next restituisce la traccia corrente)
+     *        non viene riavviato l'audio, evitando il doppio loop prima del cambio modalità.
      * @param queue   Lista delle tracce disponibili nel container attivo.
      * @param current Traccia attualmente in riproduzione.
      */
@@ -75,8 +77,8 @@ public class PlayingState implements IPlayerState {
     public void next(List<Track> queue, Track current) {
         Track nextTrack = context.getPlaybackContext().nextTrack(queue, current);
         if (nextTrack != null) {
-            System.out.println("Playing next track: " + nextTrack.getTitle());
-            play(nextTrack);
+            context.setCurrentTrack(nextTrack);
+            System.out.println("Next track set: " + nextTrack.getTitle());
         } else {
             System.out.println("No next track available.");
         }
@@ -84,8 +86,8 @@ public class PlayingState implements IPlayerState {
 
     /**
      * @brief Torna alla traccia precedente usando la strategia di riproduzione attiva.
-     *        Se la strategia non restituisce una traccia precedente (inizio coda),
-     *        la traccia corrente rimane invariata.
+     *        Aggiorna solo la traccia corrente nel context senza avviare l'audio:
+     *        l'avvio è responsabilità del controller tramite startTrackPlayback().
      * @param queue   Lista delle tracce disponibili nel container attivo.
      * @param current Traccia attualmente in riproduzione.
      */
@@ -93,8 +95,8 @@ public class PlayingState implements IPlayerState {
     public void previous(List<Track> queue, Track current) {
         Track previousTrack = context.getPlaybackContext().previousTrack(queue, current);
         if (previousTrack != null) {
-            System.out.println("Playing previous track: " + previousTrack.getTitle());
-            play(previousTrack);
+            context.setCurrentTrack(previousTrack);
+            System.out.println("Previous track set: " + previousTrack.getTitle());
         } else {
             System.out.println("No previous track available.");
         }

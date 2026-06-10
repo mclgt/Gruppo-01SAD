@@ -12,10 +12,10 @@ import com.Model.Track;
 
 /**
  * @class SequentialStrategyTest
- * @brief Test class for SequentialStrategy.
- *        Verifies that sequential forward and backward navigation
- *        in the queue behaves correctly in edge cases:
- *        end of queue, beginning of queue, and track not present in queue.
+ * @brief Classe di test per SequentialStrategy.
+ *        Verifica che la navigazione sequenziale in avanti e indietro
+ *        nella coda si comporti correttamente nei casi limite:
+ *        fine della coda, inizio della coda e traccia non presente nella coda.
  */
 public class SequentialStrategyTest {
 
@@ -26,7 +26,7 @@ public class SequentialStrategyTest {
     private List<Track> queue;
 
     /**
-     * @brief Initializes the strategy, three dummy tracks, and the queue before each test.
+     * @brief Inizializza la strategia, tre tracce dummy e la coda prima di ogni test.
      */
     @BeforeEach
     public void setUp() {
@@ -38,11 +38,11 @@ public class SequentialStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() returns the second track when advancing from the first.
+     * @brief Verifica che nextTrack() restituisca la seconda traccia avanzando dalla prima.
      */
     @Test
     public void testNextTrack_fromFirst_returnsSecond() {
@@ -50,7 +50,7 @@ public class SequentialStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the third track when advancing from the middle.
+     * @brief Verifica che nextTrack() restituisca la terza traccia avanzando dalla posizione centrale.
      */
     @Test
     public void testNextTrack_fromMiddle_returnsThird() {
@@ -58,7 +58,7 @@ public class SequentialStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns null when advancing past the last track (no wrap-around).
+     * @brief Verifica che nextTrack() restituisca null avanzando oltre l'ultima traccia (nessun wrap-around).
      */
     @Test
     public void testNextTrack_fromLast_returnsNull() {
@@ -66,7 +66,7 @@ public class SequentialStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns null when the current track is not present in the queue.
+     * @brief Verifica che nextTrack() restituisca null quando la traccia corrente non è presente nella coda.
      */
     @Test
     public void testNextTrack_trackNotInQueue_returnsNull() {
@@ -75,11 +75,11 @@ public class SequentialStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() returns the middle track when going back from the last.
+     * @brief Verifica che previousTrack() restituisca la traccia centrale tornando dall'ultima.
      */
     @Test
     public void testPreviousTrack_fromLast_returnsMiddle() {
@@ -87,7 +87,7 @@ public class SequentialStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the first track when going back from the middle.
+     * @brief Verifica che previousTrack() restituisca la prima traccia tornando dalla posizione centrale.
      */
     @Test
     public void testPreviousTrack_fromMiddle_returnsFirst() {
@@ -95,7 +95,7 @@ public class SequentialStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns null when going back past the first track (no wrap-around).
+     * @brief Verifica che previousTrack() restituisca null tornando oltre la prima traccia (nessun wrap-around).
      */
     @Test
     public void testPreviousTrack_fromFirst_returnsNull() {
@@ -103,7 +103,7 @@ public class SequentialStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns null when the current track is not present in the queue.
+     * @brief Verifica che previousTrack() restituisca null quando la traccia corrente non è presente nella coda.
      */
     @Test
     public void testPreviousTrack_trackNotInQueue_returnsNull() {

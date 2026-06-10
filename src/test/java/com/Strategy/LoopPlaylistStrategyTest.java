@@ -10,10 +10,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @class LoopPlaylistStrategyTest
- * @brief Test class for LoopPlaylistStrategy.
- *        Verifies that looped playlist navigation wraps around correctly
- *        at both ends of the queue, and handles edge cases such as
- *        a null current track or a single-track queue.
+ * @brief Classe di test per LoopPlaylistStrategy.
+ *        Verifica che la navigazione con loop nella playlist effettui il wrap-around correttamente
+ *        a entrambe le estremità della coda, e gestisca casi limite come
+ *        la traccia corrente null o una coda con un solo elemento.
  */
 public class LoopPlaylistStrategyTest {
 
@@ -23,7 +23,7 @@ public class LoopPlaylistStrategyTest {
     private Track track3;
 
     /**
-     * @brief Initializes the strategy and three dummy tracks before each test.
+     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
@@ -34,11 +34,11 @@ public class LoopPlaylistStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() returns the first track when current is null.
+     * @brief Verifica che nextTrack() restituisca la prima traccia quando current è null.
      */
     @Test
     void nextTrack_currentNull_returnsFirstTrack() {
@@ -47,7 +47,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the same track when the queue contains only one element.
+     * @brief Verifica che nextTrack() restituisca la stessa traccia quando la coda contiene un solo elemento.
      */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
@@ -56,7 +56,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the second track when current is the first.
+     * @brief Verifica che nextTrack() restituisca la seconda traccia quando current è la prima.
      */
     @Test
     void nextTrack_firstTrack_returnsSecondTrack() {
@@ -65,7 +65,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() wraps around and returns the first track when current is the last.
+     * @brief Verifica che nextTrack() effettui il wrap-around e restituisca la prima traccia quando current è l'ultima.
      */
     @Test
     void nextTrack_lastTrack_returnsFirstTrack() {
@@ -74,11 +74,11 @@ public class LoopPlaylistStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() returns the first track when current is null.
+     * @brief Verifica che previousTrack() restituisca la prima traccia quando current è null.
      */
     @Test
     void previousTrack_currentNull_returnsFirstTrack() {
@@ -87,7 +87,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the same track when the queue contains only one element.
+     * @brief Verifica che previousTrack() restituisca la stessa traccia quando la coda contiene un solo elemento.
      */
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
@@ -96,7 +96,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the first track when current is the second.
+     * @brief Verifica che previousTrack() restituisca la prima traccia quando current è la seconda.
      */
     @Test
     void previousTrack_secondTrack_returnsFirstTrack() {
@@ -105,7 +105,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() wraps around and returns the last track when current is the first.
+     * @brief Verifica che previousTrack() effettui il wrap-around e restituisca l'ultima traccia quando current è la prima.
      */
     @Test
     void previousTrack_firstTrack_returnsLastTrack() {

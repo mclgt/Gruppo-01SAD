@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @class ShuffleStrategyTest
- * @brief Test class for ShuffleStrategy.
- *        Verifies that shuffle navigation returns valid tracks from the queue
- *        and almost never returns the current track when multiple tracks are available.
- *        Statistical checks are performed over 20 iterations to rule out always
- *        returning the same track by chance.
+ * @brief Classe di test per ShuffleStrategy.
+ *        Verifica che la navigazione shuffle restituisca tracce valide dalla coda
+ *        e quasi mai restituisca la traccia corrente quando sono disponibili più tracce.
+ *        I controlli statistici vengono eseguiti su 20 iterazioni per escludere
+ *        che la stessa traccia venga restituita per caso.
  */
 class ShuffleStrategyTest {
 
@@ -27,7 +27,7 @@ class ShuffleStrategyTest {
     private Track track3;
 
     /**
-     * @brief Initializes the strategy and three dummy tracks before each test.
+     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
@@ -38,11 +38,11 @@ class ShuffleStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() returns null when the queue is empty.
+     * @brief Verifica che nextTrack() restituisca null quando la coda è vuota.
      */
     @Test
     void nextTrack_emptyQueue_returnsNull() {
@@ -51,7 +51,7 @@ class ShuffleStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the only available track when the queue has one element.
+     * @brief Verifica che nextTrack() restituisca l'unica traccia disponibile quando la coda ha un solo elemento.
      */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
@@ -60,8 +60,8 @@ class ShuffleStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() almost never returns the current track when multiple tracks are
-     *        available, checked over 20 iterations to rule out accidental repetition.
+     * @brief Verifica che nextTrack() quasi mai restituisca la traccia corrente quando sono disponibili più tracce,
+     *        controllato su 20 iterazioni per escludere ripetizioni accidentali.
      */
     @Test
     void nextTrack_multipleTracks_almostNeverReturnsCurrentTrack() {
@@ -72,8 +72,8 @@ class ShuffleStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns a track different from the current one
-     *        when multiple tracks are available.
+     * @brief Verifica che nextTrack() restituisca una traccia diversa da quella corrente
+     *        quando sono disponibili più tracce.
      */
     @Test
     void nextTrack_multipleTracks_returnsValidTrack() {
@@ -82,12 +82,12 @@ class ShuffleStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() behaves identically to nextTrack() to preserve
-     *        shuffle semantics: almost never returns the current track over 20 iterations.
+     * @brief Verifica che previousTrack() si comporti in modo identico a nextTrack() per mantenere
+     *        la semantica shuffle: quasi mai restituisce la traccia corrente su 20 iterazioni.
      */
     @Test
     void previousTrack_behaviorSameAsNextTrack() {

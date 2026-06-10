@@ -12,16 +12,16 @@ import com.Model.Track;
 
 /**
  * @class PlaybackContextTest
- * @brief Test class for PlaybackContext.
- *        Verifies that the Context correctly delegates to strategies
- *        and that runtime strategy switching works as expected.
- *        Strategies used are hand-written dummy stubs, without any mocking framework.
+ * @brief Classe di test per PlaybackContext.
+ *        Verifica che il Context deleghi correttamente alle strategie
+ *        e che il cambio di strategia a runtime funzioni come previsto.
+ *        Le strategie utilizzate sono stub dummy scritti a mano, senza framework di mocking.
  */
 public class PlaybackContextTest {
 
     /**
-     * @brief Stub strategy A: always returns a fixed next track and a fixed previous track.
-     *        Used to verify that the Context actually delegates calls to the strategy.
+     * @brief Stub strategy A: restituisce sempre una traccia successiva e una precedente fisse.
+     *        Usata per verificare che il Context deleghi effettivamente le chiamate alla strategia.
      */
     private static class DummyStrategyA implements IPlaybackStrategy {
         private final Track fixedNext;
@@ -44,8 +44,8 @@ public class PlaybackContextTest {
     }
 
     /**
-     * @brief Stub strategy B: always returns null, simulating end/beginning of queue.
-     *        Used to verify behavior after a runtime strategy switch.
+     * @brief Stub strategy B: restituisce sempre null, simulando la fine/inizio della coda.
+     *        Usata per verificare il comportamento dopo un cambio di strategia a runtime.
      */
     private static class DummyStrategyB implements IPlaybackStrategy {
         @Override
@@ -65,7 +65,7 @@ public class PlaybackContextTest {
     private List<Track> queue;
 
     /**
-     * @brief Initializes three dummy tracks and the queue before each test.
+     * @brief Inizializza tre tracce dummy e la coda prima di ogni test.
      */
     @BeforeEach
     public void setUp() {
@@ -76,12 +76,12 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for constructor and getStrategy()
+    // Test per il costruttore e getStrategy()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that the strategy passed to the constructor is stored
-     *        and returned by getStrategy().
+     * @brief Verifica che la strategia passata al costruttore venga memorizzata
+     *        e restituita da getStrategy().
      */
     @Test
     public void testConstructor_strategyIsStored() {
@@ -91,11 +91,11 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for setStrategy()
+    // Test per setStrategy()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that setStrategy() replaces the current strategy at runtime.
+     * @brief Verifica che setStrategy() sostituisca la strategia corrente a runtime.
      */
     @Test
     public void testSetStrategy_replacesStrategy() {
@@ -106,11 +106,11 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() delegates the call to the current strategy.
+     * @brief Verifica che nextTrack() deleghi la chiamata alla strategia corrente.
      */
     @Test
     public void testNextTrack_delegatesToStrategy() {
@@ -119,7 +119,7 @@ public class PlaybackContextTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() uses the new strategy after a runtime switch.
+     * @brief Verifica che nextTrack() utilizzi la nuova strategia dopo un cambio a runtime.
      */
     @Test
     public void testNextTrack_afterStrategyChange_usesNewStrategy() {
@@ -129,11 +129,11 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() delegates the call to the current strategy.
+     * @brief Verifica che previousTrack() deleghi la chiamata alla strategia corrente.
      */
     @Test
     public void testPreviousTrack_delegatesToStrategy() {
@@ -142,7 +142,7 @@ public class PlaybackContextTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() uses the new strategy after a runtime switch.
+     * @brief Verifica che previousTrack() utilizzi la nuova strategia dopo un cambio a runtime.
      */
     @Test
     public void testPreviousTrack_afterStrategyChange_usesNewStrategy() {

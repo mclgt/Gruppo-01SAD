@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @class LoopTrackStrategyTest
- * @brief Test class for LoopTrackStrategy.
- *        Verifies that single-track loop always returns the same current track,
- *        regardless of queue size, and returns null when current is null.
+ * @brief Classe di test per LoopTrackStrategy.
+ *        Verifica che il loop su singola traccia restituisca sempre la stessa traccia corrente,
+ *        indipendentemente dalla dimensione della coda, e restituisca null quando current è null.
  */
 public class LoopTrackStrategyTest {
 
@@ -22,7 +22,7 @@ public class LoopTrackStrategyTest {
     private Track track3;
 
     /**
-     * @brief Initializes the strategy and three dummy tracks before each test.
+     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
@@ -33,11 +33,11 @@ public class LoopTrackStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() returns null when current is null — no track to loop on.
+     * @brief Verifica che nextTrack() restituisca null quando current è null — nessuna traccia su cui fare loop.
      */
     @Test
     void nextTrack_currentNull_returnsNull() {
@@ -46,7 +46,7 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the same track when the queue contains only one element.
+     * @brief Verifica che nextTrack() restituisca la stessa traccia quando la coda contiene un solo elemento.
      */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
@@ -55,7 +55,7 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() always returns the current track regardless of queue size.
+     * @brief Verifica che nextTrack() restituisca sempre la traccia corrente indipendentemente dalla dimensione della coda.
      */
     @Test
     void nextTrack_multipleTracks_returnsSameTrack() {
@@ -64,7 +64,7 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the same last track when looping on it.
+     * @brief Verifica che nextTrack() restituisca la stessa ultima traccia quando si effettua il loop su di essa.
      */
     @Test
     void nextTrack_lastTrack_returnsSameTrack() {
@@ -73,11 +73,11 @@ public class LoopTrackStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() returns null when current is null.
+     * @brief Verifica che previousTrack() restituisca null quando current è null.
      */
     @Test
     void previousTrack_currentNull_returnsNull() {
@@ -86,7 +86,7 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the same track when the queue contains only one element.
+     * @brief Verifica che previousTrack() restituisca la stessa traccia quando la coda contiene un solo elemento.
      */
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
@@ -95,7 +95,7 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() always returns the current track regardless of queue size.
+     * @brief Verifica che previousTrack() restituisca sempre la traccia corrente indipendentemente dalla dimensione della coda.
      */
     @Test
     void previousTrack_multipleTracks_returnsSameTrack() {
@@ -104,7 +104,7 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the same first track when looping on it.
+     * @brief Verifica che previousTrack() restituisca la stessa prima traccia quando si effettua il loop su di essa.
      */
     @Test
     void previousTrack_firstTrack_returnsSameTrack() {
