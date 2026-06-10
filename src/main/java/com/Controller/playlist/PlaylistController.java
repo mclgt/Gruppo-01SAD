@@ -80,7 +80,7 @@ public class PlaylistController {
      * @param ev Evento di pressione del pulsante.
      */
     @FXML
-    public void handleAddToPlaylist(ActionEvent ev){
+    public void handleAddToPlaylist(ActionEvent ev) {
         mainController.openAddTrackToPlaylistView(this.currentPlaylist);
     }
 
@@ -88,8 +88,8 @@ public class PlaylistController {
      * @brief Torna alla libreria principale invocando il metodo del MainController.
      */
     @FXML
-    public void handleBackToLibrary(){
-        if(mainController != null){
+    public void handleBackToLibrary() {
+        if (mainController != null) {
             mainController.restoreMainLibraryView();
             mainController.updateDetailPanel(null);
         }
@@ -107,43 +107,56 @@ public class PlaylistController {
         }
         return null;
     }
-    
+
     public Playlist getCurrentPlaylist() {
         return currentPlaylist;
     }
-  
+
     public void selectTrack(Track track) {
         playlistTrackList.getSelectionModel().select(track);
     }
+
     /**
-     * @brief Rimuove la traccia selezionata dalla playlist, mostrando una finestra di conferma 
-     * prima di procedere. Se la traccia rimossa è quella attualmente in riproduzione, 
-     * ferma la riproduzione e aggiorna il player di conseguenza. 
+     * @brief Rimuove la traccia selezionata dalla playlist, mostrando una finestra
+     *        di conferma
+     *        prima di procedere. Se la traccia rimossa è quella attualmente in
+     *        riproduzione,
+     *        ferma la riproduzione e aggiorna il player di conseguenza.
      * @param ev
      */
     @FXML
-    public void handleRemoveFromPlaylist(ActionEvent ev){
+    public void handleRemoveFromPlaylist(ActionEvent ev) {
         Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
 
         if (selectedTrack == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione", "Seleziona prima una traccia da rimuovere dalla playlist");
+            mainController.getWindowManager().showWarning("Nessuna selezione",
+                    "Seleziona prima una traccia da rimuovere dalla playlist");
             return;
         }
-        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Rimuovi brano", "Rimozione brano da playlist", "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\" dalla playlist \"" + currentPlaylist.getName() + "\"?", null);
-        if(result.isPresent() && result.get().getText().equals("OK")){
+        Optional<ButtonType> result = mainController.getWindowManager()
+                .showConfirmation(
+                        "Rimuovi brano", "Rimozione brano da playlist", "Sei sicuro di voler rimuovere \""
+                                + selectedTrack.getTitle() + "\" dalla playlist \"" + currentPlaylist.getName() + "\"?",
+                        null);
+        if (result.isPresent() && result.get().getText().equals("OK")) {
             ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
             boolean wasPlaying = mainController.getPlayerContext().isPlaying()
                     && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
             mainController.getDeletedPlayingStack().push(wasPlaying);
-            if(wasPlaying){
+            if (wasPlaying) {
                 mainController.getTimerManager().stop();
             }
             int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
             mainController.getUndoManager().executeCommand(removeCommand);
             playlistTrackList.getSelectionModel().clearSelection();
-            if(wasPlaying){
+            if (wasPlaying) {
                 mainController.getPlayerController().handleTrackRemoval(idx);
             }
         }
+    }
+
+    @FXML
+    public void handleLoopPlaylist(ActionEvent ev) {
+        mainController.getPlayerController().loopPlaylistRip(this.currentPlaylist);
     }
 }

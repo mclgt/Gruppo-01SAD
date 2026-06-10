@@ -44,9 +44,11 @@ public class Track {
      * @param duration durata fisica del brano espressa in secondi
      * @param album    Album di appartenenza del brano
      * @param filePath Percorso del file audio da inserire
-     * @param tag      Tag associato al brano, se presente. Se null, viene impostato a TrackTag.NONE
+     * @param tag      Tag associato al brano, se presente. Se null, viene impostato
+     *                 a TrackTag.NONE
      */
-    public Track(String title, String author, int year, String genre, int duration, String album, String filePath, TrackTag tag) {
+    public Track(String title, String author, int year, String genre, int duration, String album, String filePath,
+            TrackTag tag) {
         setTitle(title);
         setAuthor(author);
         setGenre(genre);
@@ -169,6 +171,7 @@ public class Track {
     public ObjectProperty<TrackTag> tagProperty() {
         return tag;
     }
+
     /**
      * @brief Imposta la sorgente audio (Proxy) associata a questo brano.
      * @param audioSource L'oggetto che implementa la gestione audio.

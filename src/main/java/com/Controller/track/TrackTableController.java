@@ -7,7 +7,7 @@ import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Track;
 import com.Model.TrackTag;
-
+import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -16,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+
 public class TrackTableController {
     private MainController mainController;
     @FXML
@@ -27,8 +28,9 @@ public class TrackTableController {
     private Label lblTag;
 
     public void init(MainController mainController, TableView<Track> trackTable, TableColumn<Track, String> titleCol,
-                     TableColumn<Track, String> authorCol, TableColumn<Track, String> genreCol, VBox detailPanel,
-                     Label lblTitle, Label lblAuthor, Label lblAlbum, Label lblGenre, Label lblDuration, Label lblYear, Label lblTagTitle, Label lblTag) {
+            TableColumn<Track, String> authorCol, TableColumn<Track, String> genreCol, VBox detailPanel,
+            Label lblTitle, Label lblAuthor, Label lblAlbum, Label lblGenre, Label lblDuration, Label lblYear,
+            Label lblTagTitle, Label lblTag) {
         this.mainController = mainController;
         this.trackTable = trackTable;
         this.detailPanel = detailPanel;
@@ -39,7 +41,7 @@ public class TrackTableController {
         this.lblDuration = lblDuration;
         this.lblYear = lblYear;
         this.lblTagTitle = lblTagTitle;
-        this.lblTag=lblTag;
+        this.lblTag = lblTag;
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
@@ -78,16 +80,15 @@ public class TrackTableController {
             lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : genre);
             lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
             lblDuration.setText(track.getFormattedDuration());
-            if(track.getTag() == null || track.getTag() == TrackTag.NONE){
+            if (track.getTag() == null || track.getTag() == TrackTag.NONE) {
                 lblTagTitle.setVisible(false);
                 lblTag.setVisible(false);
-            }
-            else{
+            } else {
                 lblTagTitle.setVisible(true);
                 lblTag.setVisible(true);
                 lblTag.setText(track.getTag().toString());
             }
-           
+
             detailPanel.setVisible(true);
         }
     }
@@ -115,7 +116,9 @@ public class TrackTableController {
                     "Seleziona una traccia dalla tabella da rimuovere.");
             return;
         }
-        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione", "Rimozione dalla libreria e da tutte le playlist", "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\"?", null);
+        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione",
+                "Rimozione dalla libreria e da tutte le playlist",
+                "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\"?", null);
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack,

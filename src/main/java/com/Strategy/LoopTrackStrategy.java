@@ -10,7 +10,7 @@ import java.util.List;
  *        Il brano corrente viene ripetuto indefinitamente: sia il comando
  *        "successivo" che "precedente" restituiscono sempre lo stesso brano.
  */
-public class LoopStrategy implements IPlaybackStrategy {
+public class LoopTrackStrategy implements IPlaybackStrategy {
 
     /**
      * @brief Restituisce il brano corrente (loop sul singolo brano).
@@ -35,5 +35,5 @@ public class LoopStrategy implements IPlaybackStrategy {
     public Track previousTrack(List<Track> queue, Track current) {
         return current;
     }
-    
+
 }
