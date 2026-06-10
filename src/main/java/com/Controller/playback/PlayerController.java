@@ -6,8 +6,11 @@ import com.Controller.core.MainController;
 import com.Controller.playlist.PlaylistController;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
+
+import java.util.List;
+import com.Strategy.LoopPlaylistStrategy;
 import com.Model.Track;
-import com.Strategy.LoopStrategy;
+import com.Strategy.LoopTrackStrategy;
 import com.Strategy.SequentialStrategy;
 import com.Strategy.ShuffleStrategy;
 
@@ -30,7 +33,6 @@ public class PlayerController {
 
     private Label lblNowPlaying, lblCurrentTime, lblTotalTime;
     private Slider progressSlider;
-    private ITrackContainer activeContainer;
 
     /** @brief True se l'auto-avanzamento sequenziale/shuffle è attivo. */
     private boolean sequentialMode = false;
@@ -38,6 +40,7 @@ public class PlayerController {
     private boolean loopMode = false;
     /** @brief True se il brano corrente è terminato naturalmente. */
     private boolean trackFinished = false;
+    private ITrackContainer activeContainer;
     
 
     /**
@@ -235,7 +238,7 @@ public class PlayerController {
             trackFinished = false;
             sequentialMode = false;
             loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
             startTrackPlayback(selectedTrack);
             return;
         }
@@ -245,7 +248,7 @@ public class PlayerController {
             trackFinished = false;
             sequentialMode = false;
             loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
             startTrackPlayback(playlistViewTrack);
             return;
         }
@@ -257,7 +260,7 @@ public class PlayerController {
                 trackFinished = false;
                 sequentialMode = false;
                 loopMode = true;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
                 startTrackPlayback(current.getTracks().get(0));
                 return;
             }
@@ -272,7 +275,7 @@ public class PlayerController {
             trackFinished = false;
             sequentialMode = false;
             loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopStrategy());
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
             Track firstTrack = activeContainer.getTracks().get(0);
             startTrackPlayback(firstTrack);
             return;
@@ -364,7 +367,6 @@ public class PlayerController {
                 this::handlePlaybackFinished);
     }
 
-
     /**
      * @brief Toggle pausa/ripresa della riproduzione corrente.
      *        Se il player è in riproduzione, transisce a @ref PausedState e
@@ -399,8 +401,8 @@ public class PlayerController {
      * @brief Callback invocata al termine naturale di un brano.
      *        Determina il comportamento successivo in base ai flag di modalità:
      *        se @ref loopMode è attivo riavvia il brano corrente, se
-     *        @ref sequentialMode è attivo chiama @ref handleNext, altrimenti
-     *        ferma la riproduzione e resetta l'interfaccia.
+     * @ref sequentialMode è attivo chiama @ref handleNext, altrimenti
+     *      ferma la riproduzione e resetta l'interfaccia.
      */
     private void handlePlaybackFinished() {
         if (loopMode) {
@@ -421,11 +423,16 @@ public class PlayerController {
         handleNext(null);
     }
 
-    //handleNext chiede direttamente alla strategy corrente quale sia la traccia successiva,
-    //senza passare per playerContext.next() che avrebbe avviato l'audio due volte (bug del double-play).
-    //ho aggiunto sequentialMode = true così la traccia che parte continua ad auto-avanzare quando finisce.
-    //ho aggiunto selectTrack così la selezione nella tabella segue la canzone in riproduzione,
-    //in questo modo se premo loop o shuffle subito dopo, parte dalla traccia corretta e non da quella precedente
+    // handleNext chiede direttamente alla strategy corrente quale sia la traccia
+    // successiva,
+    // senza passare per playerContext.next() che avrebbe avviato l'audio due volte
+    // (bug del double-play).
+    // ho aggiunto sequentialMode = true così la traccia che parte continua ad
+    // auto-avanzare quando finisce.
+    // ho aggiunto selectTrack così la selezione nella tabella segue la canzone in
+    // riproduzione,
+    // in questo modo se premo loop o shuffle subito dopo, parte dalla traccia
+    // corretta e non da quella precedente
     /**
      * @brief Passa al brano successivo nel container attivo
      * @param event pressione sul pulsante
@@ -483,7 +490,7 @@ public class PlayerController {
 
         if (container.getTracks() != null && !container.getTracks().isEmpty()) {
             int nextIdx = Math.min(removedIdx, container.getTracks().size() - 1);
-            if(nextIdx >=0){
+            if (nextIdx >= 0) {
                 Track nextTrack = container.getTracks().get(nextIdx);
                 startTrackPlayback(nextTrack);
             }
@@ -522,7 +529,8 @@ public class PlayerController {
     }
 
     /**
-     * @brief Restituisce il brano selezionato nella vista playlist aperta, se presente.
+     * @brief Restituisce il brano selezionato nella vista playlist aperta, se
+     *        presente.
      *        Interroga il @ref PlaylistController attivo; restituisce {@code null}
      *        se nessuna vista playlist è aperta o nessun brano è selezionato.
      * @return La @ref Track selezionata nella vista playlist, o {@code null}.
@@ -541,7 +549,8 @@ public class PlayerController {
     private void selectTrackInUI(Track track) {
         if (activeContainer instanceof Playlist) {
             PlaylistController pc = mainController.getPlaylistController();
-            if (pc != null) pc.selectTrack(track);
+            if (pc != null)
+                pc.selectTrack(track);
         } else {
             mainController.getTrackTableController().selectTrack(track);
         }
@@ -551,7 +560,8 @@ public class PlayerController {
      * @brief Restituisce la lista di brani del container attivo.
      *        Se nessun container è stato impostato, utilizza la libreria globale
      *        come fallback.
-     * @return La @ref List di @ref Track su cui operano next, prev e auto-avanzamento.
+     * @return La @ref List di @ref Track su cui operano next, prev e
+     *         auto-avanzamento.
      */
     private List<Track> getActiveQueue() {
         return activeContainer != null ? activeContainer.getTracks() : mainController.getLibrary().getTracks();

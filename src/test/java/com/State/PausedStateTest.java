@@ -12,14 +12,18 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * @brief Test per PausedState: verifica il comportamento dello stato di pausa del PlayerContext.
+ * @brief Test per PausedState: verifica il comportamento dello stato di pausa
+ *        del PlayerContext.
  *
- *        PausedState è lo stato in cui il player si trova quando la riproduzione è sospesa.
+ *        PausedState è lo stato in cui il player si trova quando la
+ *        riproduzione è sospesa.
  *        I test verificano che:
  *        - pause() sia un no-op quando già in pausa (non cambia stato)
- *        - play() esca dalla pausa, riporti il player in PlayingState e aggiorni la traccia corrente
+ *        - play() esca dalla pausa, riporti il player in PlayingState e
+ *        aggiorni la traccia corrente
  *        - stop() esca dalla pausa tornando a PlayingState
- *        - next() e previous() escano dalla pausa e navighino rispettando la strategy corrente
+ *        - next() e previous() escano dalla pausa e navighino rispettando la
+ *        strategy corrente
  *
  * @author Christian
  * @see PausedState
@@ -29,8 +33,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PausedStateTest {
 
     /**
-     * @brief DummyStrategy che restituisce valori predefiniti per nextTrack() e previousTrack().
-     *        Uso uno stub manuale senza framework di mocking, per coerenza con gli altri test della suite.
+     * @brief DummyStrategy che restituisce valori predefiniti per nextTrack() e
+     *        previousTrack().
+     *        Uso uno stub manuale senza framework di mocking, per coerenza con gli
+     *        altri test della suite.
      */
     private static class DummyStrategy implements IPlaybackStrategy {
         private final Track nextResult;
@@ -59,16 +65,18 @@ public class PausedStateTest {
 
     @BeforeEach
     public void setUp() {
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3", null);
-        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3", null);
-        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3", null);
+        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",null);
+        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3",null);
+        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3",null);
         queue = Arrays.asList(track1, track2, track3);
     }
 
     /**
-     * @brief Crea un PlayerContext con DummyStrategy, avvia la riproduzione su currentTrack
+     * @brief Crea un PlayerContext con DummyStrategy, avvia la riproduzione su
+     *        currentTrack
      *        e poi lo porta in stato di pausa.
-     *        In questo modo ogni test parte già con il context in PausedState, pronto da testare.
+     *        In questo modo ogni test parte già con il context in PausedState,
+     *        pronto da testare.
      */
     private PlayerContext pausedContextWith(Track currentTrack, Track nextTrack, Track prevTrack) {
         PlaybackContext pb = new PlaybackContext(new DummyStrategy(nextTrack, prevTrack));
@@ -94,14 +102,16 @@ public class PausedStateTest {
 
         PlayerContext ctx = pausedContextWith(track1, null, null);
 
-        // chiamo pause() una seconda volta: deve essere un no-op, lo stato non deve cambiare
+        // chiamo pause() una seconda volta: deve essere un no-op, lo stato non deve
+        // cambiare
         ctx.pause();
 
         assertTrue(ctx.isPaused());
     }
 
     /**
-     * @brief Verifica che pause() chiamato quando già in pausa non avvii la riproduzione per errore.
+     * @brief Verifica che pause() chiamato quando già in pausa non avvii la
+     *        riproduzione per errore.
      */
     @Test
     public void testPause_whenAlreadyPaused_doesNotStartPlaying() {
@@ -130,7 +140,8 @@ public class PausedStateTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che play() esca dallo stato di pausa: dopo la chiamata il player non deve essere più in pausa.
+     * @brief Verifica che play() esca dallo stato di pausa: dopo la chiamata il
+     *        player non deve essere più in pausa.
      */
     @Test
     public void testPlay_exitsPausedState() {
@@ -144,7 +155,8 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che play() riporti il player in stato di riproduzione attiva (PlayingState).
+     * @brief Verifica che play() riporti il player in stato di riproduzione attiva
+     *        (PlayingState).
      */
     @Test
     public void testPlay_setsPlayingState() {
@@ -157,13 +169,15 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che play() aggiorni la traccia corrente nel context con quella passata come parametro.
+     * @brief Verifica che play() aggiorni la traccia corrente nel context con
+     *        quella passata come parametro.
      */
     @Test
     public void testPlay_updatesCurrentTrack() {
         System.out.println("[TEST PausedState] play() -> deve aggiornare la traccia corrente nel context");
 
-        // ero in pausa su track1, chiamo play(track2): mi aspetto track2 come traccia corrente
+        // ero in pausa su track1, chiamo play(track2): mi aspetto track2 come traccia
+        // corrente
         PlayerContext ctx = pausedContextWith(track1, null, null);
         ctx.play(track2);
 
@@ -171,14 +185,17 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che play() sulla stessa traccia che era in pausa esca ugualmente dalla pausa.
-     *        Questo è il caso tipico del "riprendi" dopo aver premuto pausa sulla stessa canzone.
+     * @brief Verifica che play() sulla stessa traccia che era in pausa esca
+     *        ugualmente dalla pausa.
+     *        Questo è il caso tipico del "riprendi" dopo aver premuto pausa sulla
+     *        stessa canzone.
      */
     @Test
     public void testPlay_sameTrack_exitsPausedState() {
         System.out.println("[TEST PausedState] play() sulla stessa traccia in pausa -> deve uscire dalla pausa");
 
-        // questo simula il caso in cui l'utente preme play sulla stessa canzone che era in pausa
+        // questo simula il caso in cui l'utente preme play sulla stessa canzone che era
+        // in pausa
         PlayerContext ctx = pausedContextWith(track1, null, null);
         ctx.play(track1);
 
@@ -188,8 +205,10 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che play() su una traccia senza audioSource non lanci eccezioni.
-     *        Le tracce nei test non hanno un audioSource impostato, play() deve gestirlo senza crash.
+     * @brief Verifica che play() su una traccia senza audioSource non lanci
+     *        eccezioni.
+     *        Le tracce nei test non hanno un audioSource impostato, play() deve
+     *        gestirlo senza crash.
      */
     @Test
     public void testPlay_trackWithoutAudioSource_doesNotThrow() {
@@ -205,7 +224,8 @@ public class PausedStateTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che stop() esca dallo stato di pausa riportando il context a PlayingState.
+     * @brief Verifica che stop() esca dallo stato di pausa riportando il context a
+     *        PlayingState.
      */
     @Test
     public void testStop_exitsPausedState() {
@@ -261,14 +281,17 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che next() rispetti la strategy corrente e aggiorni la traccia corrente.
-     *        La DummyStrategy è impostata per restituire track2: dopo next() la corrente deve essere track2.
+     * @brief Verifica che next() rispetti la strategy corrente e aggiorni la
+     *        traccia corrente.
+     *        La DummyStrategy è impostata per restituire track2: dopo next() la
+     *        corrente deve essere track2.
      */
     @Test
     public void testNext_updatesCurrentTrackUsingStrategy() {
         System.out.println("[TEST PausedState] next() -> deve aggiornare la traccia corrente usando la strategy");
 
-        // la DummyStrategy restituisce track2: mi aspetto che diventi la traccia corrente
+        // la DummyStrategy restituisce track2: mi aspetto che diventi la traccia
+        // corrente
         PlayerContext ctx = pausedContextWith(track1, track2, null);
         ctx.next(queue, track1);
 
@@ -276,8 +299,10 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che next() senza traccia successiva disponibile (null) esca comunque dalla pausa.
-     *        Anche se non c'è una traccia successiva il player non deve restare bloccato in pausa.
+     * @brief Verifica che next() senza traccia successiva disponibile (null) esca
+     *        comunque dalla pausa.
+     *        Anche se non c'è una traccia successiva il player non deve restare
+     *        bloccato in pausa.
      */
     @Test
     public void testNext_withNoNextTrack_exitsPausedState() {
@@ -321,7 +346,8 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che previous() riporti il player in stato di riproduzione attiva.
+     * @brief Verifica che previous() riporti il player in stato di riproduzione
+     *        attiva.
      */
     @Test
     public void testPrevious_setsPlayingState() {
@@ -334,8 +360,10 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che previous() rispetti la strategy corrente e aggiorni la traccia corrente.
-     *        La DummyStrategy è impostata per restituire track1: dopo previous() la corrente deve essere track1.
+     * @brief Verifica che previous() rispetti la strategy corrente e aggiorni la
+     *        traccia corrente.
+     *        La DummyStrategy è impostata per restituire track1: dopo previous() la
+     *        corrente deve essere track1.
      */
     @Test
     public void testPrevious_updatesCurrentTrackUsingStrategy() {
@@ -349,14 +377,18 @@ public class PausedStateTest {
     }
 
     /**
-     * @brief Verifica che previous() senza traccia precedente disponibile (null) esca comunque dalla pausa.
-     *        Anche se non c'è una traccia precedente il player non deve restare bloccato in pausa.
+     * @brief Verifica che previous() senza traccia precedente disponibile (null)
+     *        esca comunque dalla pausa.
+     *        Anche se non c'è una traccia precedente il player non deve restare
+     *        bloccato in pausa.
      */
     @Test
     public void testPrevious_withNoPreviousTrack_exitsPausedState() {
-        System.out.println("[TEST PausedState] previous() senza traccia precedente -> deve uscire dalla pausa comunque");
+        System.out
+                .println("[TEST PausedState] previous() senza traccia precedente -> deve uscire dalla pausa comunque");
 
-        // null come precedente: la strategia dice che non c'è nessuna traccia precedente
+        // null come precedente: la strategia dice che non c'è nessuna traccia
+        // precedente
         PlayerContext ctx = pausedContextWith(track2, null, null);
         ctx.previous(queue, track2);
 

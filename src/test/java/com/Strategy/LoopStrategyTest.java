@@ -10,19 +10,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LoopStrategyTest {
 
-    private LoopStrategy strategy;
+    private LoopPlaylistStrategy strategy;
     private Track track1;
     private Track track2;
     private Track track3;
 
     @BeforeEach
     void setUp() {
-        strategy = new LoopStrategy();
+        strategy = new LoopPlaylistStrategy();
+        strategy = new LoopTrackStrategy();
         track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3", null);
         track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 180, "Album B", "dummy2.mp3", null);
         track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 210, "Album C", "dummy3.mp3", null);
     }
-
 
     @Test
     void nextTrack_currentNull_restituisceNull() {
@@ -47,8 +47,6 @@ public class LoopStrategyTest {
         List<Track> queue = List.of(track1, track2, track3);
         assertSame(track3, strategy.nextTrack(queue, track3));
     }
-
-
 
     @Test
     void previousTrack_currentNull_restituisceNull() {

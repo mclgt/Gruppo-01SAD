@@ -90,11 +90,15 @@ public class MainController {
     private Library trackList = new Library();
 
     /**
-     * @brief Inizializza i componenti dell'interfaccia grafica e i sotto-controller.
-     *        Crea il @ref PlayerContext con strategia sequenziale di default, inizializza
-     *        @ref TrackTableController, @ref PlayerController e @ref PlaylistTableController
-     *        passando i riferimenti ai componenti FXML. Carica inoltre un set di brani
-     *        demo nella libreria per facilitare i test sull'interfaccia.
+     * @brief Inizializza i componenti dell'interfaccia grafica e i
+     *        sotto-controller.
+     *        Crea il @ref PlayerContext con strategia sequenziale di default,
+     *        inizializza
+     * @ref TrackTableController, @ref PlayerController e @ref
+     *      PlaylistTableController
+     *      passando i riferimenti ai componenti FXML. Carica inoltre un set di
+     *      brani
+     *      demo nella libreria per facilitare i test sull'interfaccia.
      */
     @FXML
     public void initialize() {
@@ -118,7 +122,7 @@ public class MainController {
         return trackList;
     }
 
-    public Button getBtnAddToPlaylist(){
+    public Button getBtnAddToPlaylist() {
         return btnAddToPlaylist;
     }
 
@@ -131,11 +135,11 @@ public class MainController {
         return undoManager;
     }
 
-    public PlaylistCatalog getPlaylistCatalog(){
+    public PlaylistCatalog getPlaylistCatalog() {
         return playlistCatalog;
     }
 
-    public PlaylistTableController getPlaylistTableController(){
+    public PlaylistTableController getPlaylistTableController() {
         return playlistTableController;
     }
 
@@ -163,7 +167,7 @@ public class MainController {
         return playerController;
     }
 
-    public void setTrackManagementButtonVisible(boolean visible){
+    public void setTrackManagementButtonVisible(boolean visible) {
         btnAddTrack.setVisible(visible);
         btnAddTrack.setManaged(visible);
 
@@ -260,12 +264,12 @@ public class MainController {
     }
 
     @FXML
-    public void openAddPlaylistView(ActionEvent ev){
+    public void openAddPlaylistView(ActionEvent ev) {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
-    public void openPlaylistView(Playlist selectedPlaylist){
-        try{
+    public void openPlaylistView(Playlist selectedPlaylist) {
+        try {
             setTrackManagementButtonVisible(false);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
             VBox playlistViewNode = loader.load();
@@ -282,14 +286,14 @@ public class MainController {
     }
 
     @FXML
-    public void openAddTrackToPlaylistView(){
+    public void openAddTrackToPlaylistView() {
         Playlist selectedPlaylist = playlistTableController.getSelectedPlaylist();
         openAddTrackToPlaylistView(selectedPlaylist);
     }
 
-    public void openAddTrackToPlaylistView(Playlist selectedPlaylist){
-        if(selectedPlaylist != null){
-            try{
+    public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
+        if (selectedPlaylist != null) {
+            try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
                 Parent root = loader.load();
 
@@ -300,10 +304,10 @@ public class MainController {
                 stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
                 stage.setScene(new Scene(root));
                 stage.show();
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }else{
+        } else {
             System.out.println("Nessuna playlist selezionata!");
         }
     }
@@ -317,10 +321,10 @@ public class MainController {
         return playlistController;
     }
 
-    public void restoreMainLibraryView(){
+    public void restoreMainLibraryView() {
         playlistController = null;
         setTrackManagementButtonVisible(true);
-        if(centerContentArea != null && trackTable != null){
+        if (centerContentArea != null && trackTable != null) {
             centerContentArea.getChildren().clear();
             centerContentArea.getChildren().add(trackTable);
         }
@@ -354,16 +358,15 @@ public class MainController {
             lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : track.getGenre());
             lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
             lblDuration.setText(track.getFormattedDuration());
-            if(track.getTag() == null || track.getTag() == TrackTag.NONE){
+            if (track.getTag() == null || track.getTag() == TrackTag.NONE) {
                 lblTagTitle.setVisible(false);
                 lblTag.setVisible(false);
-            }
-            else{
+            } else {
                 lblTagTitle.setVisible(true);
                 lblTag.setVisible(true);
                 lblTag.setText(track.getTag().toString());
             }
-           
+
             detailPanel.setVisible(true);
         }
     }
