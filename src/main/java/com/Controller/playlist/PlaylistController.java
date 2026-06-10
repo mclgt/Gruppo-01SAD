@@ -54,6 +54,11 @@ public class PlaylistController {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("formattedDuration"));
+        playlistTrackList.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
+            if (mainController != null) {
+                mainController.updateDetailPanel(newVal);
+            }
+        });
     }
 
     /**
