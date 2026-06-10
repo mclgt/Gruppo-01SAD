@@ -15,20 +15,17 @@ import com.Strategy.ShuffleStrategy;
 
 /**
  * @class PlayerContextPlaylistTest
- * @brief Classe di test per verificare la logica di riproduzione per le
- *        Playlist. Verifica che il PlayerContext interagisca correttamente con
- *        la Playlist utilizzando la giusta strategia di riproduzione e
- *        assicurando il corretto avanzamento tra i brani.
+ * @brief Test class for verifying playback logic with Playlists.
+ *        Verifies that PlayerContext interacts correctly with a Playlist,
+ *        using the right playback strategy and ensuring correct track advancement.
  */
-
 public class PlayerContextPlaylistTest {
     private Playlist testPlaylist;
     private Track track1;
     private Track track2;
 
     /**
-     * @brief Configura gli elementi utili per i test: contesto di riproduzione e
-     *        una playlist popolata com delle tracce.
+     * @brief Sets up the test fixtures: a playback context and a populated playlist.
      */
     @BeforeEach
     void setUp() {
@@ -37,12 +34,10 @@ public class PlayerContextPlaylistTest {
         track2 = new Track("F", "G", 2010, "H", 100, "I", "J", null);
         testPlaylist.addTrack(track1);
         testPlaylist.addTrack(track2);
-
     }
 
     /**
-     * @brief Verifica che l'avvio della riproduzione da una playlist vuota (o dallo
-     *        stato iniziale) carichi correttamente il primo brano disponibile
+     * @brief Verifies that starting playback from an empty/initial state loads the first available track.
      */
     @Test
     void testInitialPlayUpdateState() {
@@ -54,15 +49,13 @@ public class PlayerContextPlaylistTest {
         if (firstTrack != null) {
             context.play(firstTrack);
         }
-        assertEquals(track1, context.getCurrentTrack(), "La prima traccia della playlist dovrebbe essere A");
-        assertTrue(context.isPlaying(), "Il player dovrebbe trovarsi nello stato 'playingState'");
-
+        assertEquals(track1, context.getCurrentTrack(), "The first track of the playlist should be A");
+        assertTrue(context.isPlaying(), "The player should be in the 'playingState' state");
     }
 
     /**
-     * @brief Verifica che, data una traccia in riproduzione, il comando 'next'
-     *        aggiorni correttamente la traccia corrente alla successiva nella
-     *        playlist.
+     * @brief Verifies that given a playing track, the 'next' command correctly
+     *        advances the current track to the next one in the playlist.
      */
     @Test
     void testSequentialNextUpdateTrack() {
@@ -73,14 +66,12 @@ public class PlayerContextPlaylistTest {
         assertTrue(context.isPlaying());
         context.next(testPlaylist.getTracks(), track1);
         Track nextTrack = context.getCurrentTrack();
-        assertEquals(track2, nextTrack, "La  traccia successiva della playlist dovrebbe essere F");
-
+        assertEquals(track2, nextTrack, "The next track in the playlist should be F");
     }
 
     /**
-     * @brief Verifica il comportamento alla fine della playlist in modalità
-     *        sequenziale. Assicura che il player non esegua il loop automatico alla
-     *        prima traccia, rimanendo bloccato sull'ultima.
+     * @brief Verifies the behavior at the end of the playlist in sequential mode.
+     *        The player must not automatically loop to the first track.
      */
     @Test
     void testEndOfPlaylistSequential() {
@@ -92,13 +83,12 @@ public class PlayerContextPlaylistTest {
         context.next(testPlaylist.getTracks(), track2);
         Track afterLast = context.getCurrentTrack();
         assertTrue(afterLast == track2,
-                "Alla fine della playlist modalità sequenziale, il next non deve tornare alla prima traccia");
+                "At the end of the playlist in sequential mode, next must not wrap to the first track");
     }
 
     /**
-     * @brief Verifica il comportamento alla fine della playlist in modalità
-     *        loop. Assicura che il player esegua il loop automatico alla
-     *        prima traccia..
+     * @brief Verifies the behavior at the end of the playlist in loop mode.
+     *        The player must automatically loop back to the first track.
      */
     @Test
     void testEndOfPlaylistLoop() {
@@ -110,9 +100,10 @@ public class PlayerContextPlaylistTest {
         context.next(testPlaylist.getTracks(), track2);
         Track afterLast = context.getCurrentTrack();
         assertTrue(afterLast == track1,
-                "Alla fine della playlist modalità loop, il next deve tornare alla prima traccia");
+                "At the end of the playlist in loop mode, next must wrap back to the first track");
     }
 
+    /** Verifies that the shuffle strategy picks a valid track from the playlist and keeps the player playing. */
     @Test
     void testShuffleStrategy() {
         PlaybackContext playbackContext = new PlaybackContext(new ShuffleStrategy());
@@ -121,14 +112,13 @@ public class PlayerContextPlaylistTest {
         testPlaylist.addTrack(track3);
         context.setCurrentTrack(track1);
         context.play(track1);
-        assertTrue(context.isPlaying(), "Il player dovrebbe essere in riproduzione");
+        assertTrue(context.isPlaying(), "The player should be in the playing state");
         context.next(testPlaylist.getTracks(), track1);
         Track nextTrack = context.getCurrentTrack();
-        assertNotNull(nextTrack, "Il context deve aver aggiornato la traccia corrente");
+        assertNotNull(nextTrack, "The context must have updated the current track");
         assertTrue(testPlaylist.getTracks().contains(nextTrack),
-                "Il context deve aver selezionato una traccia della playlist");
-        assertTrue(context.isPlaying(), "Il player deve mantenere lo stato di riproduzione dopo il passaggio");
-
+                "The context must have selected a track from the playlist");
+        assertTrue(context.isPlaying(), "The player must remain in the playing state after advancing");
     }
 
 }

@@ -41,7 +41,6 @@ public class PlayerController {
     /** @brief True se il brano corrente è terminato naturalmente. */
     private boolean trackFinished = false;
     private ITrackContainer activeContainer;
-    
 
     /**
      * @brief Inizializza i riferimenti ai componenti grafici e al controller
@@ -238,7 +237,7 @@ public class PlayerController {
             trackFinished = false;
             sequentialMode = false;
             loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
             startTrackPlayback(selectedTrack);
             return;
         }
@@ -248,7 +247,7 @@ public class PlayerController {
             trackFinished = false;
             sequentialMode = false;
             loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
             startTrackPlayback(playlistViewTrack);
             return;
         }
@@ -260,7 +259,7 @@ public class PlayerController {
                 trackFinished = false;
                 sequentialMode = false;
                 loopMode = true;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
                 startTrackPlayback(current.getTracks().get(0));
                 return;
             }
@@ -275,7 +274,7 @@ public class PlayerController {
             trackFinished = false;
             sequentialMode = false;
             loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
+            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
             Track firstTrack = activeContainer.getTracks().get(0);
             startTrackPlayback(firstTrack);
             return;
@@ -554,6 +553,38 @@ public class PlayerController {
         } else {
             mainController.getTrackTableController().selectTrack(track);
         }
+    }
+
+    /**
+     * @brief Avvia la riproduzione in loop della playlist: scorre i brani in
+     *        sequenza e ricomincia dal primo quando si raggiunge l'ultimo.
+     *        Se un brano della playlist è già in riproduzione aggiorna solo i flag
+     *        e la strategia senza interrompere l'audio corrente.
+     * @param playlist La playlist su cui applicare il loop.
+     */
+    public void loopPlaylistRip(Playlist playlist) {
+        if (playlist == null || playlist.getTracksCount() == 0) {
+            mainController.getWindowManager().showWarning("Playlist vuota",
+                    "La playlist non ha brani.");
+            return;
+        }
+        mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
+        Track currentTrack = mainController.getPlayerContext().getCurrentTrack();
+        if (currentTrack != null && playlist.getTracks().contains(currentTrack)
+                && mainController.getPlayerContext().isPlaying()) {
+            activeContainer = playlist;
+            sequentialMode = true;
+            loopMode = false;
+            return;
+        }
+        PlaylistController pc = mainController.getPlaylistController();
+        Track selectedTrack = pc != null ? pc.getSelectedTrack() : null;
+        activeContainer = playlist;
+        trackFinished = false;
+        sequentialMode = true;
+        loopMode = false;
+        Track startTrack = selectedTrack != null ? selectedTrack : playlist.getTracks().get(0);
+        startTrackPlayback(startTrack);
     }
 
     /**

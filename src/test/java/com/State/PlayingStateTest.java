@@ -13,13 +13,13 @@ import com.Strategy.IPlaybackStrategy;
 import com.Strategy.PlaybackContext;
 
 /**
- * @brief Test per PlayingState: verifica il comportamento dello stato di riproduzione attiva (ovvero una canzone è in riproduzione) del PlayerContext.
+ * @brief Tests for PlayingState: verifies the behavior of the active playback state
+ *        (i.e., a song is currently playing) in PlayerContext.
  *
- *        PlayingState è lo stato in cui il player si trova durante la riproduzione.
- *        I test verificano che play() aggiorni correttamente la traccia corrente nel
- *        PlayerContext, e che next()/previous() navighino tra le diverse tracce; facendola partire a sua volta,
- *        oppure invochino stop() quando non esiste una traccia disponibile.
- *
+ *        PlayingState is the state the player is in during playback.
+ *        Tests verify that play() correctly updates the current track in PlayerContext,
+ *        that next()/previous() navigate between tracks and start the new one,
+ *        or call stop() when no track is available.
  *
  * @author Christian
  * @see PlayingState
@@ -29,8 +29,8 @@ import com.Strategy.PlaybackContext;
 public class PlayingStateTest {
 
     /**
-     * @brief Per semplificare i test, definiamo una DummyStrategy che restituisce 
-     *        valori predefiniti per nextTrack() e previousTrack().
+     * @brief DummyStrategy that returns predefined values for nextTrack() and previousTrack(),
+     *        used to simplify tests without a mocking framework.
      */
     private static class DummyStrategy implements IPlaybackStrategy {
         private final Track nextResult;
@@ -65,171 +65,159 @@ public class PlayingStateTest {
         queue = Arrays.asList(track1, track2, track3);
     }
 
-    /** @brief Crea un PlayerContext con una DummyStrategy che restituisce i valori forniti. */
+    /** Creates a PlayerContext with a DummyStrategy returning the given values. */
     private PlayerContext contextWith(Track nextTrack, Track prevTrack) {
         PlaybackContext pb = new PlaybackContext(new DummyStrategy(nextTrack, prevTrack));
         return new PlayerContext(pb);
     }
 
-
-
-
-    // Test per il metodo play()
+    // -----------------------------------------------------------------------
+    // Tests for play()
+    // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che play() imposti la traccia corrente nel context.
+     * @brief Verifies that play() sets the current track in the context.
      */
     @Test
     public void testPlay_setsCurrentTrack() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] play() -> deve impostare la traccia corrente nel context");
+        System.out.println("[TEST PlayingState] play() -> must set the current track in the context");
 
-        // do come parametri null, null perchè voglio solo testare che play() aggiorni la traccia attualmente in riproduzione
+        // null, null: only testing that play() updates the currently playing track
         PlayerContext ctx = contextWith(null, null);
 
-        // creo direttamente lo stato PlayingState passandogli il context
+        // create PlayingState directly, passing the context
         PlayingState state = new PlayingState(ctx);
 
-        // eseguo play su track1
         state.play(track1);
 
-        // verifico che il context abbia registrato track1 come traccia corrente
+        // verify the context has registered track1 as the current track
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che una seconda chiamata a play() aggiorni la traccia corrente.
+     * @brief Verifies that a second call to play() updates the current track.
      */
     @Test
     public void testPlay_subsequentCall_updatesCurrentTrack() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] play() due volte -> la traccia corrente deve essere quella dell'ultima chiamata");
+        System.out.println("[TEST PlayingState] play() called twice -> current track must be the last one played");
 
-        // null, null: non mi serve navigazione, verifico solo la sovrascrittura della traccia corrente
+        // null, null: no navigation needed, only testing track overwrite
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
-        // prima riproduzione: imposta track1 come corrente
+        // first call: sets track1 as current
         state.play(track1);
-        // seconda riproduzione: deve sovrascrivere la traccia con track2 altrimenti è un errore
+        // second call: must overwrite with track2
         state.play(track2);
 
-        // la traccia corrente deve essere l'ultima riprodotta, ovvero track2 e nessun'altra
+        // current track must be the last one played, i.e., track2
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che play() su tracce diverse aggiorni sempre la traccia corrente.
+     * @brief Verifies that play() on different tracks always updates the current track.
      */
     @Test
     public void testPlay_thirdTrack_updatesCurrentTrack() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] play() su traccia diversa -> deve aggiornare la traccia corrente");
+        System.out.println("[TEST PlayingState] play() on a different track -> must update the current track");
 
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
-        // riproduco track1 prima, poi salto a track3 (saltando track2)
+        // play track1 first, then jump to track3 (skipping track2)
         state.play(track1);
         state.play(track3);
 
-        // la corrente deve essere track3 e non la 2, quindi devo poter passare da una traccia ad un'altra senza problemi, anche se ne salto alcune
+        // current must be track3; jumping non-sequentially must work correctly
         assertEquals(track3, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che play() con una traccia priva di audioSource non lanci eccezioni.
+     * @brief Verifies that play() on a track with no audioSource does not throw.
      */
     @Test
     public void testPlay_trackWithoutAudioSource_doesNotThrow() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] play() su traccia senza audioSource -> non deve lanciare eccezioni");
+        System.out.println("[TEST PlayingState] play() on track without audioSource -> must not throw any exception");
 
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
-        // track1 non ha un audioSource impostato (null): play() non deve crashare
+        // track1 has no audioSource (null): play() must not crash
         assertDoesNotThrow(() -> state.play(track1));
     }
 
     // -----------------------------------------------------------------------
-    // Test di next()
+    // Tests for next()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che next() con una traccia successiva 
-     *        disponibile la imposti come corrente.
+     * @brief Verifies that next() with a valid next track sets it as the current track.
      */
     @Test
     public void testNext_withValidNext_setsNextTrackAsCurrent() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] next() con traccia disponibile -> deve impostare la traccia successiva come corrente");
+        System.out.println("[TEST PlayingState] next() with valid track -> must set the next track as current");
 
-        // la strategia restituirà track2 come prossima traccia; null per la precedente (non serve)
+        // strategy returns track2 as the next track; null for previous (not needed)
         PlayerContext ctx = contextWith(track2, null);
         PlayingState state = new PlayingState(ctx);
-        // imposto manualmente track1 come traccia corrente di partenza
+        // manually set track1 as the starting current track
         ctx.setCurrentTrack(track1);
 
-        // chiedo di avanzare alla prossima traccia
         state.next(queue, track1);
 
-        // la strategia ha restituito track2, quindi il context deve averla impostata come corrente
+        // strategy returned track2, so the context must have set it as current
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che next() con una traccia successiva disponibile avanzi di due passi se
-     *        chiamato consecutivamente (la strategia stub restituisce sempre lo stesso valore).
+     * @brief Verifies that calling next() twice uses the strategy result each time.
+     *        The stub always returns the same value, so the current track stabilizes on it.
      */
     @Test
     public void testNext_calledTwice_usesStrategyResultEachTime() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] next() chiamato due volte -> ogni chiamata usa il risultato della strategia");
+        System.out.println("[TEST PlayingState] next() called twice -> each call uses the strategy result");
 
-        // la DummyStrategy restituisce sempre track2 come prossima, indipendentemente dalla corrente
+        // DummyStrategy always returns track2 as next, regardless of current
         PlayerContext ctx = contextWith(track2, null);
         PlayingState state = new PlayingState(ctx);
         ctx.setCurrentTrack(track1);
 
-        // primo next: da track1 -> track2
+        // first next: track1 -> track2
         state.next(queue, track1);
         assertEquals(track2, ctx.getCurrentTrack());
 
-        // secondo next: la stub restituisce ancora track2, quindi rimane su track2
+        // second next: stub returns track2 again, so stays on track2
         state.next(queue, track2);
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che next() senza traccia successiva (null) non modifichi la traccia corrente.
+     * @brief Verifies that next() with no next track (null) does not change the current track.
      */
     @Test
     public void testNext_withNoNext_currentTrackUnchanged() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] next() senza traccia successiva -> la traccia corrente non deve cambiare");
+        System.out.println("[TEST PlayingState] next() with no next track -> current track must not change");
 
-        // null, null: la strategia dice che non c'è nessuna traccia successiva disponibile
+        // null, null: strategy signals no next track available
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
         ctx.setCurrentTrack(track1);
 
-        // chiamo next, ma la strategia restituisce null -> PlayingState chiama stop()
+        // next() called but strategy returns null -> PlayingState calls stop()
         state.next(queue, track1);
 
-        // track1 deve rimanere la traccia corrente perché non c'era una prossima
+        // track1 must remain current because there was no next track
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che next() con traccia successiva non lanci eccezioni.
+     * @brief Verifies that next() with a valid next track does not throw any exception.
      */
     @Test
     public void testNext_withValidNext_doesNotThrow() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] next() con traccia disponibile -> non deve lanciare eccezioni");
+        System.out.println("[TEST PlayingState] next() with valid track -> must not throw any exception");
 
-        // la strategia restituisce track2 come prossima: non deve esplodere nulla
+        // strategy returns track2 as next: must not throw
         PlayerContext ctx = contextWith(track2, null);
         PlayingState state = new PlayingState(ctx);
 
@@ -237,59 +225,55 @@ public class PlayingStateTest {
     }
 
     // -----------------------------------------------------------------------
-    // Test di previous()
+    // Tests for previous()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che previous() con una traccia precedente disponibile la imposti come corrente.
+     * @brief Verifies that previous() with a valid previous track sets it as the current track.
      */
     @Test
     public void testPrevious_withValidPrevious_setsPreviousTrackAsCurrent() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] previous() con traccia disponibile -> deve impostare la traccia precedente come corrente");
+        System.out.println("[TEST PlayingState] previous() with valid track -> must set the previous track as current");
 
-        // null per next (non serve), track1 come traccia precedente restituita dalla strategia
+        // null for next (not needed), track1 as previous returned by strategy
         PlayerContext ctx = contextWith(null, track1);
         PlayingState state = new PlayingState(ctx);
-        // parto da track2 come traccia corrente
+        // start from track2 as current
         ctx.setCurrentTrack(track2);
 
-        // chiedo di tornare alla traccia precedente
         state.previous(queue, track2);
 
-        // la strategia ha restituito track1, quindi deve diventare la traccia corrente
+        // strategy returned track1, so it must become the current track
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che previous() senza traccia precedente (null) non modifichi la traccia corrente.
+     * @brief Verifies that previous() with no previous track (null) does not change the current track.
      */
     @Test
     public void testPrevious_withNoPrevious_currentTrackUnchanged() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] previous() senza traccia precedente -> la traccia corrente non deve cambiare");
+        System.out.println("[TEST PlayingState] previous() with no previous track -> current track must not change");
 
-        // null, null: la strategia dice che non c'è nessuna traccia precedente disponibile
+        // null, null: strategy signals no previous track available
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
         ctx.setCurrentTrack(track2);
 
-        // chiamo previous, ma la strategia restituisce null -> PlayingState chiama stop()
+        // previous() called but strategy returns null -> PlayingState calls stop()
         state.previous(queue, track2);
 
-        // track2 deve rimanere la traccia corrente perché non c'era una precedente
+        // track2 must remain current because there was no previous track
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifica che previous() con traccia precedente non lanci eccezioni.
+     * @brief Verifies that previous() with a valid previous track does not throw any exception.
      */
     @Test
     public void testPrevious_withValidPrevious_doesNotThrow() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] previous() con traccia disponibile -> non deve lanciare eccezioni");
+        System.out.println("[TEST PlayingState] previous() with valid track -> must not throw any exception");
 
-        // null per next, track1 come precedente: non deve esplodere nulla
+        // null for next, track1 as previous: must not throw
         PlayerContext ctx = contextWith(null, track1);
         PlayingState state = new PlayingState(ctx);
 
@@ -297,14 +281,13 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifica che previous() senza traccia precedente non lanci eccezioni.
+     * @brief Verifies that previous() with no previous track does not throw any exception.
      */
     @Test
     public void testPrevious_withNoPrevious_doesNotThrow() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] previous() senza traccia precedente -> non deve lanciare eccezioni");
+        System.out.println("[TEST PlayingState] previous() with no previous track -> must not throw any exception");
 
-        // null, null: nessuna traccia precedente, ma non deve esplodere
+        // null, null: no previous track, but must not throw
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
@@ -312,36 +295,34 @@ public class PlayingStateTest {
     }
 
     // -----------------------------------------------------------------------
-    // Test di pause() e stop()
+    // Tests for pause() and stop()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che pause() non lanci eccezioni (comportamento attualmente no-op).
+     * @brief Verifies that pause() does not throw any exception (currently a no-op in PlayingState).
      */
     @Test
     public void testPause_doesNotThrow() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] pause() -> non deve lanciare eccezioni");
+        System.out.println("[TEST PlayingState] pause() -> must not throw any exception");
 
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
-        // pause() è attualmente no-op in PlayingState: verifichiamo che non lanci eccezioni
+        // pause() is currently a no-op in PlayingState: verify it does not throw
         assertDoesNotThrow(() -> state.pause());
     }
 
     /**
-     * @brief Verifica che stop() non lanci eccezioni (comportamento attualmente no-op).
+     * @brief Verifies that stop() does not throw any exception (currently a no-op in PlayingState).
      */
     @Test
     public void testStop_doesNotThrow() {
-        //stampa per identificare il test in output
-        System.out.println("[TEST PlayingState] stop() -> non deve lanciare eccezioni");
+        System.out.println("[TEST PlayingState] stop() -> must not throw any exception");
 
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
-        // stop() è attualmente no-op in PlayingState: verifichiamo che non lanci eccezioni
+        // stop() is currently a no-op in PlayingState: verify it does not throw
         assertDoesNotThrow(() -> state.stop());
     }
 }
