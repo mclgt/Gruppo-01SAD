@@ -8,6 +8,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -37,14 +38,30 @@
          <Insets />
       </VBox.margin>
    </ToolBar>
-    <Label fx:id="lblPlaylist" alignment="CENTER" contentDisplay="CENTER" prefHeight="21.0" prefWidth="169.0" text="Nome della Playlist">
-        <font>
-            <Font name="System Bold" size="18.0" />
-        </font>
-      <VBox.margin>
-         <Insets left="10.0" />
-      </VBox.margin>
-    </Label>
+   <HBox prefHeight="27.0" prefWidth="574.0">
+      <children>
+         <Label fx:id="lblPlaylist" prefHeight="47.0" prefWidth="238.0" text="Nome della Playlist">
+            <font>
+               <Font name="System Bold" size="18.0" />
+            </font>
+            <HBox.margin>
+               <Insets left="20.0" />
+            </HBox.margin>
+         </Label>
+         <Button fx:id="btnAddToPlaylist11" mnemonicParsing="false" onAction="#handleLoopPlaylist">
+            <graphic>
+               <ImageView fx:id="btnLoopPlaylist" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                  <image>
+                     <Image url="@loop.png" />
+                  </image>
+               </ImageView>
+            </graphic>
+            <HBox.margin>
+               <Insets left="250.0" />
+            </HBox.margin>
+         </Button>
+      </children>
+   </HBox>
     
     <TableView fx:id="playlistTrackList" VBox.vgrow="ALWAYS">
         <columns>
