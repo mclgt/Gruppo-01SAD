@@ -22,10 +22,11 @@ public class PlaylistTableController {
      *        configurando l'interfaccia utente. Effettua i binding tra la colonna
      *        visualizzata a schermo e la StringProperty contenuta in Playlist
      *        (nome).
-     * @param controller   rifeirmento al maincontroller per accedere alle
-     *                     funzionalità del WindowManager
+     * @param controller    rifeirmento al maincontroller per accedere alle
+     *                      funzionalità del WindowManager
      * @param playlistTable riferimento al componente TableView definito
-     * @param nameCol      riferimento alla colonna contenente i nomi delle playlist
+     * @param nameCol       riferimento alla colonna contenente i nomi delle
+     *                      playlist
      */
     public void init(MainController controller, TableView<Playlist> playlistList,
             TableColumn<Playlist, String> nameCol) {
@@ -35,29 +36,30 @@ public class PlaylistTableController {
         nameCol.setCellValueFactory(cellData -> cellData.getValue().getNameProperty());
         playlistList.setItems(mainController.getPlaylistCatalog().getPlaylists());
 
-        //Apertura con doppio click
+        // Apertura con doppio click
         playlistList.setOnMouseClicked((MouseEvent ev) -> {
-            if(ev.getClickCount() == 2){
+            if (ev.getClickCount() == 2) {
                 Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
-                if(selectedPlaylist != null){
+                if (selectedPlaylist != null) {
                     mainController.openPlaylistView(selectedPlaylist);
                 }
             }
         });
 
-        //Disattiva il pulsante "Aggiungi brano" se non c'è selezione
+        // Disattiva il pulsante "Aggiungi brano" se non c'è selezione
         playlistList.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if(mainController.getBtnAddToPlaylist() != null){
+            if (mainController.getBtnAddToPlaylist() != null) {
                 mainController.getBtnAddToPlaylist().setDisable(newVal == null);
             }
         });
     }
 
-    public void openModPlaylistView(ActionEvent ev){
+    public void openModPlaylistView(ActionEvent ev) {
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
-        if(selectedPlaylist != null){
-            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml", "Modifica Playlist", selectedPlaylist, mainController);
-        }else{
+        if (selectedPlaylist != null) {
+            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml",
+                    "Modifica Playlist", selectedPlaylist, mainController);
+        } else {
             mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da modificare");
         }
     }
@@ -72,7 +74,7 @@ public class PlaylistTableController {
         }
     }
 
-    public Playlist getSelectedPlaylist(){
+    public Playlist getSelectedPlaylist() {
         return playlistList.getSelectionModel().getSelectedItem();
     }
 
@@ -84,16 +86,18 @@ public class PlaylistTableController {
      *        mostrato un messaggio di avviso.
      * @param ev evento di pressione del pulsante di eliminazione.
      */
-    public void handleDeletePlaylist(ActionEvent ev){
+    public void handleDeletePlaylist(ActionEvent ev) {
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
-        if(selectedPlaylist != null){
-            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione", "Eliminazione della playlist", "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
-            if(result.isPresent() && result.get() == ButtonType.OK){
+        if (selectedPlaylist != null) {
+            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione",
+                    "Eliminazione della playlist",
+                    "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
+            if (result.isPresent() && result.get() == ButtonType.OK) {
                 ICommand removeCmd = new RemovePlaylist(mainController.getPlaylistCatalog(), selectedPlaylist);
                 mainController.getUndoManager().executeCommand(removeCmd);
                 mainController.restoreMainLibraryView();
             }
-        }else{
+        } else {
             mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da eliminare");
         }
     }
