@@ -1,14 +1,16 @@
 package com.Controller.playback;
 
+import java.util.List;
+
 import com.Controller.core.MainController;
-import com.Model.ITrackContainer;
 import com.Controller.playlist.PlaylistController;
-import com.Model.Track;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
 
 import java.util.List;
 import com.Strategy.LoopPlaylistStrategy;
+import com.Model.Track;
+import com.Strategy.LoopTrackStrategy;
 import com.Strategy.SequentialStrategy;
 import com.Strategy.ShuffleStrategy;
 
@@ -39,6 +41,7 @@ public class PlayerController {
     /** @brief True se il brano corrente è terminato naturalmente. */
     private boolean trackFinished = false;
     private ITrackContainer activeContainer;
+    
 
     /**
      * @brief Inizializza i riferimenti ai componenti grafici e al controller

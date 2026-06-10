@@ -12,7 +12,6 @@ import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
-import com.DataLayer.TrackProxy;
 import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;

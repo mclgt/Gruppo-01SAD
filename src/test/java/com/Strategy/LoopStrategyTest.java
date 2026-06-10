@@ -18,6 +18,7 @@ public class LoopStrategyTest {
     @BeforeEach
     void setUp() {
         strategy = new LoopPlaylistStrategy();
+        strategy = new LoopTrackStrategy();
         track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3", null);
         track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 180, "Album B", "dummy2.mp3", null);
         track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 210, "Album C", "dummy3.mp3", null);
