@@ -115,29 +115,6 @@ public class MainController {
                 lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
-
-        /*
-         * trackList.addTrack(
-         * TrackFactory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 354,
-         * "A Night at the Opera",
-         * "demo",
-         * TrackTag.FAVOURITE));
-         * trackList.addTrack(
-         * TrackFactory.createTrack("Billie Jean", "Michael Jackson", 1982, "Pop", 294,
-         * "Thriller", "demo",
-         * TrackTag.NONE));
-         * trackList.addTrack(
-         * TrackFactory.createTrack("Hotel California", "Eagles", 1977, "Rock", 391,
-         * "Hotel California", "demo",
-         * TrackTag.NONE));
-         * trackList.addTrack(
-         * TrackFactory.createTrack("Imagine", "John Lennon", 1971, "Pop", 187,
-         * "Imagine", "demo", TrackTag.NONE));
-         * trackList.addTrack(
-         * TrackFactory.createTrack("Smells Like Teen Spirit", "Nirvana", 1991,
-         * "Grunge", 301, "Nevermind", "demo",
-         * TrackTag.NEW_RELEASE));
-         */
     }
 
     /**
