@@ -1,6 +1,9 @@
 package com.Strategy;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactory;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,16 +24,21 @@ public class LoopPlaylistStrategyTest {
     private Track track1;
     private Track track2;
     private Track track3;
+    private TrackFactory factory;
 
     /**
      * @brief Initializes the strategy and three dummy tracks before each test.
      */
     @BeforeEach
     void setUp() {
+        factory = new MockTrackFactory();
         strategy = new LoopPlaylistStrategy();
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3", null);
-        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 180, "Album B", "dummy2.mp3", null);
-        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 210, "Album C", "dummy3.mp3", null);
+        track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
+                null);
+        track2 = factory.createTrack("Canzone B", "Artista B", 2001, "Rock", 180, "Album B", "dummy2.mp3",
+                null);
+        track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Jazz", 210, "Album C", "dummy3.mp3",
+                null);
     }
 
     // -----------------------------------------------------------------------
@@ -38,7 +46,8 @@ public class LoopPlaylistStrategyTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() returns the first track when current is null.
+     * @brief Verifies that nextTrack() returns the first track when current is
+     *        null.
      */
     @Test
     void nextTrack_currentNull_returnsFirstTrack() {
@@ -47,7 +56,8 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the same track when the queue contains only one element.
+     * @brief Verifies that nextTrack() returns the same track when the queue
+     *        contains only one element.
      */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
@@ -56,7 +66,8 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() returns the second track when current is the first.
+     * @brief Verifies that nextTrack() returns the second track when current is the
+     *        first.
      */
     @Test
     void nextTrack_firstTrack_returnsSecondTrack() {
@@ -65,7 +76,8 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that nextTrack() wraps around and returns the first track when current is the last.
+     * @brief Verifies that nextTrack() wraps around and returns the first track
+     *        when current is the last.
      */
     @Test
     void nextTrack_lastTrack_returnsFirstTrack() {
@@ -78,7 +90,8 @@ public class LoopPlaylistStrategyTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() returns the first track when current is null.
+     * @brief Verifies that previousTrack() returns the first track when current is
+     *        null.
      */
     @Test
     void previousTrack_currentNull_returnsFirstTrack() {
@@ -87,7 +100,8 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the same track when the queue contains only one element.
+     * @brief Verifies that previousTrack() returns the same track when the queue
+     *        contains only one element.
      */
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
@@ -96,7 +110,8 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() returns the first track when current is the second.
+     * @brief Verifies that previousTrack() returns the first track when current is
+     *        the second.
      */
     @Test
     void previousTrack_secondTrack_returnsFirstTrack() {
@@ -105,7 +120,8 @@ public class LoopPlaylistStrategyTest {
     }
 
     /**
-     * @brief Verifies that previousTrack() wraps around and returns the last track when current is the first.
+     * @brief Verifies that previousTrack() wraps around and returns the last track
+     *        when current is the first.
      */
     @Test
     void previousTrack_firstTrack_returnsLastTrack() {

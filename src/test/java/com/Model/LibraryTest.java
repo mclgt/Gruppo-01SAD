@@ -16,6 +16,7 @@ public class LibraryTest {
     private Track track1;
     private Track track2;
     private Track track3;
+    private TrackFactory factory;
 
     /**
      * @brief inizializza l'ambiente di test, crendo una istanza vuota di library e
@@ -23,12 +24,16 @@ public class LibraryTest {
      */
     @BeforeEach
     public void setUp() {
+        factory = new MockTrackFactory();
         l = new Library();
-        t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
+        t = factory.instantiateTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
                 "C:/audio.wav", null);
-        track1 = new Track("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "path/to/track1.mp3", null);
-        track2 = new Track("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "path/to/track2.mp3", null);
-        track3 = new Track("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "path/to/track3.mp3", null);
+        track1 = factory.instantiateTrack("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "path/to/track1.mp3",
+                null);
+        track2 = factory.instantiateTrack("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "path/to/track2.mp3",
+                null);
+        track3 = factory.instantiateTrack("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "path/to/track3.mp3",
+                null);
     }
 
     /**
@@ -67,7 +72,7 @@ public class LibraryTest {
     @Test
     public void testUpdateTrack_success() {
         l.addTrack(track1);
-        l.updateTrack(track1, "esempio1", "esempio2", 2020, "esempio3", 1, "esempio4", "esempio5.mp3",null);
+        l.updateTrack(track1, "esempio1", "esempio2", 2020, "esempio3", 1, "esempio4", "esempio5.mp3", null);
         assertEquals("esempio1", track1.getTitle(), "Il titolo dovrebbe essere cambiato");
         assertEquals("esempio2", track1.getAuthor(), "L'autore dovrebbe essere cambiato");
         assertEquals(2020, track1.getYear(), "L'anno dovrebbe essere cambiato");

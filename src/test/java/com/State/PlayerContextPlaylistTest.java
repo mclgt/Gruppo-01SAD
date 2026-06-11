@@ -3,11 +3,14 @@ package com.State;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Playlist;
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactory;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -17,27 +20,32 @@ import com.Strategy.ShuffleStrategy;
  * @class PlayerContextPlaylistTest
  * @brief Test class for verifying playback logic with Playlists.
  *        Verifies that PlayerContext interacts correctly with a Playlist,
- *        using the right playback strategy and ensuring correct track advancement.
+ *        using the right playback strategy and ensuring correct track
+ *        advancement.
  */
 public class PlayerContextPlaylistTest {
     private Playlist testPlaylist;
     private Track track1;
     private Track track2;
+    private TrackFactory factory;
 
     /**
-     * @brief Sets up the test fixtures: a playback context and a populated playlist.
+     * @brief Sets up the test fixtures: a playback context and a populated
+     *        playlist.
      */
     @BeforeEach
     void setUp() {
+        factory = new MockTrackFactory();
         testPlaylist = new Playlist("Playlist Test");
-        track1 = new Track("A", "B", 2010, "C", 100, "D", "E", null);
-        track2 = new Track("F", "G", 2010, "H", 100, "I", "J", null);
+        track1 = factory.createTrack("A", "B", 2010, "C", 100, "D", "dummy1.mp3", null);
+        track2 = factory.createTrack("F", "G", 2010, "H", 100, "I", "dummy2.mp3", null);
         testPlaylist.addTrack(track1);
         testPlaylist.addTrack(track2);
     }
 
     /**
-     * @brief Verifies that starting playback from an empty/initial state loads the first available track.
+     * @brief Verifies that starting playback from an empty/initial state loads the
+     *        first available track.
      */
     @Test
     void testInitialPlayUpdateState() {
@@ -103,12 +111,15 @@ public class PlayerContextPlaylistTest {
                 "At the end of the playlist in loop mode, next must wrap back to the first track");
     }
 
-    /** Verifies that the shuffle strategy picks a valid track from the playlist and keeps the player playing. */
+    /**
+     * Verifies that the shuffle strategy picks a valid track from the playlist and
+     * keeps the player playing.
+     */
     @Test
     void testShuffleStrategy() {
         PlaybackContext playbackContext = new PlaybackContext(new ShuffleStrategy());
         PlayerContext context = new PlayerContext(playbackContext);
-        Track track3 = new Track("K", "L", 2010, "M", 100, "N", "O", null);
+        Track track3 = factory.createTrack("K", "L", 2010, "M", 100, "N", "dummy3.mp3", null);
         testPlaylist.addTrack(track3);
         context.setCurrentTrack(track1);
         context.play(track1);

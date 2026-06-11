@@ -1,11 +1,14 @@
 package com.Command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Library;
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactory;
 
 /**
  * @brief Test per la modifica di un ogetto Track e l'aggiornamento in Library.
@@ -16,15 +19,19 @@ import com.Model.Track;
 public class ModifyTrackTest {
     private Library library;
     private Track t;
+    private TrackFactory factory;
 
     /**
-     * @brief Inizializza un oggetto Library e un oggetto Track validi prima di ogni test.
+     * @brief Inizializza un oggetto Library e un oggetto Track validi prima di ogni
+     *        test.
      */
 
     @BeforeEach
     public void setUp() {
+        factory = new MockTrackFactory();
         library = new Library();
-        t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera", "C:/audio.wav", null);
+        t = factory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
+                "dummy.mp3", null);
         library.addTrack(t);
     }
 
@@ -35,7 +42,8 @@ public class ModifyTrackTest {
      */
     @Test
     public void testLibraryUpdateTrack_executeAndUndo() {
-        ICommand updateCommand = new ModifyTrack(library, t, "Bohemian Rhapsody Cover", "Queen", 1975, "Rock", 200, "A Night at the Opera", "C:/audio.wav", null);
+        ICommand updateCommand = new ModifyTrack(library, t, "Bohemian Rhapsody Cover", "Queen", 1975, "Rock", 200,
+                "A Night at the Opera", "dummy.mp3", null);
 
         // Fase di execute
         updateCommand.execute();
