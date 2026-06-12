@@ -7,26 +7,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.LocalTrackFactory;
 
 /***
- * @brief Classe di test per la validazione della TrackFactory
+ * @brief Classe di test per la validazione della LocalTrackFactory
  *        Si verifica che l'istanziazione dei brani rispetti gli Acceptance
  *        Criteria della [US-1]
  *        osservando sia i casi di successo che la gestione delle eccezioni per
  *        dati non validi.
  */
 
-public class TrackFactoryTest {
+public class LocalTrackFactoryTest {
+    private TrackFactory factory;
+
+    @BeforeEach
+    public void setUp() {
+        this.factory = new LocalTrackFactory();
+    }
 
     @Test
     public void testCreateTrack_success() throws IOException {
         File tmpFile = File.createTempFile("test_audio", ".wav");
         tmpFile.deleteOnExit();
 
-        Track track = TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238,
+        Track track = factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238,
                 "A Night at the opera", tmpFile.getAbsolutePath(), null);
         assertNotNull(track);
         assertEquals("Creep", track.getTitle());
@@ -44,7 +54,8 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", tmpFile.getAbsolutePath(),null);
+            factory.createTrack("", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera",
+                    tmpFile.getAbsolutePath(), null);
         });
         assertTrue(exc.getMessage().contains("Titolo"));
     }
@@ -55,7 +66,8 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "", 1992, "Alternative Rock", 238, "A Night at the opera", tmpFile.getAbsolutePath(),null);
+            factory.createTrack("Creep", "", 1992, "Alternative Rock", 238, "A Night at the opera",
+                    tmpFile.getAbsolutePath(), null);
         });
         assertTrue(exc.getMessage().contains("Autore"));
     }
@@ -66,25 +78,29 @@ public class TrackFactoryTest {
         tmpFile.deleteOnExit();
 
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", -2, "A Night at the opera", tmpFile.getAbsolutePath(),null);
+            factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", -2, "A Night at the opera",
+                    tmpFile.getAbsolutePath(), null);
         });
         assertTrue(exc.getMessage().contains("Durata"));
     }
 
     @Test
-    public void testCreateTrack_notExistentFilePath(){
+    public void testCreateTrack_notExistentFilePath() {
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", "C:/percorso/test.wav",null);
+            factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera",
+                    "C:/percorso/test.wav", null);
         });
 
         assertTrue(exc.getMessage().contains("mancante") ||
-                    exc.getMessage().contains("non valido"));
+                exc.getMessage().contains("non valido"));
     }
 
     @Test
-    public void testCreateTrack_emptyFilePath(){
+    public void testCreateTrack_emptyFilePath() {
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
-            TrackFactory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera", "",null);
+            factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera",
+                    "",
+                    null);
         });
 
         assertTrue(exc.getMessage().contains("File"));

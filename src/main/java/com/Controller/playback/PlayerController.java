@@ -7,7 +7,6 @@ import com.Controller.playlist.PlaylistController;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
 
-import java.util.List;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Model.Track;
 import com.Strategy.LoopTrackStrategy;
@@ -456,6 +455,7 @@ public class PlayerController {
             trackFinished = true;
             mainController.getPlayerContext().stop();
             resetUI();
+            mainController.updatePlayPauseButton(false);
         }
     }
 

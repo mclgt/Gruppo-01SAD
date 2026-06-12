@@ -16,6 +16,7 @@ import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
 import com.Model.Track;
+import com.Model.TrackFactory;
 import com.Model.TrackTag;
 import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
@@ -85,9 +86,13 @@ public class MainController {
     private final PlaylistTableController playlistTableController = new PlaylistTableController();
     private final Deque<Boolean> deletedPlayingStack = new ArrayDeque<>();
     private final PlaybackTimerManager timerManager = new PlaybackTimerManager();
-    private WindowManager windowManager = new WindowManager(this);
+    private WindowManager windowManager;
 
     private Library trackList = new Library();
+
+    public MainController(TrackFactory factory) {
+        windowManager = new WindowManager(this, factory);
+    }
 
     /**
      * @brief Inizializza i componenti dell'interfaccia grafica e i
@@ -110,12 +115,6 @@ public class MainController {
                 lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
         playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         playlistTableController.init(this, playlistList, nameCol);
-
-        trackList.addTrack(new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 354, "A Night at the Opera", "demo", TrackTag.FAVOURITE));
-        trackList.addTrack(new Track("Billie Jean", "Michael Jackson", 1982, "Pop", 294, "Thriller", "demo", TrackTag.NONE));
-        trackList.addTrack(new Track("Hotel California", "Eagles", 1977, "Rock", 391, "Hotel California", "demo", TrackTag.NONE));
-        trackList.addTrack(new Track("Imagine", "John Lennon", 1971, "Pop", 187, "Imagine", "demo", TrackTag.NONE));
-        trackList.addTrack(new Track("Smells Like Teen Spirit", "Nirvana", 1991, "Grunge", 301, "Nevermind", "demo", TrackTag.NEW_RELEASE));
     }
 
     /**

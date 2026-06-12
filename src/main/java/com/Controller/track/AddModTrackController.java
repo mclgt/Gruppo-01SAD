@@ -6,9 +6,8 @@ import com.Command.AddTrack;
 import com.Command.ICommand;
 import com.Command.ModifyTrack;
 import com.Controller.core.MainController;
-import com.DataLayer.TrackProxy;
-import com.Factory.TrackFactory;
 import com.Model.Track;
+import com.Model.TrackFactory;
 import com.Model.TrackTag;
 
 import javafx.collections.FXCollections;
@@ -22,6 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+
 /**
  * @brief Controller unico per l'Aggiunta e la Modifica di un brano.
  *        Gestisce l'interazione dell'utente con il form per aggiungere una
@@ -52,9 +52,14 @@ public class AddModTrackController implements ITrackImporter {
     @FXML
     private Button btnSave;
     private MainController mainController;
+    private final TrackFactory factory;
     private Track trackToModify;
     /** @brief Flag per determinare la modalità del form: aggiunta o modifica */
     private boolean isEditMode = false;
+
+    public AddModTrackController(TrackFactory factory) {
+        this.factory = factory;
+    }
 
     /**
      * @brief Imposta il riferimento al controller principale. Consente di far
@@ -66,13 +71,13 @@ public class AddModTrackController implements ITrackImporter {
         this.mainController = mainController;
     }
 
-    
     @FXML
-    public void initialize() {  
+    public void initialize() {
         ObservableList<TrackTag> tags = FXCollections.observableArrayList(TrackTag.values());
         tagCombo.setItems(tags);
         tagCombo.setPromptText("Seleziona un tag...");
     }
+
     /**
      * @brief Consente di inizializzare il form in modalità "Aggiunta" o "Modifica"
      *        Se l'oggetto track passato (oggetto selezionato) è non nullo, allora i
@@ -92,12 +97,12 @@ public class AddModTrackController implements ITrackImporter {
             txtFilePath.setText(track.getFilePath());
             txtYear.setText(track.getYear() == 0 ? "" : String.valueOf(track.getYear()));
             txtDuration.setText(track.getDuration() == 0 ? "" : (String.valueOf(track.getFormattedDuration())));
-            if(track.getTag() != null) {
+            if (track.getTag() != null) {
                 tagCombo.getSelectionModel().select((track.getTag() != null) ? track.getTag() : TrackTag.NONE);
             }
         } else {
             this.isEditMode = false;
-            if(tagCombo != null) {
+            if (tagCombo != null) {
                 tagCombo.getSelectionModel().select(TrackTag.NONE);
             }
         }
@@ -142,14 +147,15 @@ public class AddModTrackController implements ITrackImporter {
             }
 
             if (isEditMode) {
-                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author, year, genre, duration, album, filePath,tag);
+                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author,
+                        year, genre, duration, album, filePath, tag);
 
-                if(mainController != null) {
+                if (mainController != null) {
                     mainController.getUndoManager().executeCommand(modifyCommand);
                 }
             } else {
-                Track newTrack = TrackFactory.createTrack(title, author, year, genre, duration, album, filePath, tag);
-                newTrack.setAudioSource(new TrackProxy(filePath));
+                Track newTrack = this.factory.createTrack(title, author, year, genre, duration, album, filePath,
+                        tag);
 
                 if (mainController != null) {
                     ICommand addCommand = new AddTrack(mainController.getLibrary(), newTrack);
@@ -158,7 +164,8 @@ public class AddModTrackController implements ITrackImporter {
             }
             closeWindow();
         } catch (NumberFormatException ex) {
-            mainController.getWindowManager().showError("Errore nell'inserimento dei dati numerici", "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
+            mainController.getWindowManager().showError("Errore nell'inserimento dei dati numerici",
+                    "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
         } catch (IllegalArgumentException ex) {
             mainController.getWindowManager().showError("Dati non vallidi", ex.getMessage());
         }

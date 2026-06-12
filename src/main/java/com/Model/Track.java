@@ -47,7 +47,7 @@ public class Track {
      * @param tag      Tag associato al brano, se presente. Se null, viene impostato
      *                 a TrackTag.NONE
      */
-    public Track(String title, String author, int year, String genre, int duration, String album, String filePath,
+    Track(String title, String author, int year, String genre, int duration, String album, String filePath,
             TrackTag tag) {
         setTitle(title);
         setAuthor(author);

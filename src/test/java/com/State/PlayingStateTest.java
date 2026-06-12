@@ -5,19 +5,24 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactory;
 import com.Strategy.IPlaybackStrategy;
 import com.Strategy.PlaybackContext;
 
 /**
- * @brief Tests for PlayingState: verifies the behavior of the active playback state
+ * @brief Tests for PlayingState: verifies the behavior of the active playback
+ *        state
  *        (i.e., a song is currently playing) in PlayerContext.
  *
  *        PlayingState is the state the player is in during playback.
- *        Tests verify that play() correctly updates the current track in PlayerContext,
+ *        Tests verify that play() correctly updates the current track in
+ *        PlayerContext,
  *        that next()/previous() navigate between tracks and start the new one,
  *        or call stop() when no track is available.
  *
@@ -29,7 +34,8 @@ import com.Strategy.PlaybackContext;
 public class PlayingStateTest {
 
     /**
-     * @brief DummyStrategy that returns predefined values for nextTrack() and previousTrack(),
+     * @brief DummyStrategy that returns predefined values for nextTrack() and
+     *        previousTrack(),
      *        used to simplify tests without a mocking framework.
      */
     private static class DummyStrategy implements IPlaybackStrategy {
@@ -56,12 +62,17 @@ public class PlayingStateTest {
     private Track track2;
     private Track track3;
     private List<Track> queue;
+    private TrackFactory factory;
 
     @BeforeEach
     public void setUp() {
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",null);
-        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3",null);
-        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3",null);
+        factory = new MockTrackFactory();
+        track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
+                null);
+        track2 = factory.createTrack("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3",
+                null);
+        track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3",
+                null);
         queue = Arrays.asList(track1, track2, track3);
     }
 
@@ -115,7 +126,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that play() on different tracks always updates the current track.
+     * @brief Verifies that play() on different tracks always updates the current
+     *        track.
      */
     @Test
     public void testPlay_thirdTrack_updatesCurrentTrack() {
@@ -151,7 +163,8 @@ public class PlayingStateTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that next() with a valid next track sets it as the current track.
+     * @brief Verifies that next() with a valid next track sets it as the current
+     *        track.
      */
     @Test
     public void testNext_withValidNext_setsNextTrackAsCurrent() {
@@ -171,7 +184,8 @@ public class PlayingStateTest {
 
     /**
      * @brief Verifies that calling next() twice uses the strategy result each time.
-     *        The stub always returns the same value, so the current track stabilizes on it.
+     *        The stub always returns the same value, so the current track
+     *        stabilizes on it.
      */
     @Test
     public void testNext_calledTwice_usesStrategyResultEachTime() {
@@ -192,7 +206,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that next() with no next track (null) does not change the current track.
+     * @brief Verifies that next() with no next track (null) does not change the
+     *        current track.
      */
     @Test
     public void testNext_withNoNext_currentTrackUnchanged() {
@@ -211,7 +226,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that next() with a valid next track does not throw any exception.
+     * @brief Verifies that next() with a valid next track does not throw any
+     *        exception.
      */
     @Test
     public void testNext_withValidNext_doesNotThrow() {
@@ -229,7 +245,8 @@ public class PlayingStateTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previous() with a valid previous track sets it as the current track.
+     * @brief Verifies that previous() with a valid previous track sets it as the
+     *        current track.
      */
     @Test
     public void testPrevious_withValidPrevious_setsPreviousTrackAsCurrent() {
@@ -248,7 +265,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that previous() with no previous track (null) does not change the current track.
+     * @brief Verifies that previous() with no previous track (null) does not change
+     *        the current track.
      */
     @Test
     public void testPrevious_withNoPrevious_currentTrackUnchanged() {
@@ -267,7 +285,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that previous() with a valid previous track does not throw any exception.
+     * @brief Verifies that previous() with a valid previous track does not throw
+     *        any exception.
      */
     @Test
     public void testPrevious_withValidPrevious_doesNotThrow() {
@@ -281,7 +300,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that previous() with no previous track does not throw any exception.
+     * @brief Verifies that previous() with no previous track does not throw any
+     *        exception.
      */
     @Test
     public void testPrevious_withNoPrevious_doesNotThrow() {
@@ -299,7 +319,8 @@ public class PlayingStateTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that pause() does not throw any exception (currently a no-op in PlayingState).
+     * @brief Verifies that pause() does not throw any exception (currently a no-op
+     *        in PlayingState).
      */
     @Test
     public void testPause_doesNotThrow() {
@@ -313,7 +334,8 @@ public class PlayingStateTest {
     }
 
     /**
-     * @brief Verifies that stop() does not throw any exception (currently a no-op in PlayingState).
+     * @brief Verifies that stop() does not throw any exception (currently a no-op
+     *        in PlayingState).
      */
     @Test
     public void testStop_doesNotThrow() {
