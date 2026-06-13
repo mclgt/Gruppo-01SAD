@@ -71,7 +71,8 @@ public class WindowManager {
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(p));
+            Scene scene = new Scene(p);
+            stage.setScene(scene);
             stage.showAndWait();
         } catch (IOException e) {
             System.err.println("Errore nel caricamento della finestra " + fxmlPath + ": " + e.getMessage());
@@ -98,7 +99,8 @@ public class WindowManager {
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(p));
+            Scene scene = new Scene(p);
+            stage.setScene(scene);
             stage.showAndWait();
         } catch (IOException e) {
             System.err.println("Errore nel caricamento della finestra " + fxmlPath + ": " + e.getMessage());

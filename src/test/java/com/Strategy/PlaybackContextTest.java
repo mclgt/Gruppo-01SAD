@@ -73,7 +73,7 @@ public class PlaybackContextTest {
     private TrackFactory factory;
 
     /**
-     * @brief Initializes three dummy tracks and the queue before each test.
+     * @brief Inizializza tre tracce dummy e la coda prima di ogni test.
      */
     @BeforeEach
     public void setUp() {
@@ -88,12 +88,12 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for constructor and getStrategy()
+    // Test per il costruttore e getStrategy()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that the strategy passed to the constructor is stored
-     *        and returned by getStrategy().
+     * @brief Verifica che la strategia passata al costruttore venga memorizzata
+     *        e restituita da getStrategy().
      */
     @Test
     public void testConstructor_strategyIsStored() {
@@ -103,11 +103,11 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for setStrategy()
+    // Test per setStrategy()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that setStrategy() replaces the current strategy at runtime.
+     * @brief Verifica che setStrategy() sostituisca la strategia corrente a runtime.
      */
     @Test
     public void testSetStrategy_replacesStrategy() {
@@ -118,11 +118,11 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() delegates the call to the current strategy.
+     * @brief Verifica che nextTrack() deleghi la chiamata alla strategia corrente.
      */
     @Test
     public void testNextTrack_delegatesToStrategy() {
@@ -142,7 +142,7 @@ public class PlaybackContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**

@@ -31,7 +31,7 @@ class ShuffleStrategyTest {
     private TrackFactory factory;
 
     /**
-     * @brief Initializes the strategy and three dummy tracks before each test.
+     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
@@ -43,11 +43,11 @@ class ShuffleStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that nextTrack() returns null when the queue is empty.
+     * @brief Verifica che nextTrack() restituisca null quando la coda è vuota.
      */
     @Test
     void nextTrack_emptyQueue_returnsNull() {
@@ -91,7 +91,7 @@ class ShuffleStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**

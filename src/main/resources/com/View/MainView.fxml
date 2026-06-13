@@ -15,6 +15,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -62,6 +63,7 @@
                            </image>
                         </ImageView>
                      </graphic></Button>
+                <TextField fx:id="searchField" promptText="Cerca..." prefWidth="180.0" />
               </items>
             </ToolBar>
          </children>

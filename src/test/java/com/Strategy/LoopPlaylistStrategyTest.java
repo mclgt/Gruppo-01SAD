@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @class LoopPlaylistStrategyTest
- * @brief Test class for LoopPlaylistStrategy.
- *        Verifies that looped playlist navigation wraps around correctly
- *        at both ends of the queue, and handles edge cases such as
- *        a null current track or a single-track queue.
+ * @brief Classe di test per LoopPlaylistStrategy.
+ *        Verifica che la navigazione con loop nella playlist effettui il wrap-around correttamente
+ *        a entrambe le estremità della coda, e gestisca casi limite come
+ *        la traccia corrente null o una coda con un solo elemento.
  */
 public class LoopPlaylistStrategyTest {
 
@@ -27,7 +27,7 @@ public class LoopPlaylistStrategyTest {
     private TrackFactory factory;
 
     /**
-     * @brief Initializes the strategy and three dummy tracks before each test.
+     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
@@ -42,7 +42,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
@@ -86,7 +86,7 @@ public class LoopPlaylistStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**

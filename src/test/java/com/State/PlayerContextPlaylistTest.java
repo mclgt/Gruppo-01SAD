@@ -57,13 +57,13 @@ public class PlayerContextPlaylistTest {
         if (firstTrack != null) {
             context.play(firstTrack);
         }
-        assertEquals(track1, context.getCurrentTrack(), "The first track of the playlist should be A");
-        assertTrue(context.isPlaying(), "The player should be in the 'playingState' state");
+        assertEquals(track1, context.getCurrentTrack(), "La prima traccia della playlist dovrebbe essere A");
+        assertTrue(context.isPlaying(), "Il player dovrebbe essere nello stato 'playingState'");
     }
 
     /**
-     * @brief Verifies that given a playing track, the 'next' command correctly
-     *        advances the current track to the next one in the playlist.
+     * @brief Verifica che, data una traccia in riproduzione, il comando 'next' avanzi correttamente
+     *        la traccia corrente alla successiva nella playlist.
      */
     @Test
     void testSequentialNextUpdateTrack() {
@@ -74,12 +74,12 @@ public class PlayerContextPlaylistTest {
         assertTrue(context.isPlaying());
         context.next(testPlaylist.getTracks(), track1);
         Track nextTrack = context.getCurrentTrack();
-        assertEquals(track2, nextTrack, "The next track in the playlist should be F");
+        assertEquals(track2, nextTrack, "La traccia successiva nella playlist dovrebbe essere F");
     }
 
     /**
-     * @brief Verifies the behavior at the end of the playlist in sequential mode.
-     *        The player must not automatically loop to the first track.
+     * @brief Verifica il comportamento alla fine della playlist in modalità sequenziale.
+     *        Il player non deve ciclare automaticamente alla prima traccia.
      */
     @Test
     void testEndOfPlaylistSequential() {
@@ -91,12 +91,12 @@ public class PlayerContextPlaylistTest {
         context.next(testPlaylist.getTracks(), track2);
         Track afterLast = context.getCurrentTrack();
         assertTrue(afterLast == track2,
-                "At the end of the playlist in sequential mode, next must not wrap to the first track");
+                "Alla fine della playlist in modalità sequenziale, next non deve tornare alla prima traccia");
     }
 
     /**
-     * @brief Verifies the behavior at the end of the playlist in loop mode.
-     *        The player must automatically loop back to the first track.
+     * @brief Verifica il comportamento alla fine della playlist in modalità loop.
+     *        Il player deve tornare automaticamente alla prima traccia.
      */
     @Test
     void testEndOfPlaylistLoop() {
@@ -108,7 +108,7 @@ public class PlayerContextPlaylistTest {
         context.next(testPlaylist.getTracks(), track2);
         Track afterLast = context.getCurrentTrack();
         assertTrue(afterLast == track1,
-                "At the end of the playlist in loop mode, next must wrap back to the first track");
+                "Alla fine della playlist in modalità loop, next deve tornare alla prima traccia");
     }
 
     /**
@@ -123,13 +123,13 @@ public class PlayerContextPlaylistTest {
         testPlaylist.addTrack(track3);
         context.setCurrentTrack(track1);
         context.play(track1);
-        assertTrue(context.isPlaying(), "The player should be in the playing state");
+        assertTrue(context.isPlaying(), "Il player dovrebbe essere nello stato di riproduzione");
         context.next(testPlaylist.getTracks(), track1);
         Track nextTrack = context.getCurrentTrack();
-        assertNotNull(nextTrack, "The context must have updated the current track");
+        assertNotNull(nextTrack, "Il contesto deve aver aggiornato la traccia corrente");
         assertTrue(testPlaylist.getTracks().contains(nextTrack),
-                "The context must have selected a track from the playlist");
-        assertTrue(context.isPlaying(), "The player must remain in the playing state after advancing");
+                "Il contesto deve aver selezionato una traccia dalla playlist");
+        assertTrue(context.isPlaying(), "Il player deve rimanere nello stato di riproduzione dopo l'avanzamento");
     }
 
 }

@@ -15,10 +15,10 @@ import com.Model.MockTrackFactory;
 
 /**
  * @class SequentialStrategyTest
- * @brief Test class for SequentialStrategy.
- *        Verifies that sequential forward and backward navigation
- *        in the queue behaves correctly in edge cases:
- *        end of queue, beginning of queue, and track not present in queue.
+ * @brief Classe di test per SequentialStrategy.
+ *        Verifica che la navigazione sequenziale in avanti e indietro
+ *        nella coda si comporti correttamente nei casi limite:
+ *        fine della coda, inizio della coda e traccia non presente nella coda.
  */
 public class SequentialStrategyTest {
 
@@ -47,7 +47,7 @@ public class SequentialStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
@@ -89,7 +89,7 @@ public class SequentialStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**

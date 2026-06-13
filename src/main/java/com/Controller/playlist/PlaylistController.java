@@ -106,6 +106,10 @@ public class PlaylistController {
         }
     }
 
+    public TableView<Track> getPlaylistTrackList() {
+        return playlistTrackList;
+    }
+
     public Track getSelectedTrack() {
         if (playlistTrackList != null) {
             return playlistTrackList.getSelectionModel().getSelectedItem();
