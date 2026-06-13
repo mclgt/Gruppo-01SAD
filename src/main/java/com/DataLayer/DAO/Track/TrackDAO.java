@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,12 +36,28 @@ public class TrackDAO implements ITrackDAO {
             st.setString(1, track.getId());
             st.setString(2, track.getTitle());
             st.setString(3, track.getAuthor());
-            st.setInt(4, track.getDuration());
-            st.setString(5, track.getAlbum());
-            st.setString(6, track.getFilePath());
+            st.setInt(6, track.getDuration());
+            st.setString(8, track.getFilePath());
             st.setInt(9, track.getPlayCount());
             st.setString(10, track.getTag().name());
 
+            if(track.getYear() > 0){
+                st.setInt(4, track.getYear());
+            }else{
+                st.setNull(4, Types.INTEGER);
+            }
+
+            if(track.getGenre() != null && !track.getGenre().trim().isEmpty()){
+                st.setString(5, track.getGenre());
+            }else{
+                st.setNull(5, Types.VARCHAR);
+            }
+
+            if(track.getAlbum() != null && !track.getAlbum().trim().isEmpty()){
+                st.setString(7, track.getAlbum());
+            }else{
+                st.setNull(7, Types.VARCHAR);
+            }
             st.executeUpdate();
         }
     }
@@ -55,25 +72,44 @@ public class TrackDAO implements ITrackDAO {
                 ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
+                String genre = rs.getString("genre");
+                if(genre == null){
+                    genre = "";
+                }
+
+                String album = rs.getString("album");
+                if(album == null){
+                    album = "";
+                }
+
+                int year = rs.getInt("year");
+                if(rs.wasNull()){
+                    year = 0;
+                }
+
                 String tagStr = rs.getString("tag");
                 TrackTag currentTag = TrackTag.NONE;
                 if (tagStr != null && !tagStr.trim().isEmpty()) {
                     currentTag = TrackTag.valueOf(tagStr);
                 }
 
+
+
                 Track track = factory.createTrack(
                         rs.getString("title"),
                         rs.getString("author"),
-                        rs.getInt("yeat"),
-                        rs.getString("genre"),
+                        year,
+                        genre,
                         rs.getInt("duration"),
-                        rs.getString("album"),
+                        album,
                         rs.getString("file_path"),
                         currentTag);
 
                 Field idField = Track.class.getDeclaredField("id");
                 idField.setAccessible(true);
-                idField.set(track, rs.getInt("play_count"));
+                idField.set(track, rs.getString("id"));
+
+                track.setPlayCount(rs.getInt("play_count"));
 
                 tracks.add(track);
             }
@@ -92,19 +128,34 @@ public class TrackDAO implements ITrackDAO {
 
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
+                    String genre = rs.getString("genre");
+                    if(genre == null){
+                        genre = "";
+                    }
+
+                    String album = rs.getString("album");
+                    if(album == null){
+                        album = "";
+                    }
+
                     String tagStr = rs.getString("tag");
                     TrackTag currentTag = TrackTag.NONE;
                     if (tagStr != null && !tagStr.trim().isEmpty()) {
                         currentTag = TrackTag.valueOf(tagStr);
                     }
 
+                    int year = rs.getInt("year");
+                    if(rs.wasNull()){
+                        year = 0;
+                    }
+
                     Track track = factory.createTrack(
                             rs.getString("title"),
                             rs.getString("author"),
-                            rs.getInt("year"),
-                            rs.getString("genre"),
+                            year,
+                            genre,
                             rs.getInt("duration"),
-                            rs.getString("album"),
+                            album,
                             rs.getString("file_path"),
                             currentTag);
 

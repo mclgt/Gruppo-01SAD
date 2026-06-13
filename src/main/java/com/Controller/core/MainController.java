@@ -1,8 +1,12 @@
 package com.Controller.core;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
@@ -13,6 +17,9 @@ import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.SearchController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
+import com.DataLayer.DAO.DatabaseManager;
+import com.DataLayer.DAO.Playlist.PlaylistDAO;
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
@@ -23,6 +30,7 @@ import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,7 +42,9 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -61,13 +71,7 @@ public class MainController {
     @FXML
     private Slider progressSlider;
     @FXML
-    private Button btnPlay;
-    @FXML
-    private Button btnUndo;
-    @FXML
-    private Button btnAddToPlaylist;
-    @FXML
-    private Button btnAddTrack, btnEditTrack, btnRemoveTrack;
+    private Button btnPlay, btnUndo, btnAddToPlaylist, btnAddTrack, btnEditTrack, btnRemoveTrack;
     @FXML
     private Label lblTagTitle;
     @FXML
@@ -79,6 +83,25 @@ public class MainController {
 
     @FXML
     private TextField searchField;
+
+    @FXML
+    private Label lblEmptyHistoryMessage;
+    @FXML
+    private HBox frequentlyPlayedContainer;
+
+    @FXML
+    private TableView<Track> frequentlyPlayedTable;
+    @FXML
+    private TableColumn<Track, String> topTitleCol, topAuthorCol;
+    @FXML
+    private TableColumn<Track, Integer> topCountCol;
+
+    @FXML
+    private TableView<Playlist> frequentlyPlayedPlaylistTable;
+    @FXML
+    private TableColumn<Playlist, String> topPlaylistNameCol;
+    @FXML
+    private TableColumn<Playlist, Integer> topPlaylistCountCol;
 
     private PlaylistController playlistController;
 
@@ -98,9 +121,24 @@ public class MainController {
     private Library trackList = new Library();
     private TrackFactory factory;
 
+    private final TrackDAO trackDAO;
+    private final PlaylistDAO playlistDAO;
+
     public MainController(TrackFactory factory) {
         this.factory = factory;
         windowManager = new WindowManager(this, factory);
+
+        this.trackDAO = new TrackDAO(factory);
+        this.playlistDAO = new PlaylistDAO();
+
+        try {
+            this.trackList.getTracks().addAll(trackDAO.getAll());
+            this.playlistCatalog.getPlaylists().addAll(playlistDAO.getAll());
+            System.out.println("Ripristino iniziale tramite DAO completato con successo.");
+        } catch (Exception e) {
+            System.err.println("Impossibile caricare i dati storici dal file DB all'avvio:");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -126,6 +164,19 @@ public class MainController {
         playlistTableController.init(this, playlistList, nameCol);
         searchController.init(trackList.getTracks(), trackTable);
         searchController.bindSearchField(searchField);
+
+        topTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        topAuthorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
+        topCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
+
+        topPlaylistNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        topPlaylistCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
+
+        if(playlistList != null){
+            playlistList.setItems(playlistCatalog.getPlaylists());
+        }
+
+        updateTop();
 
         String dummyPath;
         try {
@@ -154,6 +205,97 @@ public class MainController {
         trackList.addTrack(factory.instantiateTrack("Lose Yourself",         "Eminem",            2002, "Hip-Hop",         326, "8 Mile Soundtrack",       dummyPath, TrackTag.NONE));
         trackList.addTrack(factory.instantiateTrack("Blinding Lights",       "The Weeknd",        2019, "Synth-Pop",       200, "After Hours",             dummyPath, TrackTag.NONE));
         trackList.addTrack(factory.instantiateTrack("Shape of You",          "Ed Sheeran",        2017, "Pop",             234, "Divide",                  dummyPath, TrackTag.NONE));
+    }
+
+    /**
+     * @brief Aggiorna lo stato visivo dei tab Frequently Played (US-21)
+     * Compatibile con versioni Java 11+ tramite .collect(Collectors.toList())
+     */
+    public void updateTop(){
+        try {
+            List<Track> topTracks = this.trackDAO.getFrequentlyPlayed(5);
+            List<Playlist> topPlaylists = this.playlistDAO.getFrequentlyPlayed(5);
+
+            boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) || 
+                                   topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
+
+            if (hasHistory) {
+                if (lblEmptyHistoryMessage != null) {
+                    lblEmptyHistoryMessage.setVisible(false);
+                    lblEmptyHistoryMessage.setManaged(false);
+                }
+                if (frequentlyPlayedContainer != null) {
+                    frequentlyPlayedContainer.setVisible(true);
+                    frequentlyPlayedContainer.setManaged(true);
+                }
+                
+                List<Track> filteredTracks = topTracks.stream()
+                        .filter(t -> t.getPlayCount() > 0)
+                        .collect(Collectors.toList());
+                frequentlyPlayedTable.setItems(FXCollections.observableArrayList(filteredTracks));
+
+                List<Playlist> filteredPlaylists = topPlaylists.stream()
+                        .filter(p -> p.getPlayCount() > 0)
+                        .collect(Collectors.toList());
+                frequentlyPlayedPlaylistTable.setItems(FXCollections.observableArrayList(filteredPlaylists));
+            } else {
+                if (frequentlyPlayedContainer != null) {
+                    frequentlyPlayedContainer.setVisible(false);
+                    frequentlyPlayedContainer.setManaged(false);
+                }
+                if (lblEmptyHistoryMessage != null) {
+                    lblEmptyHistoryMessage.setVisible(true);
+                    lblEmptyHistoryMessage.setManaged(true);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Errore nell'aggiornamento grafico del Frequently Played: " + e.getMessage());
+        }
+    }
+
+    /**
+     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo tramite Transazione (Commit).
+     * Invocato esclusivamente dal metodo stop() della classe Main.
+     */
+    public void saveDB() {
+        System.out.println("Inizio esportazione massiva dello stato RAM sul database...");
+        Connection c = null;
+        try {
+            c = DatabaseManager.getConnection();
+            c.setAutoCommit(false); // Avviamo la transazione sicura
+
+            try (Statement st = c.createStatement()) {
+                st.executeUpdate("DELETE FROM tracks;");
+                st.executeUpdate("DELETE FROM playlists;");
+            }
+
+            for (Track track : this.trackList.getTracks()) {
+                this.trackDAO.save(track);
+            }
+
+            for (Playlist playlist : this.playlistCatalog.getPlaylists()) {
+                this.playlistDAO.save(playlist);
+            }
+
+            c.commit(); // Scrittura fisica bloccata sul file db
+            System.out.println("Sincronizzazione finale completata. File SQLite aggiornato.");
+        } catch (Exception e) {
+            System.err.println("Errore durante la persistenza di chiusura dei DAO:");
+            e.printStackTrace();
+            if (c != null) {
+                try { c.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+            }
+        } finally {
+            try { if (c != null) c.setAutoCommit(true); } catch (Exception ex) { ex.printStackTrace(); }
+        }
+    }
+
+    public List<Track> getFrequentlyPlayedTracks(int limit) throws Exception {
+        return this.trackDAO.getFrequentlyPlayed(limit);
+    }
+
+    public List<Playlist> getFrequentlyPlayedPlaylists(int limit) throws Exception {
+        return this.playlistDAO.getFrequentlyPlayed(limit);
     }
 
     /**

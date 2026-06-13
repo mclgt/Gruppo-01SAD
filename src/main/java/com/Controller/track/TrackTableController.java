@@ -188,6 +188,9 @@ public class TrackTableController implements IPlayerSubscriber {
     @Override
     public void onPlaybackChanged(Track newTrack) {
         Platform.runLater(() -> {
+            if(mainController != null){
+                mainController.updateTop();
+            }
             trackTable.refresh();
         });
     }
