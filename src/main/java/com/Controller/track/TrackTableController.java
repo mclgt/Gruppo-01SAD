@@ -6,10 +6,8 @@ import com.Command.ICommand;
 import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Track;
-import com.Model.TrackTag;
 import javafx.fxml.FXML;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -22,8 +20,7 @@ public class TrackTableController {
     @FXML
     private Label lblTagTitle;
     private TableView<Track> trackTable;
-    private VBox detailPanel;
-    private Label lblTitle, lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear;
+
     @FXML
     private Label lblTag;
 
@@ -33,13 +30,6 @@ public class TrackTableController {
             Label lblTagTitle, Label lblTag) {
         this.mainController = mainController;
         this.trackTable = trackTable;
-        this.detailPanel = detailPanel;
-        this.lblTitle = lblTitle;
-        this.lblAuthor = lblAuthor;
-        this.lblAlbum = lblAlbum;
-        this.lblGenre = lblGenre;
-        this.lblDuration = lblDuration;
-        this.lblYear = lblYear;
         this.lblTagTitle = lblTagTitle;
         this.lblTag = lblTag;
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
@@ -50,7 +40,7 @@ public class TrackTableController {
         detailPanel.setVisible(false);
 
         trackTable.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
-            updateDetailPanel(newVal);
+            mainController.updateDetailPanel(newVal);
         });
     }
 
@@ -66,31 +56,6 @@ public class TrackTableController {
     // così la riga evidenziata corrisponde sempre alla traccia in riproduzione
     public void selectTrack(Track track) {
         trackTable.getSelectionModel().select(track);
-    }
-
-    private void updateDetailPanel(Track track) {
-        if (track == null) {
-            detailPanel.setVisible(false);
-        } else {
-            lblTitle.setText(track.getTitle());
-            lblAuthor.setText(track.getAuthor());
-            String album = track.getAlbum();
-            lblAlbum.setText((album == null || album.trim().isEmpty()) ? "-" : album);
-            String genre = track.getGenre();
-            lblGenre.setText((genre == null || genre.trim().isEmpty()) ? "-" : genre);
-            lblYear.setText(track.getYear() == 0 ? "-" : String.valueOf(track.getYear()));
-            lblDuration.setText(track.getFormattedDuration());
-            if (track.getTag() == null || track.getTag() == TrackTag.NONE) {
-                lblTagTitle.setVisible(false);
-                lblTag.setVisible(false);
-            } else {
-                lblTagTitle.setVisible(true);
-                lblTag.setVisible(true);
-                lblTag.setText(track.getTag().toString());
-            }
-
-            detailPanel.setVisible(true);
-        }
     }
 
     public void openAddTrackWindow(ActionEvent ev) {

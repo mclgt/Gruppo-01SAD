@@ -1,6 +1,8 @@
 package com.Strategy;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactoryTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -13,11 +15,12 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @class ShuffleStrategyTest
- * @brief Classe di test per ShuffleStrategy.
- *        Verifica che la navigazione shuffle restituisca tracce valide dalla coda
- *        e quasi mai restituisca la traccia corrente quando sono disponibili più tracce.
- *        I controlli statistici vengono eseguiti su 20 iterazioni per escludere
- *        che la stessa traccia venga restituita per caso.
+ * @brief Test class for ShuffleStrategy.
+ *        Verifies that shuffle navigation returns valid tracks from the queue
+ *        and almost never returns the current track when multiple tracks are
+ *        available.
+ *        Statistical checks are performed over 20 iterations to rule out always
+ *        returning the same track by chance.
  */
 class ShuffleStrategyTest {
 
@@ -25,16 +28,18 @@ class ShuffleStrategyTest {
     private Track track1;
     private Track track2;
     private Track track3;
+    private TrackFactory factory;
 
     /**
      * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
+        factory = new MockTrackFactoryTest();
         strategy = new ShuffleStrategy();
-        track1 = new Track("Track 1", "Artista", 2020, "Pop", 180, "Album", "/path/1.mp3", null);
-        track2 = new Track("Track 2", "Artista", 2021, "Pop", 200, "Album", "/path/2.mp3", null);
-        track3 = new Track("Track 3", "Artista", 2022, "Pop", 210, "Album", "/path/3.mp3", null);
+        track1 = factory.createTrack("Track 1", "Artista", 2020, "Pop", 180, "Album", "dummy1.mp3", null);
+        track2 = factory.createTrack("Track 2", "Artista", 2021, "Pop", 200, "Album", "dummy2.mp3", null);
+        track3 = factory.createTrack("Track 3", "Artista", 2022, "Pop", 210, "Album", "dummy3.mp3", null);
     }
 
     // -----------------------------------------------------------------------
@@ -51,7 +56,8 @@ class ShuffleStrategyTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() restituisca l'unica traccia disponibile quando la coda ha un solo elemento.
+     * @brief Verifies that nextTrack() returns the only available track when the
+     *        queue has one element.
      */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
@@ -60,8 +66,10 @@ class ShuffleStrategyTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() quasi mai restituisca la traccia corrente quando sono disponibili più tracce,
-     *        controllato su 20 iterazioni per escludere ripetizioni accidentali.
+     * @brief Verifies that nextTrack() almost never returns the current track when
+     *        multiple tracks are
+     *        available, checked over 20 iterations to rule out accidental
+     *        repetition.
      */
     @Test
     void nextTrack_multipleTracks_almostNeverReturnsCurrentTrack() {
@@ -72,8 +80,9 @@ class ShuffleStrategyTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() restituisca una traccia diversa da quella corrente
-     *        quando sono disponibili più tracce.
+     * @brief Verifies that nextTrack() returns a track different from the current
+     *        one
+     *        when multiple tracks are available.
      */
     @Test
     void nextTrack_multipleTracks_returnsValidTrack() {
@@ -86,8 +95,10 @@ class ShuffleStrategyTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che previousTrack() si comporti in modo identico a nextTrack() per mantenere
-     *        la semantica shuffle: quasi mai restituisce la traccia corrente su 20 iterazioni.
+     * @brief Verifies that previousTrack() behaves identically to nextTrack() to
+     *        preserve
+     *        shuffle semantics: almost never returns the current track over 20
+     *        iterations.
      */
     @Test
     void previousTrack_behaviorSameAsNextTrack() {

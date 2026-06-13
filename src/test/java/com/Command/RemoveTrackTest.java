@@ -2,12 +2,15 @@ package com.Command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.ITrackContainer;
 import com.Model.Library;
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactoryTest;
 
 /**
  * @brief Definizione della classe di unit test per la rimozione delle tracce.
@@ -19,14 +22,19 @@ public class RemoveTrackTest {
     private Track track1;
     private Track track2;
     private Track track3;
+    private TrackFactory factory;
 
     @BeforeEach
     public void setUp() {
+        factory = new MockTrackFactoryTest();
         container = new Library();
         undoManager = new UndoManager();
-        track1 = new Track("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "path/to/track1.mp3", null);
-        track2 = new Track("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "path/to/track2.mp3", null);
-        track3 = new Track("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "path/to/track3.mp3", null);
+        track1 = factory.createTrack("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "dummy.mp3",
+                null);
+        track2 = factory.createTrack("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "dummy.mp3",
+                null);
+        track3 = factory.createTrack("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "dummy.mp3",
+                null);
     }
 
     @Test

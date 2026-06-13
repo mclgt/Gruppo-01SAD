@@ -8,6 +8,7 @@ import com.Controller.playlist.AddModPlaylistController;
 import com.Controller.track.AddModTrackController;
 import com.Model.Playlist;
 import com.Model.Track;
+import com.Model.TrackFactory;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,13 +25,17 @@ import javafx.stage.Stage;
  */
 public class WindowManager {
     public final MainController mainController;
+    private final TrackFactory addFactory;
 
     /**
      * @brief Costruttore del WindowManager
      * @param mainController controller principale dell'applicazione,
+     * @param addFactory     La factory concreta (passata da una classe superiore)
+     *                       usata per creare i brani
      */
-    public WindowManager(MainController mainController) {
+    public WindowManager(MainController mainController, TrackFactory addFactory) {
         this.mainController = mainController;
+        this.addFactory = addFactory;
     }
 
     /**
@@ -44,6 +49,16 @@ public class WindowManager {
     public void openWindow(String fxmlPath, String title, Track trackToModify) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            loader.setControllerFactory(controllerClass -> {
+                if (controllerClass == AddModTrackController.class) {
+                    return new AddModTrackController(this.addFactory);
+                }
+                try {
+                    return controllerClass.getDeclaredConstructor().newInstance();
+                } catch (Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            });
             Parent p = loader.load();
 
             AddModTrackController controller = loader.getController();
@@ -56,7 +71,8 @@ public class WindowManager {
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(p));
+            Scene scene = new Scene(p);
+            stage.setScene(scene);
             stage.showAndWait();
         } catch (IOException e) {
             System.err.println("Errore nel caricamento della finestra " + fxmlPath + ": " + e.getMessage());
@@ -83,7 +99,8 @@ public class WindowManager {
             Stage stage = new Stage();
             stage.setTitle(title);
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(new Scene(p));
+            Scene scene = new Scene(p);
+            stage.setScene(scene);
             stage.showAndWait();
         } catch (IOException e) {
             System.err.println("Errore nel caricamento della finestra " + fxmlPath + ": " + e.getMessage());
@@ -122,8 +139,8 @@ public class WindowManager {
      * @brief Mostra un alert di errore all'utente: è una finestra di dialogo che
      *        notifica all'utente l'errore avvenuto. Blocca l'interfaccia finché non
      *        si chiude la finestra.
-     * @param title titlo da visualizzare nella barra in alto
-     * @param content   messaggio di errore
+     * @param title   titlo da visualizzare nella barra in alto
+     * @param content messaggio di errore
      */
     public void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

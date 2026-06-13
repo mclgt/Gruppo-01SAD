@@ -1,6 +1,11 @@
 package com.Strategy;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.LocalTrackFactory;
+import com.Model.MockTrackFactoryTest;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,16 +25,21 @@ public class LoopTrackStrategyTest {
     private Track track1;
     private Track track2;
     private Track track3;
+    private TrackFactory factory;
 
     /**
      * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
+        factory = new MockTrackFactoryTest();
         strategy = new LoopTrackStrategy();
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3", null);
-        track2 = new Track("Canzone B", "Artista B", 2001, "Rock", 180, "Album B", "dummy2.mp3", null);
-        track3 = new Track("Canzone C", "Artista C", 2002, "Jazz", 210, "Album C", "dummy3.mp3", null);
+        track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
+                null);
+        track2 = factory.createTrack("Canzone B", "Artista B", 2001, "Rock", 180, "Album B", "dummy2.mp3",
+                null);
+        track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Jazz", 210, "Album C", "dummy3.mp3",
+                null);
     }
 
     // -----------------------------------------------------------------------
@@ -37,7 +47,8 @@ public class LoopTrackStrategyTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che nextTrack() restituisca null quando current è null — nessuna traccia su cui fare loop.
+     * @brief Verifies that nextTrack() returns null when current is null — no track
+     *        to loop on.
      */
     @Test
     void nextTrack_currentNull_returnsNull() {
@@ -46,7 +57,8 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() restituisca la stessa traccia quando la coda contiene un solo elemento.
+     * @brief Verifies that nextTrack() returns the same track when the queue
+     *        contains only one element.
      */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
@@ -55,7 +67,8 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() restituisca sempre la traccia corrente indipendentemente dalla dimensione della coda.
+     * @brief Verifies that nextTrack() always returns the current track regardless
+     *        of queue size.
      */
     @Test
     void nextTrack_multipleTracks_returnsSameTrack() {
@@ -64,7 +77,8 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() restituisca la stessa ultima traccia quando si effettua il loop su di essa.
+     * @brief Verifies that nextTrack() returns the same last track when looping on
+     *        it.
      */
     @Test
     void nextTrack_lastTrack_returnsSameTrack() {
@@ -86,7 +100,8 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifica che previousTrack() restituisca la stessa traccia quando la coda contiene un solo elemento.
+     * @brief Verifies that previousTrack() returns the same track when the queue
+     *        contains only one element.
      */
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
@@ -95,7 +110,8 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifica che previousTrack() restituisca sempre la traccia corrente indipendentemente dalla dimensione della coda.
+     * @brief Verifies that previousTrack() always returns the current track
+     *        regardless of queue size.
      */
     @Test
     void previousTrack_multipleTracks_returnsSameTrack() {
@@ -104,7 +120,8 @@ public class LoopTrackStrategyTest {
     }
 
     /**
-     * @brief Verifica che previousTrack() restituisca la stessa prima traccia quando si effettua il loop su di essa.
+     * @brief Verifies that previousTrack() returns the same first track when
+     *        looping on it.
      */
     @Test
     void previousTrack_firstTrack_returnsSameTrack() {

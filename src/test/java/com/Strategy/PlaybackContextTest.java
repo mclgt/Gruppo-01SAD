@@ -5,23 +5,29 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactoryTest;
 
 /**
  * @class PlaybackContextTest
- * @brief Classe di test per PlaybackContext.
- *        Verifica che il Context deleghi correttamente alle strategie
- *        e che il cambio di strategia a runtime funzioni come previsto.
- *        Le strategie utilizzate sono stub dummy scritti a mano, senza framework di mocking.
+ * @brief Test class for PlaybackContext.
+ *        Verifies that the Context correctly delegates to strategies
+ *        and that runtime strategy switching works as expected.
+ *        Strategies used are hand-written dummy stubs, without any mocking
+ *        framework.
  */
 public class PlaybackContextTest {
 
     /**
-     * @brief Stub strategy A: restituisce sempre una traccia successiva e una precedente fisse.
-     *        Usata per verificare che il Context deleghi effettivamente le chiamate alla strategia.
+     * @brief Stub strategy A: always returns a fixed next track and a fixed
+     *        previous track.
+     *        Used to verify that the Context actually delegates calls to the
+     *        strategy.
      */
     private static class DummyStrategyA implements IPlaybackStrategy {
         private final Track fixedNext;
@@ -44,8 +50,9 @@ public class PlaybackContextTest {
     }
 
     /**
-     * @brief Stub strategy B: restituisce sempre null, simulando la fine/inizio della coda.
-     *        Usata per verificare il comportamento dopo un cambio di strategia a runtime.
+     * @brief Stub strategy B: always returns null, simulating end/beginning of
+     *        queue.
+     *        Used to verify behavior after a runtime strategy switch.
      */
     private static class DummyStrategyB implements IPlaybackStrategy {
         @Override
@@ -63,15 +70,20 @@ public class PlaybackContextTest {
     private Track track2;
     private Track track3;
     private List<Track> queue;
+    private TrackFactory factory;
 
     /**
      * @brief Inizializza tre tracce dummy e la coda prima di ogni test.
      */
     @BeforeEach
     public void setUp() {
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",null);
-        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3",null);
-        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3",null);
+        factory = new MockTrackFactoryTest();
+        track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
+                null);
+        track2 = factory.createTrack("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3",
+                null);
+        track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3",
+                null);
         queue = Arrays.asList(track1, track2, track3);
     }
 
@@ -119,7 +131,8 @@ public class PlaybackContextTest {
     }
 
     /**
-     * @brief Verifica che nextTrack() utilizzi la nuova strategia dopo un cambio a runtime.
+     * @brief Verifies that nextTrack() uses the new strategy after a runtime
+     *        switch.
      */
     @Test
     public void testNextTrack_afterStrategyChange_usesNewStrategy() {
@@ -133,7 +146,8 @@ public class PlaybackContextTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che previousTrack() deleghi la chiamata alla strategia corrente.
+     * @brief Verifies that previousTrack() delegates the call to the current
+     *        strategy.
      */
     @Test
     public void testPreviousTrack_delegatesToStrategy() {
@@ -142,7 +156,8 @@ public class PlaybackContextTest {
     }
 
     /**
-     * @brief Verifica che previousTrack() utilizzi la nuova strategia dopo un cambio a runtime.
+     * @brief Verifies that previousTrack() uses the new strategy after a runtime
+     *        switch.
      */
     @Test
     public void testPreviousTrack_afterStrategyChange_usesNewStrategy() {

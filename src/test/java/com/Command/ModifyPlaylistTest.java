@@ -1,12 +1,16 @@
 package com.Command;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
 import com.Model.Track;
+import com.Model.TrackFactory;
+
+import com.Model.MockTrackFactoryTest;
 
 /**
  * @class ModifyPlaylistTest
@@ -20,6 +24,7 @@ public class ModifyPlaylistTest {
     PlaylistCatalog catalog;
     private Playlist playlistTest;
     private Track t;
+    private TrackFactory factory;
 
     /**
      * @brief Configura il test prima di ogni esecuzione. Crea un nuovo catalogo,
@@ -28,10 +33,12 @@ public class ModifyPlaylistTest {
      */
     @BeforeEach
     public void setUp() {
+        factory = new MockTrackFactoryTest();
         catalog = new PlaylistCatalog();
         playlistTest = new Playlist("playlist test");
         catalog.addPlaylist(playlistTest);
-        t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera", "C:/audio.wav", null);
+        t = factory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
+                "dummy.mp3", null);
         playlistTest.addTrack(t);
     }
 

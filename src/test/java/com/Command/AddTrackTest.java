@@ -7,21 +7,27 @@ package com.Command;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Library;
 import com.Model.Track;
+import com.Model.TrackFactory;
+
+import com.Model.MockTrackFactoryTest;
 
 public class AddTrackTest {
     private Library l;
     private Track t;
+    private TrackFactory factory;
 
     @BeforeEach
     public void setUp() {
+        factory = new MockTrackFactoryTest();
         l = new Library();
-        t = new Track("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
-                "C:/audio.wav", null);
+        t = factory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
+                "dummy.mp3", null);
     }
 
     @Test

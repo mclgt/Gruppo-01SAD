@@ -54,6 +54,11 @@ public class PlaylistController {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("formattedDuration"));
+        playlistTrackList.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
+            if (mainController != null) {
+                mainController.updateDetailPanel(newVal);
+            }
+        });
     }
 
     /**
@@ -99,6 +104,10 @@ public class PlaylistController {
         if (playlistTrackList != null) {
             playlistTrackList.getSelectionModel().clearSelection();
         }
+    }
+
+    public TableView<Track> getPlaylistTrackList() {
+        return playlistTrackList;
     }
 
     public Track getSelectedTrack() {

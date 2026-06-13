@@ -3,11 +3,14 @@ package com.State;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Playlist;
 import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Model.MockTrackFactoryTest;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -15,29 +18,34 @@ import com.Strategy.ShuffleStrategy;
 
 /**
  * @class PlayerContextPlaylistTest
- * @brief Classe di test per verificare la logica di riproduzione con le Playlist.
- *        Verifica che PlayerContext interagisca correttamente con una Playlist,
- *        utilizzando la giusta strategia di riproduzione e assicurando il corretto avanzamento delle tracce.
+ * @brief Test class for verifying playback logic with Playlists.
+ *        Verifies that PlayerContext interacts correctly with a Playlist,
+ *        using the right playback strategy and ensuring correct track
+ *        advancement.
  */
 public class PlayerContextPlaylistTest {
     private Playlist testPlaylist;
     private Track track1;
     private Track track2;
+    private TrackFactory factory;
 
     /**
-     * @brief Inizializza le fixture di test: un contesto di riproduzione e una playlist popolata.
+     * @brief Sets up the test fixtures: a playback context and a populated
+     *        playlist.
      */
     @BeforeEach
     void setUp() {
+        factory = new MockTrackFactoryTest();
         testPlaylist = new Playlist("Playlist Test");
-        track1 = new Track("A", "B", 2010, "C", 100, "D", "E", null);
-        track2 = new Track("F", "G", 2010, "H", 100, "I", "J", null);
+        track1 = factory.createTrack("A", "B", 2010, "C", 100, "D", "dummy1.mp3", null);
+        track2 = factory.createTrack("F", "G", 2010, "H", 100, "I", "dummy2.mp3", null);
         testPlaylist.addTrack(track1);
         testPlaylist.addTrack(track2);
     }
 
     /**
-     * @brief Verifica che avviare la riproduzione da uno stato vuoto/iniziale carichi la prima traccia disponibile.
+     * @brief Verifies that starting playback from an empty/initial state loads the
+     *        first available track.
      */
     @Test
     void testInitialPlayUpdateState() {
@@ -103,12 +111,15 @@ public class PlayerContextPlaylistTest {
                 "Alla fine della playlist in modalità loop, next deve tornare alla prima traccia");
     }
 
-    /** @brief Verifica che la strategia shuffle selezioni una traccia valida dalla playlist e mantenga il player in riproduzione. */
+    /**
+     * Verifies that the shuffle strategy picks a valid track from the playlist and
+     * keeps the player playing.
+     */
     @Test
     void testShuffleStrategy() {
         PlaybackContext playbackContext = new PlaybackContext(new ShuffleStrategy());
         PlayerContext context = new PlayerContext(playbackContext);
-        Track track3 = new Track("K", "L", 2010, "M", 100, "N", "O", null);
+        Track track3 = factory.createTrack("K", "L", 2010, "M", 100, "N", "dummy3.mp3", null);
         testPlaylist.addTrack(track3);
         context.setCurrentTrack(track1);
         context.play(track1);

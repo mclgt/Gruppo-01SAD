@@ -5,19 +5,24 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Track;
+import com.Model.TrackFactory;
+
+import com.Model.MockTrackFactoryTest;
 import com.Strategy.IPlaybackStrategy;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
 /**
  * @class PlayerContextTest
- * @brief Test per PlayerContext tramite PlayingState (riproduzione di singola traccia).
- *        Verifica il comportamento di play(), next() e previous() nello stato Playing.
- *        Usa stub manuali per PlaybackContext, senza framework di mocking.
+ * @brief Tests for PlayerContext via PlayingState (single track playback).
+ *        Verifies the behavior of play(), next(), and previous() in the Playing
+ *        state.
+ *        Uses manual stubs for PlaybackContext, without any mocking framework.
  * @author Christian
  */
 public class PlayerContextTest {
@@ -50,20 +55,26 @@ public class PlayerContextTest {
     private Track track2;
     private Track track3;
     private List<Track> queue;
+    private TrackFactory factory;
 
     /**
      * @brief Inizializza tre tracce dummy e la coda prima di ogni test.
      */
     @BeforeEach
     public void setUp() {
-        track1 = new Track("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3", null);
-        track2 = new Track("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3", null);
-        track3 = new Track("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3", null);
+        factory = new MockTrackFactoryTest();
+        track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
+                null);
+        track2 = factory.createTrack("Canzone B", "Artista B", 2001, "Pop", 210, "Album B", "dummy2.mp3",
+                null);
+        track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3",
+                null);
         queue = Arrays.asList(track1, track2, track3);
     }
 
     /**
-     * @brief Crea un PlayerContext supportato da una DummyStrategy con risultati fissi di next/previous.
+     * @brief Creates a PlayerContext backed by a DummyStrategy with fixed
+     *        next/previous results.
      */
     private PlayerContext contextWith(Track nextTrack, Track prevTrack) {
         PlaybackContext playbackContext = new PlaybackContext(new DummyStrategy(nextTrack, prevTrack));
@@ -86,7 +97,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che play() imposti la traccia corrente su quella passata come parametro.
+     * @brief Verifies that play() sets the current track to the one passed as
+     *        parameter.
      */
     @Test
     public void testPlay_setsCurrentTrack() {
@@ -115,7 +127,8 @@ public class PlayerContextTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che next() con una traccia successiva valida aggiorni la traccia corrente.
+     * @brief Verifies that next() with a valid next track updates the current
+     *        track.
      */
     @Test
     public void testNext_withValidNext_updatesCurrentTrack() {
@@ -127,7 +140,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che next() con una traccia successiva valida mantenga il player nello stato Playing.
+     * @brief Verifies that next() with a valid next track keeps the player in
+     *        Playing state.
      */
     @Test
     public void testNext_withValidNext_remainsPlaying() {
@@ -139,7 +153,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che next() senza traccia successiva (null) non cambi la traccia corrente.
+     * @brief Verifies that next() with no next track (null) does not change the
+     *        current track.
      */
     @Test
     public void testNext_withNoNext_currentTrackUnchanged() {
@@ -155,7 +170,8 @@ public class PlayerContextTest {
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifica che previous() con una traccia precedente valida aggiorni la traccia corrente.
+     * @brief Verifies that previous() with a valid previous track updates the
+     *        current track.
      */
     @Test
     public void testPrevious_withValidPrevious_updatesCurrentTrack() {
@@ -167,7 +183,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che previous() con una traccia precedente valida mantenga il player nello stato Playing.
+     * @brief Verifies that previous() with a valid previous track keeps the player
+     *        in Playing state.
      */
     @Test
     public void testPrevious_withValidPrevious_remainsPlaying() {
@@ -179,7 +196,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che previous() senza traccia precedente (null) non cambi la traccia corrente.
+     * @brief Verifies that previous() with no previous track (null) does not change
+     *        the current track.
      */
     @Test
     public void testPrevious_withNoPrevious_currentTrackUnchanged() {
@@ -227,7 +245,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che next() sequenziale sull'ultima traccia non cambi la traccia corrente.
+     * @brief Verifies that sequential next() on the last track does not change the
+     *        current track.
      */
     @Test
     public void testSequential_next_atLastTrack_currentTrackUnchanged() {
@@ -251,7 +270,8 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifica che previous() sequenziale sulla prima traccia non cambi la traccia corrente.
+     * @brief Verifies that sequential previous() on the first track does not change
+     *        the current track.
      */
     @Test
     public void testSequential_previous_atFirstTrack_currentTrackUnchanged() {
