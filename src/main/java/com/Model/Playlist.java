@@ -18,6 +18,7 @@ public class Playlist implements ITrackContainer {
     private StringProperty name = new SimpleStringProperty();
     private ObservableList<Track> tracks;
     private final String id;
+    private int playCount = 0;
 
     /**
      * @brief Costruttore della classe Playlist. Inizializza la playlist con un nome
@@ -49,6 +50,17 @@ public class Playlist implements ITrackContainer {
      */
     public String getName() {
         return name.get();
+    }
+
+    public void setPlayCount(int playCount){
+        if(playCount < 0){
+            throw new IllegalArgumentException("Il contatore delle riproduzioni non può essere negativo!");
+        }
+        this.playCount = playCount;
+    }
+
+    public int getPlayCount(){
+        return this.playCount;
     }
 
     /**
@@ -157,6 +169,13 @@ public class Playlist implements ITrackContainer {
         } else {
             return String.format("%02d:%02d", minutes, seconds);
         }
+    }
+
+    /**
+     * @brief Incrementa di 1 unità il numero di riproduzioni della playlist.
+     */
+    public void incrementPlayCount() {
+        this.playCount++;
     }
 
     /**
