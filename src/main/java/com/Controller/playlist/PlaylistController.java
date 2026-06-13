@@ -135,6 +135,10 @@ public class PlaylistController implements IPlayerSubscriber {
      * @brief Recupera il brano selezionato nella tabella della playlist
      * @return oggetto Track selezionato, o null
      */
+    public TableView<Track> getPlaylistTrackList() {
+        return playlistTrackList;
+    }
+
     public Track getSelectedTrack() {
         if (playlistTrackList != null) {
             return playlistTrackList.getSelectionModel().getSelectedItem();

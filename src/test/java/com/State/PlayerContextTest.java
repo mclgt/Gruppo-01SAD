@@ -28,8 +28,8 @@ import com.Strategy.SequentialStrategy;
 public class PlayerContextTest {
 
     /**
-     * @brief Stub strategy: returns fixed next and previous values (can be null).
-     *        Isolates the Context under test from real strategy logic.
+     * @brief Stub strategy: restituisce valori fissi di next e previous (possono essere null).
+     *        Isola il Context sotto test dalla logica reale della strategia.
      */
     private static class DummyStrategy implements IPlaybackStrategy {
         private final Track nextResult;
@@ -58,7 +58,7 @@ public class PlayerContextTest {
     private TrackFactory factory;
 
     /**
-     * @brief Initializes three dummy tracks and the queue before each test.
+     * @brief Inizializza tre tracce dummy e la coda prima di ogni test.
      */
     @BeforeEach
     public void setUp() {
@@ -82,15 +82,15 @@ public class PlayerContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for play()
+    // Test per play()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that play() puts the player in the Playing state.
+     * @brief Verifica che play() porti il player nello stato Playing.
      */
     @Test
     public void testPlay_startsPlaying() {
-        System.out.println("[TEST] play() -> the player must be in Playing state");
+        System.out.println("[TEST] play() -> il player deve essere nello stato Playing");
         PlayerContext ctx = contextWith(null, null);
         ctx.play(track1);
         assertTrue(ctx.isPlaying());
@@ -102,19 +102,19 @@ public class PlayerContextTest {
      */
     @Test
     public void testPlay_setsCurrentTrack() {
-        System.out.println("[TEST] play() -> the current track must be the one passed");
+        System.out.println("[TEST] play() -> la traccia corrente deve essere quella passata");
         PlayerContext ctx = contextWith(null, null);
         ctx.play(track1);
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
     /**
-     * @brief Verifies that play() on a different track updates the current track
-     *        and keeps the player in Playing state.
+     * @brief Verifica che play() su una traccia diversa aggiorni la traccia corrente
+     *        e mantenga il player nello stato Playing.
      */
     @Test
     public void testPlay_differentTrack_updatesCurrentTrack() {
-        System.out.println("[TEST] play() on a different track -> must update current track and remain in Playing");
+        System.out.println("[TEST] play() su una traccia diversa -> deve aggiornare la traccia corrente e rimanere in Playing");
         PlayerContext ctx = contextWith(null, null);
         ctx.play(track1);
         ctx.play(track2);
@@ -123,7 +123,7 @@ public class PlayerContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for next()
+    // Test per next()
     // -----------------------------------------------------------------------
 
     /**
@@ -132,7 +132,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testNext_withValidNext_updatesCurrentTrack() {
-        System.out.println("[TEST] next() with a valid next track -> must update the current track");
+        System.out.println("[TEST] next() con una traccia successiva valida -> deve aggiornare la traccia corrente");
         PlayerContext ctx = contextWith(track2, null);
         ctx.play(track1);
         ctx.next(queue, track1);
@@ -145,7 +145,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testNext_withValidNext_remainsPlaying() {
-        System.out.println("[TEST] next() with a valid next track -> the player must remain in Playing");
+        System.out.println("[TEST] next() con una traccia successiva valida -> il player deve rimanere in Playing");
         PlayerContext ctx = contextWith(track2, null);
         ctx.play(track1);
         ctx.next(queue, track1);
@@ -158,7 +158,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testNext_withNoNext_currentTrackUnchanged() {
-        System.out.println("[TEST] next() with no next track (null) -> current track must not change");
+        System.out.println("[TEST] next() senza traccia successiva (null) -> la traccia corrente non deve cambiare");
         PlayerContext ctx = contextWith(null, null);
         ctx.play(track1);
         ctx.next(queue, track1);
@@ -166,7 +166,7 @@ public class PlayerContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previous()
+    // Test per previous()
     // -----------------------------------------------------------------------
 
     /**
@@ -175,7 +175,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testPrevious_withValidPrevious_updatesCurrentTrack() {
-        System.out.println("[TEST] previous() with a valid previous track -> must update the current track");
+        System.out.println("[TEST] previous() con una traccia precedente valida -> deve aggiornare la traccia corrente");
         PlayerContext ctx = contextWith(null, track1);
         ctx.play(track2);
         ctx.previous(queue, track2);
@@ -188,7 +188,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testPrevious_withValidPrevious_remainsPlaying() {
-        System.out.println("[TEST] previous() with a valid previous track -> the player must remain in Playing");
+        System.out.println("[TEST] previous() con una traccia precedente valida -> il player deve rimanere in Playing");
         PlayerContext ctx = contextWith(null, track1);
         ctx.play(track2);
         ctx.previous(queue, track2);
@@ -201,7 +201,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testPrevious_withNoPrevious_currentTrackUnchanged() {
-        System.out.println("[TEST] previous() with no previous track (null) -> current track must not change");
+        System.out.println("[TEST] previous() senza traccia precedente (null) -> la traccia corrente non deve cambiare");
         PlayerContext ctx = contextWith(null, null);
         ctx.play(track2);
         ctx.previous(queue, track2);
@@ -209,11 +209,11 @@ public class PlayerContextTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for sequential playback (US-8)
+    // Test per la riproduzione sequenziale (US-8)
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Creates a PlayerContext backed by a real SequentialStrategy.
+     * @brief Crea un PlayerContext supportato da una SequentialStrategy reale.
      */
     private PlayerContext sequentialContext() {
         System.out.println("\n [TEST US-8] sequential Context");
@@ -221,11 +221,11 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifies that sequential next() advances from track1 to track2.
+     * @brief Verifica che next() sequenziale avanzi da track1 a track2.
      */
     @Test
     public void testSequential_next_advancesFromFirstToSecond() {
-        System.out.println("[TEST US-8] sequential next() -> advances from track1 to track2");
+        System.out.println("[TEST US-8] next() sequenziale -> avanza da track1 a track2");
         PlayerContext ctx = sequentialContext();
         ctx.play(track1);
         ctx.next(queue, track1);
@@ -233,11 +233,11 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifies that sequential next() advances from track2 to track3.
+     * @brief Verifica che next() sequenziale avanzi da track2 a track3.
      */
     @Test
     public void testSequential_next_advancesFromSecondToThird() {
-        System.out.println("[TEST US-8] sequential next() -> advances from track2 to track3");
+        System.out.println("[TEST US-8] next() sequenziale -> avanza da track2 a track3");
         PlayerContext ctx = sequentialContext();
         ctx.play(track2);
         ctx.next(queue, track2);
@@ -250,7 +250,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testSequential_next_atLastTrack_currentTrackUnchanged() {
-        System.out.println("[TEST US-8] next() on the last track -> current track must not change");
+        System.out.println("[TEST US-8] next() sull'ultima traccia -> la traccia corrente non deve cambiare");
         PlayerContext ctx = sequentialContext();
         ctx.play(track3);
         ctx.next(queue, track3);
@@ -258,11 +258,11 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifies that sequential previous() goes back from track3 to track2.
+     * @brief Verifica che previous() sequenziale torni da track3 a track2.
      */
     @Test
     public void testSequential_previous_goesBackFromThirdToSecond() {
-        System.out.println("[TEST US-8] sequential previous() -> goes back from track3 to track2");
+        System.out.println("[TEST US-8] previous() sequenziale -> torna da track3 a track2");
         PlayerContext ctx = sequentialContext();
         ctx.play(track3);
         ctx.previous(queue, track3);
@@ -275,7 +275,7 @@ public class PlayerContextTest {
      */
     @Test
     public void testSequential_previous_atFirstTrack_currentTrackUnchanged() {
-        System.out.println("[TEST US-8] previous() on the first track -> current track must not change");
+        System.out.println("[TEST US-8] previous() sulla prima traccia -> la traccia corrente non deve cambiare");
         PlayerContext ctx = sequentialContext();
         ctx.play(track1);
         ctx.previous(queue, track1);
@@ -283,12 +283,12 @@ public class PlayerContextTest {
     }
 
     /**
-     * @brief Verifies a full sequential traversal of all tracks in order,
-     *        including the no-op behavior when the end of the queue is reached.
+     * @brief Verifica una traversata sequenziale completa di tutte le tracce in ordine,
+     *        incluso il comportamento no-op quando si raggiunge la fine della coda.
      */
     @Test
     public void testSequential_fullSequence_traversesAllTracks() {
-        System.out.println("[TEST US-8] full sequence -> traverses all tracks in order");
+        System.out.println("[TEST US-8] sequenza completa -> attraversa tutte le tracce in ordine");
         PlayerContext ctx = sequentialContext();
         ctx.play(track1);
         assertEquals(track1, ctx.getCurrentTrack());
@@ -300,6 +300,6 @@ public class PlayerContextTest {
         assertEquals(track3, ctx.getCurrentTrack());
 
         ctx.next(queue, ctx.getCurrentTrack());
-        assertEquals(track3, ctx.getCurrentTrack()); // end of queue: stays on last track
+        assertEquals(track3, ctx.getCurrentTrack()); // fine della coda: rimane sull'ultima traccia
     }
 }

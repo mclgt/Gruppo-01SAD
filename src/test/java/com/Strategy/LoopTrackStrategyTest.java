@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @class LoopTrackStrategyTest
- * @brief Test class for LoopTrackStrategy.
- *        Verifies that single-track loop always returns the same current track,
- *        regardless of queue size, and returns null when current is null.
+ * @brief Classe di test per LoopTrackStrategy.
+ *        Verifica che il loop su singola traccia restituisca sempre la stessa traccia corrente,
+ *        indipendentemente dalla dimensione della coda, e restituisca null quando current è null.
  */
 public class LoopTrackStrategyTest {
 
@@ -26,7 +26,7 @@ public class LoopTrackStrategyTest {
     private TrackFactory factory;
 
     /**
-     * @brief Initializes the strategy and three dummy tracks before each test.
+     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
      */
     @BeforeEach
     void setUp() {
@@ -41,7 +41,7 @@ public class LoopTrackStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for nextTrack()
+    // Test per nextTrack()
     // -----------------------------------------------------------------------
 
     /**
@@ -85,11 +85,11 @@ public class LoopTrackStrategyTest {
     }
 
     // -----------------------------------------------------------------------
-    // Tests for previousTrack()
+    // Test per previousTrack()
     // -----------------------------------------------------------------------
 
     /**
-     * @brief Verifies that previousTrack() returns null when current is null.
+     * @brief Verifica che previousTrack() restituisca null quando current è null.
      */
     @Test
     void previousTrack_currentNull_returnsNull() {
