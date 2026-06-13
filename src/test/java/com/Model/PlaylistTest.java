@@ -14,7 +14,7 @@ public class PlaylistTest {
 
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
     }
 
     @Test

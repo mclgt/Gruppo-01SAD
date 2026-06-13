@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import com.Model.Playlist;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -35,7 +35,7 @@ public class PlayerContextPlaylistTest {
      */
     @BeforeEach
     void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         testPlaylist = new Playlist("Playlist Test");
         track1 = factory.createTrack("A", "B", 2010, "C", 100, "D", "dummy1.mp3", null);
         track2 = factory.createTrack("F", "G", 2010, "H", 100, "I", "dummy2.mp3", null);

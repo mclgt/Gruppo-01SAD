@@ -10,7 +10,7 @@ import com.Model.ITrackContainer;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 /**
  * @brief Definizione della classe di unit test per la rimozione delle tracce.
@@ -26,7 +26,7 @@ public class RemoveTrackTest {
 
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         container = new Library();
         undoManager = new UndoManager();
         track1 = factory.createTrack("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "dummy.mp3",

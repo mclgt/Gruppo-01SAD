@@ -24,7 +24,7 @@ public class LibraryTest {
      */
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         l = new Library();
         t = factory.instantiateTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
                 "C:/audio.wav", null);

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 import com.Strategy.IPlaybackStrategy;
 import com.Strategy.PlaybackContext;
 
@@ -66,7 +66,7 @@ public class PlayingStateTest {
 
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
                 null);
         track2 = factory.createTrack("Canzone B", "Artista B", 2001, "Rock", 210, "Album B", "dummy2.mp3",

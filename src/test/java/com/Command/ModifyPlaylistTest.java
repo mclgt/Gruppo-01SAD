@@ -10,7 +10,7 @@ import com.Model.PlaylistCatalog;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 /**
  * @class ModifyPlaylistTest
@@ -33,7 +33,7 @@ public class ModifyPlaylistTest {
      */
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         catalog = new PlaylistCatalog();
         playlistTest = new Playlist("playlist test");
         catalog.addPlaylist(playlistTest);

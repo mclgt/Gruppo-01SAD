@@ -15,7 +15,7 @@ import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 public class AddTrackTest {
     private Library l;
@@ -24,7 +24,7 @@ public class AddTrackTest {
 
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         l = new Library();
         t = factory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
                 "dummy.mp3", null);

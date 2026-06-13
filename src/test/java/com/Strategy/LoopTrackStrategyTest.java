@@ -3,7 +3,7 @@ package com.Strategy;
 import com.Model.Track;
 import com.Model.TrackFactory;
 import com.Model.LocalTrackFactory;
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +32,7 @@ public class LoopTrackStrategyTest {
      */
     @BeforeEach
     void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         strategy = new LoopTrackStrategy();
         track1 = factory.createTrack("Canzone A", "Artista A", 2000, "Pop", 200, "Album A", "dummy1.mp3",
                 null);

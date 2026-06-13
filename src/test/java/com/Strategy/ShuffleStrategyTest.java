@@ -2,7 +2,7 @@ package com.Strategy;
 
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -35,7 +35,7 @@ class ShuffleStrategyTest {
      */
     @BeforeEach
     void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         strategy = new ShuffleStrategy();
         track1 = factory.createTrack("Track 1", "Artista", 2020, "Pop", 180, "Album", "dummy1.mp3", null);
         track2 = factory.createTrack("Track 2", "Artista", 2021, "Pop", 200, "Album", "dummy2.mp3", null);

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 /**
  * @brief Test per la modifica di un ogetto Track e l'aggiornamento in Library.
@@ -28,7 +28,7 @@ public class ModifyTrackTest {
 
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         library = new Library();
         t = factory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
                 "dummy.mp3", null);

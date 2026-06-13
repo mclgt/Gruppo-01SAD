@@ -11,7 +11,7 @@ import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-import com.Model.MockTrackFactoryTest;
+import com.Model.MockTrackFactory;
 
 /**
  * @class UndoManagerTest
@@ -27,7 +27,7 @@ public class UndoManagerTest {
 
     @BeforeEach
     public void setUp() {
-        factory = new MockTrackFactoryTest();
+        factory = new MockTrackFactory();
         undoManager = new UndoManager();
         library = new Library();
         track = factory.createTrack("Fix You", "Coldplay", 2005, "Alternative", 295, "X&Y", "dummy.mp3",
