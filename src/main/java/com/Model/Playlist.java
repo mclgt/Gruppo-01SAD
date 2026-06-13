@@ -1,5 +1,7 @@
 package com.Model;
 
+import java.util.UUID;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -15,6 +17,7 @@ import javafx.collections.ObservableList;
 public class Playlist implements ITrackContainer {
     private StringProperty name = new SimpleStringProperty();
     private ObservableList<Track> tracks;
+    private final String id;
 
     /**
      * @brief Costruttore della classe Playlist. Inizializza la playlist con un nome
@@ -25,6 +28,7 @@ public class Playlist implements ITrackContainer {
     public Playlist(String name) {
         setName(name);
         this.tracks = FXCollections.observableArrayList();
+        this.id = UUID.randomUUID().toString();
     }
 
     /**
@@ -48,6 +52,14 @@ public class Playlist implements ITrackContainer {
     }
 
     /**
+     * @brief Restituisce l'identificativo univoco della playlist
+     * @return Stringa rappresentando l'ID della playlist
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
      * @brief Restituisce la proprietà osservabile del nome.
      * @return oggetto StringProperty associato al nome
      */
@@ -68,14 +80,16 @@ public class Playlist implements ITrackContainer {
     }
 
     /**
-     * @brief Aggiunge un brano alla playlist nel posto desiderato. Il brano viene aggiunto solo se non
+     * @brief Aggiunge un brano alla playlist nel posto desiderato. Il brano viene
+     *        aggiunto solo se non
      *        nullo e se non è presente nella lista.
      * @param track oggetto track da aggiungere.
-     * @param index la posizione nella quale inserire il brano all'interno della playlist.
+     * @param index la posizione nella quale inserire il brano all'interno della
+     *              playlist.
      */
     @Override
-    public void addTrack(int index, Track track){
-        if(track != null && !tracks.contains(track)){
+    public void addTrack(int index, Track track) {
+        if (track != null && !tracks.contains(track)) {
             tracks.add(index, track);
         }
     }
@@ -92,7 +106,7 @@ public class Playlist implements ITrackContainer {
     }
 
     @Override
-    public int indexOf(Track track){
+    public int indexOf(Track track) {
         return this.tracks.indexOf(track);
     }
 
@@ -108,7 +122,7 @@ public class Playlist implements ITrackContainer {
      * @brief Restituisce il numero di brani contenuti nella playlist.
      * @return il numero di brani effettivamente contenuti nella playlist.
      */
-    public int getTracksCount(){
+    public int getTracksCount() {
         return tracks.size();
     }
 
@@ -152,5 +166,32 @@ public class Playlist implements ITrackContainer {
     @Override
     public String toString() {
         return this.name.get();
+    }
+
+    /**
+     * @brief Verifica l'uguaglianza tra due oggetti PLaylist. Il confronto si basa
+     *        solo sull'ID univoco. Due istanze di playlist vrranno considerate
+     *        uguali solo se hanno lo stesso ID.
+     * 
+     * @param o oggetto da confrontare
+     * @return true se gli oggetti hanno lo stesso ID, false altrimenti
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Playlist))
+            return false;
+        Playlist playlist = (Playlist) o;
+        return id.equals(playlist.id);
+    }
+
+    /**
+     * @brief Calcola il codice hash per l'oggetto Playlist basandosi sul suo ID
+     * @return Codice hash calcolato
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

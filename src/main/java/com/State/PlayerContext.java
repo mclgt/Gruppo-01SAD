@@ -2,7 +2,10 @@ package com.State;
 
 import com.Strategy.PlaybackContext;
 import com.Model.Track;
+import com.Observer.IPlayerSubscriber;
+
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * @class PlayerContext
@@ -27,8 +30,10 @@ public class PlayerContext {
      */
     private IPlayerState playingState;
 
-    //ho aggiunto pausedState per supportare la pausa all'interno del pattern State,
-    //prima pause() in PlayingState era vuoto e non cambiava stato
+    /**
+     * @brief Stato "in pausa"; serve per gestire la transizione tra in riproduzione
+     *        e pausa.
+     */
     private IPlayerState pausedState;
 
     /** @brief Stato attualmente attivo; le operazioni vengono delegate a questo. */
@@ -36,6 +41,12 @@ public class PlayerContext {
 
     /** @brief Context della strategia di navigazione tra le tracce. */
     private PlaybackContext playbackContext;
+
+    /**
+     * @brief Lista dei sottoscrittori che ricevono notifiche sui cambiamenti di
+     *        riproduzione
+     */
+    private List<IPlayerSubscriber> listeners = new ArrayList<>();
 
     /** @brief Traccia attualmente selezionata/riprodotta. */
     private Track currentTrack;
@@ -55,7 +66,7 @@ public class PlayerContext {
 
     /**
      * @brief Cambia lo stato corrente del player.
-     * @param state Il nuovo stato (@ref IPlayerState) da impostare.
+     * @param state Il nuovo stato da impostare.
      */
     public void setState(IPlayerState state) {
         this.currentState = state;
@@ -63,26 +74,32 @@ public class PlayerContext {
 
     /**
      * @brief Restituisce l'istanza dello stato PlayingState.
-     * @return L'oggetto @ref IPlayerState corrispondente a PlayingState.
+     * @return L'oggetto IPlayerState di tipo PlayingState.
      */
     public IPlayerState getPlayingState() {
         return playingState;
     }
 
-    //restituisce il riferimento a PausedState, serve a PlayingState per fare la transizione
+    /**
+     * @brief Restituisce il riferimento a PausedState
+     * @return L'oggetto IPlayerState di tipo PausedState
+     */
     public IPlayerState getPausedState() {
         return pausedState;
     }
 
-    //controlla se il player è in pausa confrontando lo stato corrente con pausedState
-    //serve al controller per distinguere pausa da riproduzione e decidere se riprendere o riavviare
+    /**
+     * @brief Verifica se il player si trova nello stato di pausa
+     * @return true se lo stato è PausedState, false altrimenti
+     */
     public boolean isPaused() {
         return currentState == pausedState;
     }
 
     /**
      * @brief Restituisce il context della strategia di riproduzione.
-     * @return L'oggetto @ref PlaybackContext associato a questo player.
+     * @return L'oggetto PlaybackContext usato per il calcolo della traccia
+     *         successiva/precedente
      */
     public PlaybackContext getPlaybackContext() {
         return playbackContext;
@@ -98,7 +115,7 @@ public class PlayerContext {
 
     /**
      * @brief Restituisce la traccia attualmente impostata come corrente.
-     * @return La @ref Track corrente, o {@code null} se nessuna traccia è stata
+     * @return La Track corrente, o null se nessuna traccia è stata
      *         impostata.
      */
     public Track getCurrentTrack() {
@@ -107,7 +124,7 @@ public class PlayerContext {
 
     /**
      * @brief Indica se il player si trova nello stato di riproduzione attiva.
-     * @return {@code true} se lo stato corrente è @ref PlayingState, {@code false}
+     * @return true se lo stato corrente è PlayingState, false
      *         altrimenti.
      */
     public boolean isPlaying() {
@@ -121,6 +138,8 @@ public class PlayerContext {
      */
     public void play(Track track) {
         currentState.play(track);
+        this.currentTrack = track;
+        notifySubscribers();
     }
 
     /**
@@ -134,11 +153,14 @@ public class PlayerContext {
      * @brief Ferma la riproduzione delegando allo stato corrente.
      */
     public void stop() {
+        this.currentTrack = null;
         currentState.stop();
+        notifySubscribers();
     }
 
     /**
-     * @brief Passa alla traccia successiva delegando allo stato corrente.
+     * @brief Calcola e passa alla traccia successiva utilizzando la trategia
+     *        attiva, delengando allo stato corrente l'esecuzione.
      * @param queue   La lista completa delle tracce disponibili.
      * @param current La traccia attualmente in riproduzione.
      */
@@ -146,6 +168,7 @@ public class PlayerContext {
         Track nexTrack = this.playbackContext.nextTrack(queue, current);
         if (nexTrack != null) {
             this.setCurrentTrack(nexTrack);
+            notifySubscribers();
         }
         if (currentState != null) {
             currentState.next(queue, current);
@@ -153,7 +176,8 @@ public class PlayerContext {
     }
 
     /**
-     * @brief Torna alla traccia precedente delegando allo stato corrente.
+     * @brief Calcola e torna alla traccia precedente utilizzando la strategia
+     *        attiva, delegando allo stato corrente l'esecuzione.
      * @param queue   La lista completa delle tracce disponibili.
      * @param current La traccia attualmente in riproduzione.
      */
@@ -161,7 +185,34 @@ public class PlayerContext {
         Track prevTrack = this.playbackContext.previousTrack(queue, current);
         if (prevTrack != null) {
             this.setCurrentTrack(prevTrack);
+            notifySubscribers();
         }
         currentState.previous(queue, current);
     }
+
+    /**
+     * @brief Registra un nuovo subscriber per le notifiche del playback
+     * @param s oggetto che implementa l'interfaccia subscriber
+     */
+    public void subscribe(IPlayerSubscriber s) {
+        listeners.add(s);
+    }
+
+    /**
+     * @brief Rimuove il subscriber dalla ricezione di notifiche del playback
+     * @param s oggetto che implementa l'interfaccia subscriber
+     */
+    public void unsubscribe(IPlayerSubscriber s) {
+        listeners.remove(s);
+    }
+
+    /**
+     * @brief Notifica tutti i subscriber del cambiamento della traccia corrente
+     */
+    private void notifySubscribers() {
+        for (IPlayerSubscriber s : listeners) {
+            s.onPlaybackChanged(this.currentTrack);
+        }
+    }
+
 }

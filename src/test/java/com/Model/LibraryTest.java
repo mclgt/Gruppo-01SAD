@@ -26,13 +26,13 @@ public class LibraryTest {
     public void setUp() {
         factory = new MockTrackFactory();
         l = new Library();
-        t = factory.instantiateTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
+        t = factory.createTrack("Bohemian Rhapsody", "Queen", 1975, "Rock", 355, "A Night at the Opera",
                 "C:/audio.wav", null);
-        track1 = factory.instantiateTrack("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "path/to/track1.mp3",
+        track1 = factory.createTrack("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "path/to/track1.mp3",
                 null);
-        track2 = factory.instantiateTrack("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "path/to/track2.mp3",
+        track2 = factory.createTrack("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "path/to/track2.mp3",
                 null);
-        track3 = factory.instantiateTrack("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "path/to/track3.mp3",
+        track3 = factory.createTrack("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "path/to/track3.mp3",
                 null);
     }
 

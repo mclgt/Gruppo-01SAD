@@ -5,14 +5,18 @@ import java.util.Optional;
 import com.Command.ICommand;
 import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
+import com.Model.ITrackContainer;
 import com.Model.Playlist;
 import com.Model.Track;
+import com.Observer.IPlayerSubscriber;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,7 +33,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * @see MainController
  * @see PlaylistTableController
  */
-public class PlaylistController {
+public class PlaylistController implements IPlayerSubscriber {
     @FXML
     private Label lblPlaylist;
     @FXML
@@ -59,6 +63,23 @@ public class PlaylistController {
                 mainController.updateDetailPanel(newVal);
             }
         });
+
+        playlistTrackList.setRowFactory(tv -> {
+            TableRow<Track> row = new TableRow<>();
+            row.itemProperty().addListener((observed, oldVal, newVal) -> {
+                Track current = (mainController != null) ? mainController.getPlayerContext().getCurrentTrack() : null;
+                ITrackContainer activeContainer = mainController.getPlayerController().getActiveContainer();
+                boolean isSameTrack = (newVal != null && newVal.equals(current));
+                boolean isSamePlaylist = (currentPlaylist != null && currentPlaylist.equals(activeContainer));
+                if (isSameTrack && isSamePlaylist) {
+                    row.setStyle("-fx-background-color: #f5a747;"); // cambia colore
+                } else {
+                    row.setStyle("");
+                }
+
+            });
+            return row;
+        });
     }
 
     /**
@@ -67,6 +88,7 @@ public class PlaylistController {
      */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
+        this.mainController.getPlayerContext().subscribe(this);
     }
 
     /**
@@ -100,12 +122,19 @@ public class PlaylistController {
         }
     }
 
+    /**
+     * @brief Rimuove la selezione corrente dalla tabella dei brani
+     */
     public void clearSelection() {
         if (playlistTrackList != null) {
             playlistTrackList.getSelectionModel().clearSelection();
         }
     }
 
+    /**
+     * @brief Recupera il brano selezionato nella tabella della playlist
+     * @return oggetto Track selezionato, o null
+     */
     public Track getSelectedTrack() {
         if (playlistTrackList != null) {
             return playlistTrackList.getSelectionModel().getSelectedItem();
@@ -113,10 +142,20 @@ public class PlaylistController {
         return null;
     }
 
+    /**
+     * @brief Recupera la playlist attualmente visualizzata nel controller
+     * @return oggetto Playlist gestito dalla vista
+     */
     public Playlist getCurrentPlaylist() {
         return currentPlaylist;
     }
 
+    /**
+     * @brief Seleziona una traccia all'interno della tabella della playlist,
+     *        richiamto quando il brano in ripdozione cambia o viene richiesto
+     *        dall'esterno.
+     * @param track oggetto Track da selezionare nella tabella
+     */
     public void selectTrack(Track track) {
         playlistTrackList.getSelectionModel().select(track);
     }
@@ -160,8 +199,36 @@ public class PlaylistController {
         }
     }
 
+    /**
+     * @brief Attiva la modalità di riproduzione in loop per la playlist corrente
+     * @param ev evento di pressione del pulsante loop
+     */
     @FXML
     public void handleLoopPlaylist(ActionEvent ev) {
         mainController.getPlayerController().loopPlaylistRip(this.currentPlaylist);
+    }
+
+    /**
+     * @brief Callback chiamata quando cambia lo stato del player. Forza il refresh
+     *        della tabella per aggiornare l'evidenziazione se la playlist corrente
+     *        è quella in riproduzione.
+     * @param newTrack nuova traccia impostata come corrente
+     */
+    @Override
+    public void onPlaybackChanged(Track newTrack) {
+        Platform.runLater(() -> {
+            if (playlistTrackList != null) {
+                playlistTrackList.refresh();
+            }
+        });
+    }
+
+    /**
+     * @brief Rilascia le risorse e annulla l'iscrizione al PlayerContext
+     */
+    public void dispose() {
+        if (mainController != null) {
+            mainController.getPlayerContext().unsubscribe(this);
+        }
     }
 }
