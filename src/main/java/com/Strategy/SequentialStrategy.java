@@ -31,7 +31,7 @@ public class SequentialStrategy implements IPlaybackStrategy {
             return queue.get(0);
         }
         int currentIndex = queue.indexOf(current);
-        if (currentIndex == -1 || currentIndex == queue.size() - 1) {
+        if (currentIndex == -1 || currentIndex >= queue.size() - 1) {
             return null;
         }
         return queue.get(currentIndex + 1);

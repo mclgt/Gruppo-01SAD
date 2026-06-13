@@ -1,5 +1,7 @@
 package com.Model;
 
+import java.util.UUID;
+
 import com.DataLayer.IAudioTrack;
 
 import javafx.beans.property.IntegerProperty;
@@ -28,6 +30,7 @@ public class Track {
     private final StringProperty album = new SimpleStringProperty();
     private final StringProperty filePath = new SimpleStringProperty();
     private final ObjectProperty<TrackTag> tag = new SimpleObjectProperty<>(TrackTag.NONE);
+    private final String id;
     private IAudioTrack audioSource;
 
     /**
@@ -57,6 +60,7 @@ public class Track {
         setAlbum(album);
         setFilePath(filePath);
         setTag(tag);
+        this.id = UUID.randomUUID().toString();
     }
 
     // Getter e setter classici
@@ -205,5 +209,34 @@ public class Track {
     @Override
     public String toString() {
         return title + " - " + author + "( " + year + ")" + "-" + genre + "(" + duration + "s ), " + album;
+    }
+
+    /**
+     * @brief Verifica l'uguaglianza tra due oggetti Track. Il confronto è basato
+     *        solo sull'identificatore univoco (ID) del brano.
+     * 
+     * @param o oggetto da confrontare
+     * @return true se gli oggetti sono uguali (stesso id), false altrimenti
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || this.getClass() != o.getClass())
+            return false;
+        Track t = (Track) o;
+        return (this.id.equals(t.id));
+    }
+
+    /**
+     * @brief Calcola il codice di hash per l'oggetto TRack. Il valore viene
+     *        derivato dall'ID univoco, garantendo la coerenza anche con
+     *        l'implementazione del metodo equals.
+     * 
+     * @return il codice hash calcolato sull'id della traccia.
+     */
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

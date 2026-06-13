@@ -30,7 +30,7 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
             return queue.get(0);
         }
         int currentIndex = queue.indexOf(current);
-        if (currentIndex == -1 || currentIndex == queue.size() - 1) {
+        if (currentIndex == -1) {
             return queue.get(0);
         }
         int nextIndex = (currentIndex + 1) % queue.size();
@@ -54,7 +54,7 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
             return queue.get(0);
         }
         int currentIndex = queue.indexOf(current);
-        if (currentIndex == -1 || currentIndex == queue.size() - 1) {
+        if (currentIndex == -1) {
             return queue.get(0);
         }
         int prevIndex = (currentIndex - 1 + queue.size()) % queue.size();
