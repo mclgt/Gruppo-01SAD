@@ -129,7 +129,7 @@ public class MainController {
         windowManager = new WindowManager(this, factory);
 
         this.trackDAO = new TrackDAO(factory);
-        this.playlistDAO = new PlaylistDAO();
+        this.playlistDAO = new PlaylistDAO(factory);
 
         try {
             this.trackList.getTracks().addAll(trackDAO.getAll());
