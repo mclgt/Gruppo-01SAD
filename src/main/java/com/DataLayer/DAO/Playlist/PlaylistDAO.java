@@ -9,16 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.DataLayer.DAO.DatabaseManager;
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Playlist;
 import com.Model.Track;
-import com.Model.TrackFactory;
-import com.Model.TrackTag;
 
 public class PlaylistDAO implements IPlaylistDAO {
-    private final TrackFactory factory;
 
-    public PlaylistDAO(TrackFactory factory){
-        this.factory = factory;
+    private final TrackDAO trackDAO;
+
+    public PlaylistDAO(TrackDAO trackDAO) {
+        this.trackDAO = trackDAO;
     }
 
     @Override
@@ -32,17 +32,14 @@ public class PlaylistDAO implements IPlaylistDAO {
         //Salvo i dati della playlist
         Connection c = DatabaseManager.getConnection();
         try (PreparedStatement st = c.prepareStatement(sql)) {
-            st.setString(1, playlist.getId());
-            st.setString(2, playlist.getName());
-            st.setInt(3, playlist.getPlayCount());
-
+            setPlaylistParameters(st, playlist);
             st.executeUpdate();
         }
 
         //Salvo l'associazione di tutti i brani contenuti in questa playlist
         String sqlRelation = "INSERT INTO playlist_tracks (playlist_id, track_id) VALUES (?, ?);";
-        try(PreparedStatement st = c.prepareStatement(sqlRelation)){
-            for(Track t : playlist.getTracks()){
+        try (PreparedStatement st = c.prepareStatement(sqlRelation)) {
+            for (Track t : playlist.getTracks()) {
                 st.setString(1, playlist.getId());
                 st.setString(2, t.getId());
                 st.addBatch();
@@ -53,25 +50,41 @@ public class PlaylistDAO implements IPlaylistDAO {
     }
 
     @Override
+    public void update(Playlist playlist) throws Exception {
+        if (playlist == null) {
+            return;
+        }
+
+        String sql = "UPDATE playlists SET id = ?, name = ?, play_count = ? WHERE id = ?;";
+        Connection c = DatabaseManager.getConnection();
+        try (PreparedStatement st = c.prepareStatement(sql)) {
+            setPlaylistParameters(st, playlist);
+
+            st.setString(4, playlist.getId());
+            st.executeUpdate();
+        }
+    }
+
+    @Override
+    public void delete(String playlistId) throws Exception {
+        String sql = "DELETE FROM playlists WHERE id = ?;";
+        Connection c = DatabaseManager.getConnection();
+        try (PreparedStatement st = c.prepareStatement(sql)) {
+            st.setString(1, playlistId);
+            st.executeUpdate();
+        }
+    }
+
+    @Override
     public List<Playlist> getAll() throws Exception {
         List<Playlist> playlists = new ArrayList<>();
         String query = "SELECT * FROM playlists;";
 
         Connection c = DatabaseManager.getConnection();
-        try (Statement st = c.createStatement();
-                ResultSet rs = st.executeQuery(query)) {
+        try (Statement st = c.createStatement(); ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
-                Playlist p = new Playlist(rs.getString("name"));
-
-                Field idField = Playlist.class.getDeclaredField("id");
-                idField.setAccessible(true);
-                idField.set(p, rs.getString("id"));
-
-                p.setPlayCount(rs.getInt("play_count"));
-
-                loadTracks(c, p);
-                playlists.add(p);
+                playlists.add(mapRowToPlaylist(rs));
             }
         }
         return playlists;
@@ -88,65 +101,35 @@ public class PlaylistDAO implements IPlaylistDAO {
             try (ResultSet rs = st.executeQuery()) {
 
                 while (rs.next()) {
-                    Playlist p = new Playlist(rs.getString("name"));
-
-                    Field idField = Playlist.class.getDeclaredField("id");
-                    idField.setAccessible(true);
-                    idField.set(p, rs.getString("id"));
-
-                    p.setPlayCount(rs.getInt("play_count"));
-
-                    loadTracks(c, p);
-                    topPlaylists.add(p);
+                    topPlaylists.add(mapRowToPlaylist(rs));
                 }
             }
         }
         return topPlaylists;
     }
 
-    private void loadTracks(Connection c, Playlist p) throws Exception {
-        String queryTrack = "SELECT t.* FROM tracks t INNER JOIN playlist_tracks pt ON t.id = pt.track_id WHERE pt.playlist_id = ?;";
+    private void loadTracks(Playlist p) throws Exception {
+        List<Track> playlistTracks = trackDAO.getTracksByPlaylist(p.getId());
+        p.getTracks().addAll(playlistTracks);
+    }
 
-        try(PreparedStatement st = c.prepareStatement(queryTrack)){
-            st.setString(1, p.getId());
-            try(ResultSet rs = st.executeQuery()){
+    private void setPlaylistParameters(PreparedStatement st, Playlist playlist) throws Exception {
+        st.setString(1, playlist.getId());
+        st.setString(2, playlist.getName());
+        st.setInt(3, playlist.getPlayCount());
+    }
 
-                while(rs.next()){
-                    String genre = rs.getString("genre");
-                    if (genre == null) genre = "";
+    private Playlist mapRowToPlaylist(ResultSet rs) throws Exception {
+        Playlist p = new Playlist(rs.getString("name"));
 
-                    String album = rs.getString("album");
-                    if (album == null) album = "";
+        Field idField = Playlist.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(p, rs.getString("id"));
 
-                    String tagStr = rs.getString("tag");
-                    TrackTag currentTag = TrackTag.NONE;
-                    if (tagStr != null && !tagStr.trim().isEmpty()) {
-                        currentTag = TrackTag.valueOf(tagStr);
-                    }
+        p.setPlayCount(rs.getInt("play_count"));
 
-                    int year = rs.getInt("year");
-                    if (rs.wasNull()) year = 0;
+        loadTracks(p);
 
-                    Track t = factory.createTrack(
-                        rs.getString("title"),
-                        rs.getString("author"),
-                        year,
-                        genre,
-                        rs.getInt("duration"),
-                        album,
-                        rs.getString("file_path"),
-                        currentTag
-                    );
-
-                    Field idField = Track.class.getDeclaredField("id");
-                    idField.setAccessible(true);
-                    idField.set(t, rs.getString("id"));
-
-                    t.setPlayCount(rs.getInt("play_count"));
-
-                    p.getTracks().add(t);
-                }
-            }
-        }
+        return p;
     }
 }
