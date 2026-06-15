@@ -119,13 +119,11 @@ public class MainController {
     private SearchController searchController = new SearchController();
 
     private Library trackList = new Library();
-    private TrackFactory factory;
 
     private final TrackDAO trackDAO;
     private final PlaylistDAO playlistDAO;
 
     public MainController(TrackFactory factory) {
-        this.factory = factory;
         windowManager = new WindowManager(this, factory);
 
         this.trackDAO = new TrackDAO(factory);
@@ -177,34 +175,6 @@ public class MainController {
         }
 
         updateTop();
-
-        String dummyPath;
-        try {
-            dummyPath = java.nio.file.Paths.get(getClass().getResource("/com/dummy.mp3").toURI()).toString();
-        } catch (Exception e) {
-            dummyPath = "dummy.mp3";
-        }
-
-        trackList.addTrack(factory.instantiateTrack("Bohemian Rhapsody",    "Queen",             1975, "Rock",            354, "A Night at the Opera",   dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Hotel California",      "Eagles",            1976, "Rock",            391, "Hotel California",        dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Stairway to Heaven",    "Led Zeppelin",      1971, "Rock",            482, "Led Zeppelin IV",         dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Smells Like Teen Spirit","Nirvana",          1991, "Grunge",          301, "Nevermind",               dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Billie Jean",           "Michael Jackson",   1982, "Pop",             294, "Thriller",                dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Like a Rolling Stone",  "Bob Dylan",         1965, "Folk Rock",       369, "Highway 61 Revisited",    dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Purple Haze",           "Jimi Hendrix",      1967, "Psychedelic Rock",170, "Are You Experienced",     dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Johnny B. Goode",       "Chuck Berry",       1958, "Rock and Roll",   162, "Chuck Berry Is on Top",   dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("What's Going On",       "Marvin Gaye",       1971, "Soul",            235, "What's Going On",         dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Superstition",          "Stevie Wonder",     1972, "Funk",            245, "Talking Book",            dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Good Vibrations",       "The Beach Boys",    1966, "Pop",             215, "Smiley Smile",            dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Imagine",               "John Lennon",       1971, "Pop",             187, "Imagine",                 dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Respect",               "Aretha Franklin",   1967, "Soul",            147, "I Never Loved a Man",     dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Johnny Guitar",         "Peggy Lee",         1954, "Jazz",            181, "Black Coffee",            dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Blue Suede Shoes",      "Elvis Presley",     1956, "Rock and Roll",   140, "Elvis Presley",           dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Born to Run",           "Bruce Springsteen", 1975, "Rock",            270, "Born to Run",             dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Yesterday",             "The Beatles",       1965, "Pop",             125, "Help!",                   dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Lose Yourself",         "Eminem",            2002, "Hip-Hop",         326, "8 Mile Soundtrack",       dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Blinding Lights",       "The Weeknd",        2019, "Synth-Pop",       200, "After Hours",             dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Shape of You",          "Ed Sheeran",        2017, "Pop",             234, "Divide",                  dummyPath, TrackTag.NONE));
     }
 
     /**
@@ -367,6 +337,11 @@ public class MainController {
         trackList.addTrack(track);
     }
 
+    public void notifyTrackModified(Track track) {
+        playerController.handleTrackModified(track);
+        updateDetailPanel(track);
+    }
+
     /**
      * @brief Gestisce l'evento di pressione sul pulsante di undo.
      *        Richiama il metodo undo() dell'UndoManager, che si occupa di
@@ -395,7 +370,12 @@ public class MainController {
     @FXML
     public void togglePlayPause() {
         Track current = playerContext.getCurrentTrack();
-        if (current != null && !playerController.isTrackFinished()) {
+        Track librarySelected = trackTableController.getSelectedTrack();
+        Track playlistSelected = playlistController != null ? playlistController.getSelectedTrack() : null;
+        Track selected = librarySelected != null ? librarySelected : playlistSelected;
+
+        if (current != null && !playerController.isTrackFinished()
+                && (selected == null || selected == current)) {
             playerController.pauseSong();
         } else {
             playerController.playSong();
@@ -524,6 +504,11 @@ public class MainController {
 
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
+        javafx.scene.Node node = (javafx.scene.Node) ev.getTarget();
+        while (node != null) {
+            if (node instanceof javafx.scene.control.Control) return;
+            node = node.getParent();
+        }
         trackTableController.clearSelection();
         playlistTableController.clearSelection();
     }

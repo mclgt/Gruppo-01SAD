@@ -152,6 +152,7 @@ public class AddModTrackController implements ITrackImporter {
 
                 if (mainController != null) {
                     mainController.getUndoManager().executeCommand(modifyCommand);
+                    mainController.notifyTrackModified(trackToModify);
                 }
             } else {
                 Track newTrack = this.factory.createTrack(title, author, year, genre, duration, album, filePath,

@@ -603,6 +603,27 @@ public class PlayerController {
     }
 
     /**
+     * @brief Ferma la riproduzione se il brano modificato è quello corrente.
+     *        Da chiamare dopo ogni modifica tramite ModifyTrack.
+     * @param modifiedTrack Il brano appena modificato.
+     */
+    public void handleTrackModified(Track modifiedTrack) {
+        Track current = mainController.getPlayerContext().getCurrentTrack();
+        if (current == null || current != modifiedTrack) return;
+
+        mainController.getTimerManager().stop();
+        if (current.getAudioSource() != null) {
+            current.getAudioSource().stopPlayback();
+        }
+        mainController.getPlayerContext().stop();
+        mainController.getPlayerContext().setCurrentTrack(null);
+        trackFinished = true;
+        resetUI();
+        lblNowPlaying.setText("Nessuna traccia in riproduzione");
+        mainController.updatePlayPauseButton(false);
+    }
+
+    /**
      * @brief Restituisce il contenitore attivo.
      * @return ITrackContainer corrente.
      */
