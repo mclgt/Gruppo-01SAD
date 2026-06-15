@@ -37,6 +37,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
@@ -83,6 +84,9 @@ public class MainController {
 
     @FXML
     private TextField searchField;
+
+    @FXML
+    private ComboBox<String> playbackModeCombo;
 
     @FXML
     private Label lblEmptyHistoryMessage;
@@ -162,6 +166,11 @@ public class MainController {
         playlistTableController.init(this, playlistList, nameCol);
         searchController.init(trackList.getTracks(), trackTable);
         searchController.bindSearchField(searchField);
+
+        playbackModeCombo.setItems(FXCollections.observableArrayList(
+                "Singola", "Sequenziale", "Loop brano", "Shuffle"));
+        playbackModeCombo.setValue("Singola");
+        playbackModeCombo.setOnAction(e -> playerController.setPlaybackMode(playbackModeCombo.getValue()));
 
         topTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         topAuthorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
@@ -391,21 +400,6 @@ public class MainController {
         if (btnPlay != null) {
             btnPlay.setText(playing ? "⏸ Pause" : "▶ Play");
         }
-    }
-
-    @FXML
-    public void sequentialRip(ActionEvent ev) {
-        playerController.sequentialRip(ev);
-    }
-
-    @FXML
-    public void loopRip(ActionEvent ev) {
-        playerController.loopRip(ev);
-    }
-
-    @FXML
-    public void shuffleRip(ActionEvent ev) {
-        playerController.shuffleRip(ev);
     }
 
     @FXML

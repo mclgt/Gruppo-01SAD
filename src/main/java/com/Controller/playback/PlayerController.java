@@ -77,6 +77,40 @@ public class PlayerController {
     }
 
     /**
+     * @brief Imposta la modalità di riproduzione selezionata dal ComboBox.
+     */
+    public void setPlaybackMode(String mode) {
+        switch (mode) {
+            case "Singola":
+                sequentialMode = false;
+                loopMode = false;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+                break;
+            case "Sequenziale":
+                sequentialMode = true;
+                loopMode = false;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+                break;
+            case "Loop brano":
+                sequentialMode = false;
+                loopMode = true;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
+                break;
+            case "Shuffle":
+                sequentialMode = true;
+                loopMode = false;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * @brief Gestisce l'avvio della riproduzione per il brano o la playlist
      *        selezionata
      */
@@ -93,8 +127,6 @@ public class PlayerController {
             }
             activeContainer = mainController.getLibrary();
             trackFinished = false;
-            sequentialMode = false;
-            loopMode = false;
             startTrackPlayback(selectedTrack);
             return;
         }
@@ -110,8 +142,6 @@ public class PlayerController {
             }
             activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
             trackFinished = false;
-            sequentialMode = false;
-            loopMode = false;
             startTrackPlayback(playlistViewTrack);
             return;
         }
@@ -129,8 +159,6 @@ public class PlayerController {
                 }
                 activeContainer = current;
                 trackFinished = false;
-                sequentialMode = false;
-                loopMode = false;
                 startTrackPlayback(firstTrack);
                 return;
             }
@@ -145,7 +173,6 @@ public class PlayerController {
 
             activeContainer = selectedPlaylist;
             trackFinished = false;
-            sequentialMode = false;
             Track firstTrack = activeContainer.getTracks().get(0);
             if (mainController.getPlayerContext().isPlaying()
                     && firstTrack == mainController.getPlayerContext().getCurrentTrack() && !trackFinished) {
@@ -408,6 +435,15 @@ public class PlayerController {
             }
             return;
         }
+        if (!sequentialMode) {
+            stopSong();
+            trackFinished = true;
+            mainController.getPlayerContext().stop();
+            resetUI();
+            lblNowPlaying.setText("Canzone terminata");
+            mainController.updatePlayPauseButton(false);
+            return;
+        }
         Track before = mainController.getPlayerContext().getCurrentTrack();
         Track next = mainController.getPlayerContext().getPlaybackContext().nextTrack(getActiveQueue(), before);
         if (next != null) {
@@ -420,7 +456,6 @@ public class PlayerController {
             lblNowPlaying.setText("Canzone terminata");
             mainController.updatePlayPauseButton(false);
         }
-
     }
 
     /**
@@ -458,8 +493,6 @@ public class PlayerController {
      */
     public void handlePrev(ActionEvent event) {
         mainController.getTimerManager().stop();
-        sequentialMode = true;
-        loopMode = false;
         Track before = mainController.getPlayerContext().getCurrentTrack();
         ObservableList<Track> queue = (activeContainer != null) ? activeContainer.getTracks()
                 : mainController.getLibrary().getTracks();

@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.Slider?>
@@ -319,21 +320,10 @@
                   <Button fx:id="btnNext" mnemonicParsing="false" onAction="#handleNext" prefHeight="35.0" prefWidth="45.0" text="⏭">
                      <font><Font size="14.0" /></font>
                   </Button>
-                  <Button fx:id="btnSeq" mnemonicParsing="false" onAction="#sequentialRip" prefHeight="40.0" prefWidth="84.0" text="Seq.">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="btnLoop" mnemonicParsing="false" onAction="#loopRip" prefHeight="40.0" prefWidth="84.0" text="Loop">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="btnShuffle" mnemonicParsing="false" onAction="#shuffleRip" prefHeight="40.0" prefWidth="84.0" text="Shuffle">
-                     <font>
-                        <Font name="System Bold" size="14.0" />
-                     </font>
-                  </Button>
+                  <Label text="Modalità:" style="-fx-font-weight: bold;">
+                     <font><Font size="13.0" /></font>
+                  </Label>
+                  <ComboBox fx:id="playbackModeCombo" prefWidth="150.0" />
                </children>
             </HBox>
          </children>
