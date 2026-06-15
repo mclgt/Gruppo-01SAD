@@ -3,6 +3,8 @@ package com.Controller.playlist;
 import java.util.Optional;
 
 import com.Command.ICommand;
+import com.Command.MoveDownTrack;
+import com.Command.MoveUpTrack;
 import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.ITrackContainer;
@@ -16,8 +18,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -43,6 +45,10 @@ public class PlaylistController implements IPlayerSubscriber {
     private TableColumn<Track, String> colTitle, colAuthor, colDuration;
     @FXML
     private Button btnRemoveFromPlaylist;
+    @FXML
+    private Button btnDownTrackInPlaylist;
+    @FXML
+    private Button btnUpTrackInPlaylist;
 
     private Playlist currentPlaylist;
     private MainController mainController;
@@ -58,6 +64,8 @@ public class PlaylistController implements IPlayerSubscriber {
         colTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         colAuthor.setCellValueFactory(new PropertyValueFactory<>("author"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("formattedDuration"));
+        btnDownTrackInPlaylist.setDisable(true);
+        btnUpTrackInPlaylist.setDisable(true);
         playlistTrackList.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
             if (mainController != null) {
                 mainController.updateDetailPanel(newVal);
@@ -79,6 +87,19 @@ public class PlaylistController implements IPlayerSubscriber {
 
             });
             return row;
+        });
+        playlistTrackList.getSelectionModel().selectedIndexProperty().addListener((observable, oldVal, newValue) -> {
+        int index = newValue.intValue();
+        int size = getCurrentPlaylist().getTracksCount();
+        if (index == -1){
+            btnDownTrackInPlaylist.setDisable(true);
+            btnUpTrackInPlaylist.setDisable(true);
+        }
+        else{
+            btnDownTrackInPlaylist.setDisable(index == size - 1);
+            btnUpTrackInPlaylist.setDisable(index == 0);
+           
+        }
         });
     }
 
@@ -233,6 +254,35 @@ public class PlaylistController implements IPlayerSubscriber {
     public void dispose() {
         if (mainController != null) {
             mainController.getPlayerContext().unsubscribe(this);
+        }
+    }
+
+    @FXML
+    private void handleMoveUpPlaylist(ActionEvent event) {
+       Track selectedTrack = getSelectedTrack();
+        
+        if (selectedTrack != null){
+            int index = playlistTrackList.getSelectionModel().getSelectedIndex();
+            if (index > 0){
+                ICommand moveUp = new MoveUpTrack(getCurrentPlaylist().getTracks(), selectedTrack);
+                mainController.getUndoManager().executeCommand(moveUp);           
+                playlistTrackList.getSelectionModel().select(index-1);
+            }
+        }
+    }
+
+    @FXML
+    private void handleMoveDownPlaylist(ActionEvent event) {
+        Track selectedTrack = getSelectedTrack();
+                
+        if (selectedTrack != null){
+            int index = playlistTrackList.getSelectionModel().getSelectedIndex();
+            int size = getCurrentPlaylist().getTracksCount();
+            if(index >= 0 && index < size-1){
+                ICommand moveDown = new MoveDownTrack(getCurrentPlaylist().getTracks(), selectedTrack);
+                mainController.getUndoManager().executeCommand(moveDown);
+                playlistTrackList.getSelectionModel().select(index+1);
+            }
         }
     }
 }

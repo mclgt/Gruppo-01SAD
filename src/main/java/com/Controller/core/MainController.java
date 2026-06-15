@@ -76,7 +76,10 @@ public class MainController {
     private TableView<Playlist> playlistList;
     @FXML
     private TableColumn<Playlist, String> nameCol;
-
+    @FXML
+    private Button btnUpTrack;
+    @FXML 
+    private Button btnDownTrack;
     @FXML
     private TextField searchField;
 
@@ -424,4 +427,25 @@ public class MainController {
     public void handleDeletePlaylist(ActionEvent ev) {
         playlistTableController.handleDeletePlaylist(ev);
     }
+
+    public void setMoveButtonDisable(boolean disableUp, boolean disableDown){
+        if(btnUpTrack != null){
+            btnUpTrack.setDisable(disableUp);
+        }
+        if(btnDownTrack != null){
+            btnDownTrack.setDisable(disableDown);
+        }
+    }
+
+    @FXML
+    private void handleMoveUp(ActionEvent event) {
+        trackTableController.handleMoveUp(event);
+    }
+
+    @FXML
+    private void handleMoveDown(ActionEvent event) {
+        trackTableController.handleMoveDown(event);
+    }
+
+
 }
