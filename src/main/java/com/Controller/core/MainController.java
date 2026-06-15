@@ -427,6 +427,11 @@ public class MainController {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
+    @FXML
+    public void openAutoPlaylistWindow(ActionEvent ev) {
+        windowManager.openAutoPlaylistWindow(this);
+    }
+
     public void openPlaylistView(Playlist selectedPlaylist) {
         try {
             setTrackManagementButtonVisible(false);
