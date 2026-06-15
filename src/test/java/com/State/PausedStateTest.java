@@ -1,17 +1,20 @@
 package com.State;
 
-import com.Model.Track;
-import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
-import com.Strategy.IPlaybackStrategy;
-import com.Strategy.PlaybackContext;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.Model.MockTrackFactory;
+import com.Model.Track;
+import com.Model.TrackFactory;
+import com.Strategy.IPlaybackStrategy;
+import com.Strategy.PlaybackContext;
 
 /**
  * @brief Test per PausedState: verifica il comportamento dello stato di pausa
@@ -75,6 +78,7 @@ public class PausedStateTest {
         track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Jazz", 220, "Album C", "dummy3.mp3",
                 null);
         queue = Arrays.asList(track1, track2, track3);
+        
     }
 
     /**
