@@ -164,14 +164,6 @@ public class PlayerContext {
      * @param current La traccia attualmente in riproduzione.
      */
     public void next() {
-        /*Track nexTrack = this.playbackContext.nextTrack(queue, current);
-        if (nexTrack != null) {
-            this.setCurrentTrack(nexTrack);
-            notifySubscribers();
-        }
-        if (currentState != null) {
-            currentState.next(queue, current);
-        }*/
         if(currentState!=null){
             currentState.next();
             notifySubscribers();
@@ -185,12 +177,7 @@ public class PlayerContext {
      * @param current La traccia attualmente in riproduzione.
      */
     public void previous() {
-       /* Track prevTrack = this.playbackContext.previousTrack(queue, current);
-        if (prevTrack != null) {
-            this.setCurrentTrack(prevTrack);
-            notifySubscribers();
-        }
-        currentState.previous(queue, current);*/
+
         if(currentState!=null){
             currentState.previous();
             notifySubscribers();

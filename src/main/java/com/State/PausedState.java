@@ -39,7 +39,6 @@ public class PausedState implements IPlayerState {
     @Override
     public void next() {
         context.setState(context.getPlayingState());
-        //context.next(queue, current);
         Track nextTrack = context.getPlaybackContext().getStrategy().nextTrack(context.getCurrentTrack());
         if(nextTrack!=null){
             context.setCurrentTrack(nextTrack);
@@ -50,7 +49,6 @@ public class PausedState implements IPlayerState {
     @Override
     public void previous() {
         context.setState(context.getPlayingState());
-        //context.previous(queue, current);
         Track previousTrack = context.getPlaybackContext().getStrategy().previousTrack(context.getCurrentTrack());
         if(previousTrack!=null){
             context.setCurrentTrack(previousTrack);
