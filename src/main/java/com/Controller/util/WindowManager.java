@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.Controller.core.MainController;
 import com.Controller.playlist.AddModPlaylistController;
+import com.Controller.playlist.AutoPlaylistController;
 import com.Controller.track.AddModTrackController;
 import com.Model.Playlist;
 import com.Model.Track;
@@ -148,6 +149,26 @@ public class WindowManager {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    /**
+     * @brief Apre la finestra di dialogo per la generazione automatica di playlist.
+     * @param mc controller principale
+     */
+    public void openAutoPlaylistWindow(MainController mc) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AutoPlaylistView.fxml"));
+            Parent p = loader.load();
+            AutoPlaylistController controller = loader.getController();
+            controller.setMainController(mc);
+            Stage stage = new Stage();
+            stage.setTitle("Genera Playlist Automatica");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(new Scene(p));
+            stage.showAndWait();
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento della finestra AutoPlaylist: " + e.getMessage());
+        }
     }
 
     public Optional<ButtonType> showConfirmation(String title, String header, String content, Runnable onConfirm) {

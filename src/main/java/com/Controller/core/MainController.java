@@ -72,7 +72,7 @@ public class MainController {
     @FXML
     private Slider progressSlider;
     @FXML
-    private Button btnPlay, btnUndo, btnAddToPlaylist, btnAddTrack, btnEditTrack, btnRemoveTrack;
+    private Button btnPlay, btnUndo, btnAddToPlaylist, btnAddTrack, btnEditTrack, btnRemoveTrack, btnNext;
     @FXML
     private Label lblTagTitle;
     @FXML
@@ -182,7 +182,7 @@ public class MainController {
         topPlaylistNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         topPlaylistCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
 
-        if(playlistList != null){
+        if (playlistList != null) {
             playlistList.setItems(playlistCatalog.getPlaylists());
         }
 
@@ -191,15 +191,16 @@ public class MainController {
 
     /**
      * @brief Aggiorna lo stato visivo dei tab Frequently Played (US-21)
-     * Compatibile con versioni Java 11+ tramite .collect(Collectors.toList())
+     *        Compatibile con versioni Java 11+ tramite
+     *        .collect(Collectors.toList())
      */
-    public void updateTop(){
+    public void updateTop() {
         try {
             List<Track> topTracks = this.trackDAO.getFrequentlyPlayed(5);
             List<Playlist> topPlaylists = this.playlistDAO.getFrequentlyPlayed(5);
 
-            boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) || 
-                                   topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
+            boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) ||
+                    topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
 
             if (hasHistory) {
                 if (lblEmptyHistoryMessage != null) {
@@ -210,7 +211,7 @@ public class MainController {
                     frequentlyPlayedContainer.setVisible(true);
                     frequentlyPlayedContainer.setManaged(true);
                 }
-                
+
                 List<Track> filteredTracks = topTracks.stream()
                         .filter(t -> t.getPlayCount() > 0)
                         .collect(Collectors.toList());
@@ -236,8 +237,9 @@ public class MainController {
     }
 
     /**
-     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo tramite Transazione (Commit).
-     * Invocato esclusivamente dal metodo stop() della classe Main.
+     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo
+     *        tramite Transazione (Commit).
+     *        Invocato esclusivamente dal metodo stop() della classe Main.
      */
     public void saveDB() {
         System.out.println("Inizio esportazione massiva dello stato RAM sul database...");
@@ -265,10 +267,19 @@ public class MainController {
             System.err.println("Errore durante la persistenza di chiusura dei DAO:");
             e.printStackTrace();
             if (c != null) {
-                try { c.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+                try {
+                    c.rollback();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         } finally {
-            try { if (c != null) c.setAutoCommit(true); } catch (Exception ex) { ex.printStackTrace(); }
+            try {
+                if (c != null)
+                    c.setAutoCommit(true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -405,6 +416,12 @@ public class MainController {
         }
     }
 
+    public void updateNextButton() {
+        if (btnNext != null) {
+            btnNext.setDisable(!playerController.isNextAvailable());
+        }
+    }
+
     @FXML
     public void handleNext(ActionEvent ev) {
         playerController.handleNext(ev);
@@ -428,6 +445,11 @@ public class MainController {
     @FXML
     public void openAddPlaylistView(ActionEvent ev) {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
+    }
+
+    @FXML
+    public void openAutoPlaylistWindow(ActionEvent ev) {
+        windowManager.openAutoPlaylistWindow(this);
     }
 
     public void openPlaylistView(Playlist selectedPlaylist) {
@@ -503,7 +525,8 @@ public class MainController {
     public void handleBackgroundClick(MouseEvent ev) {
         javafx.scene.Node node = (javafx.scene.Node) ev.getTarget();
         while (node != null) {
-            if (node instanceof javafx.scene.control.Control) return;
+            if (node instanceof javafx.scene.control.Control)
+                return;
             node = node.getParent();
         }
         trackTableController.clearSelection();

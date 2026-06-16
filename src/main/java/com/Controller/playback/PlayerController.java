@@ -239,6 +239,8 @@ public class PlayerController {
                     lblCurrentTime.setText(timer.getFormattedTime(elapsed));
                 },
                 this::handlePlaybackFinished);
+
+        mainController.updateNextButton();
     }
 
     /**
@@ -293,6 +295,7 @@ public class PlayerController {
             resetUI();
             lblNowPlaying.setText("Canzone terminata");
             mainController.updatePlayPauseButton(false);
+            mainController.updateNextButton();
             return;
         }
         handleNext(null);
@@ -322,6 +325,7 @@ public class PlayerController {
             mainController.getPlayerContext().stop();
             resetUI();
             mainController.updatePlayPauseButton(false);
+            mainController.updateNextButton();
         }
     }
 
@@ -450,6 +454,7 @@ public class PlayerController {
         loopMode = false;
         Track startTrack = selectedTrack != null ? selectedTrack : playlist.getTracks().get(0);
         startTrackPlayback(startTrack);
+        mainController.updateNextButton();
     }
 
     /**
@@ -488,4 +493,19 @@ public class PlayerController {
     public ITrackContainer getActiveContainer() {
         return this.activeContainer;
     }
+
+    public boolean isNextAvailable() {
+        if (loopMode || loopPlaylistMode) return true;
+        if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy) return true;
+        Track current = mainController.getPlayerContext().getCurrentTrack();
+        if (current == null) return false;
+        ObservableList<Track> queue = getSelectedQueueFromUI();
+        if(queue==null || queue.isEmpty()){
+            return false;
+        }
+        int idx = queue.indexOf(current);
+        return idx >= 0 && idx < queue.size() - 1;
+
+    }
+
 }
