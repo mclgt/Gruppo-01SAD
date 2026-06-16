@@ -21,7 +21,7 @@ import javafx.scene.control.Slider;
  * @brief Gestisce la logica della riproduzione audio, il timer e l'interazione
  *        con l'interfaccia. La classe funge da controller per il sistema di
  *        riproduzione. Gestisce il flusso audio e coordina l'aggiornamento
- *        dell'interfaccia grafica in base allo stato del context e dela
+ *        dell'interfaccia grafica in base allo stato del context e della
  *        strategia di riproduzione selezionata.
  */
 public class PlayerController {
@@ -75,6 +75,7 @@ public class PlayerController {
 
     /**
      * @brief Imposta la modalità di riproduzione selezionata dal ComboBox.
+     * @param mode Stringa che rappresenta la modalità scelta
      */
     public void setPlaybackMode(String mode) {
         Track currenTrack=mainController.getPlayerContext().getCurrentTrack();
@@ -108,6 +109,12 @@ public class PlayerController {
         }
     }
 
+    /**
+     * @brief Recupera la coda di riproduzione corretta basandosi sulla selezione corrente dell'interfaccia utente.
+     * Controlla in ordine gerarchico se è selezionata una traccia nella libreria generale,
+     * una traccia nella vista della playlist aperta, o una playlist intera dalla tabella.
+     * @return L'ObservableList di oggetti Track associata alla selezione corrente, oppure null.
+ */
     private ObservableList<Track> getSelectedQueueFromUI(){
         if(mainController.getTrackTableController().getSelectedTrack()!=null){
             return (ObservableList<Track>) mainController.getLibrary().getTracks();
@@ -123,6 +130,13 @@ public class PlayerController {
         return activeContainer != null ? (ObservableList<Track>)activeContainer.getTracks() : null;
     }
 
+    /**
+     * @brief Configura il motore di riproduzione e avvia il brano.
+     * Resetta lo stato di traccia terminata, imposta la coda corrente nel contesto di riproduzione
+     * e nel contesto del lettore, avviando infine l'effettiva esecuzione audio.
+     * @param queue La lista osservabile che costituisce la coda di riproduzione corrente.
+     * @param track La traccia specifica da avviare.
+ */
     private void setupEngineAndPlay(ObservableList<Track> queue, Track track){
         trackFinished=false;
         mainController.getPlayerContext().getPlaybackContext().setCurrentQueue(queue, track);

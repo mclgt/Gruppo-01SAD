@@ -19,7 +19,9 @@ public class PlaybackContext {
     private IPlaybackStrategy strategy;
     private ObservableList<Track> currentQueue;
     
-
+    /**
+     * @brief Listener per intercettare le modifiche in tempo reale sulla coda JavaFX (es. canzoni aggiunte/rimosse).
+     */
     private final ListChangeListener<Track> queueListener = change -> {
         if(strategy != null && currentQueue != null){
             strategy.updateQueue(currentQueue);
@@ -33,12 +35,17 @@ public class PlaybackContext {
         this.strategy = strategy;
     }
 
+    /**
+     * @brief Cambia la strategia a runtime senza specificare un brano di partenza.
+     * @param strategy La nuova strategia da adottare.
+     */
     public void setStrategy(IPlaybackStrategy strategy) {
         setStrategy(strategy, null);
     }
     /**
-     * @brief Sostituisce la strategia corrente a runtime.
-     * @param strategy Nuova strategia da adottare (es. da sequenziale a shuffle).
+     * @brief Cambia la strategia a runtime sincronizzandola sul brano attualmente in riproduzione.
+     * @param strategy La nuova strategia da adottare.
+     * @param currentTrack Il brano attualmente in esecuzione per mantenere l'indice coerente.
      */
     public void setStrategy(IPlaybackStrategy strategy, Track currentTrack) {
         this.strategy = strategy;
@@ -47,6 +54,11 @@ public class PlaybackContext {
         }
     }
 
+    /**
+     * @brief Imposta una nuova coda di riproduzione osservabile (JavaFX), gestendo l'aggancio del listener.
+     * @param newQueue La nuova ObservableList di brani.
+     * @param startTrack Il brano dal quale avviare la riproduzione nella nuova coda.
+     */
     public void setCurrentQueue(ObservableList<Track> newQueue, Track startTrack){
         if(currentQueue!=null){
             currentQueue.removeListener(queueListener);
@@ -61,19 +73,20 @@ public class PlaybackContext {
             }
         }
     }
+
     /**
-     * @brief Restituisce la strategia attualmente attiva.
-     * @return Riferimento all'@ref IPlaybackStrategy corrente.
+     * @brief Restituisce la strategia di riproduzione attualmente attiva.
+     * @return Il riferimento all'oggetto IPlaybackStrategy corrente.
      */
     public IPlaybackStrategy getStrategy() {
         return strategy;
     }
 
     /**
-     * @brief Delega alla strategia corrente il calcolo del brano successivo.
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Il brano successivo secondo la strategia attiva, o {@code null} se la coda è terminata.
+     * @brief Calcola il brano successivo delegando la decisione alla strategia attiva.
+     * @param queue Lista ordinata di supporto aggiornata dei brani.
+     * @param current Il brano attualmente in riproduzione.
+     * @return Il brano successivo configurato dalla strategia, o null se la coda è terminata.
      */
     public Track nextTrack(List<Track> queue, Track current) {
         if(strategy!=null && current!=null){
@@ -82,11 +95,11 @@ public class PlaybackContext {
         return strategy.nextTrack(current);
     }
 
-    /**
-     * @brief Delega alla strategia corrente il calcolo del brano precedente.
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Il brano precedente secondo la strategia attiva, o {@code null} se si è a inizio coda.
+   /**
+     * @brief Calcola il brano precedente delegando la decisione alla strategia attiva.
+     * @param queue Lista ordinata di supporto aggiornata dei brani.
+     * @param current Il brano attualmente in riproduzione.
+     * @return Il brano precedente configurato dalla strategia, o null se si è a inizio coda.
      */
     public Track previousTrack(List<Track> queue, Track current) {
         return strategy.previousTrack(current);

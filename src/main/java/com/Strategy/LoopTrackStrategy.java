@@ -23,11 +23,10 @@ public class LoopTrackStrategy implements IPlaybackStrategy {
         
     }
     /**
-     * @brief Restituisce il brano corrente (loop sul singolo brano).
+     * @brief Restituisce il brano corrente per consentire la ripetizione infinita.
      *
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Lo stesso brano corrente.
+     * @param current Il brano attualmente in riproduzione.
+     * @return Lo stesso brano passato come parametro (current).
      */
     @Override
     public Track nextTrack(Track current) {
@@ -36,11 +35,10 @@ public class LoopTrackStrategy implements IPlaybackStrategy {
 
     
     /**
-     * @brief Restituisce il brano corrente (loop sul singolo brano).
+     * @brief Restituisce il brano corrente per consentire la ripetizione infinita.
      *
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Lo stesso brano corrente.
+     * @param current Il brano attualmente in riproduzione.
+     * @return Lo stesso brano passato come parametro (current).
      */
     @Override
     public Track previousTrack(Track current) {

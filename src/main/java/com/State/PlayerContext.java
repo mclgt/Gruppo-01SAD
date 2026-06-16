@@ -158,10 +158,7 @@ public class PlayerContext {
     }
 
     /**
-     * @brief Calcola e passa alla traccia successiva utilizzando la trategia
-     *        attiva, delengando allo stato corrente l'esecuzione.
-     * @param queue   La lista completa delle tracce disponibili.
-     * @param current La traccia attualmente in riproduzione.
+     * @brief Avanza alla traccia successiva delegando l'azione allo stato attivo e notificando i subscriber.
      */
     public void next() {
         if(currentState!=null){
@@ -171,10 +168,7 @@ public class PlayerContext {
     }
 
     /**
-     * @brief Calcola e torna alla traccia precedente utilizzando la strategia
-     *        attiva, delegando allo stato corrente l'esecuzione.
-     * @param queue   La lista completa delle tracce disponibili.
-     * @param current La traccia attualmente in riproduzione.
+     * @brief Ritorna alla traccia precedente delegando l'azione allo stato attivo e notificando i subscriber.
      */
     public void previous() {
 

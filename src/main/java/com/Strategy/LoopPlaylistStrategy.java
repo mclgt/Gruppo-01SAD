@@ -18,9 +18,18 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
     private int currentIndex = -1;
 
 
+    /**
+     * @brief Inizializza la coda di riproduzione e imposta l'indice del brano corrente.
+     * @param queue La lista di brani che costituirà la coda.
+     * @param currentTrack Il brano attualmente in riproduzione da cui sincronizzare l'indice.
+     */
     @Override
     public void setQueue(List<Track> queue, Track currentTrack){
-        this.queue = queue != null ? queue : new ArrayList<>();
+        this.queue = queue /**
+             * @brief Inizializza la coda di riproduzione e imposta l'indice del brano corrente.
+             * * @param queue La lista di brani che costituirà la coda.
+             * @param currentTrack Il brano attualmente in riproduzione da cui sincronizzare l'indice.
+             */!= null ? queue : new ArrayList<>();
         if(currentTrack!=null){
             this.currentIndex=this.queue.indexOf(currentTrack);
         }
@@ -29,6 +38,10 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
         }
     }
 
+    /**
+     * @brief Aggiorna la coda mantenendo la sincronizzazione sul brano attualmente in riproduzione.
+     * @param updatedQueue La nuova lista di brani aggiornata.
+     */
     @Override
     public void updateQueue(List<Track> updatedQueue){
         Track currentTrack = (currentIndex >= 0 && currentIndex < queue.size()) ? queue.get(currentIndex) : null;
@@ -37,15 +50,13 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
             this.currentIndex=this.queue.indexOf(currentTrack);
         }
     }
+    
     /**
-     * @brief Restituisce il brano successivo (con loop all'inizio se si è alla
-     *        fine).
+     * @brief Restituisce il brano successivo all'interno della coda (con comportamento ad anello).
      *
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Il brano successivo, o il primo se current è l'ultimo.
+     * @param current Il brano attualmente in riproduzione.
+     * @return Il brano successivo, il primo brano se si è a fine coda, oppure null se la coda è vuota.
      */
-   
 
     @Override
     public Track nextTrack(Track current) {
@@ -68,12 +79,10 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
     }
 
     /**
-     * @brief Restituisce il brano precedente, con loop alla fine se si è
-     *        all'inizio.
+     * @brief Restituisce il brano precedente all'interno della coda (con comportamento ad anello).
      *
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return IL brano precedente, o l'ultimo se current è il primo.
+     * @param current Il brano attualmente in riproduzione.
+     * @return Il brano precedente, l'ultimo brano se si è all'inizio della coda, oppure null se la coda è vuota.
      */
     
     @Override

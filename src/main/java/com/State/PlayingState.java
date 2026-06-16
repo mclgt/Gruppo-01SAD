@@ -57,13 +57,10 @@ public class PlayingState implements IPlayerState {
     }
 
     /**
-     * @brief Avanza alla traccia successiva usando la strategia di riproduzione attiva.
-     *        Aggiorna solo la traccia corrente nel context senza avviare l'audio:
-     *        l'avvio è responsabilità del controller tramite startTrackPlayback().
-     *        In questo modo con LoopTrackStrategy (next restituisce la traccia corrente)
-     *        non viene riavviato l'audio, evitando il doppio loop prima del cambio modalità.
-     * @param queue   Lista delle tracce disponibili nel container attivo.
-     * @param current Traccia attualmente in riproduzione.
+     * @brief Avanza alla traccia successiva sfruttando la strategia di riproduzione attiva.
+     *
+     * Calcola la traccia successiva tramite il PlaybackContext. Se disponibile, aggiorna 
+     * il brano corrente del player; se la coda è terminata (restituisce null), invoca lo stop del player.
      */
     @Override
     public void next() {
@@ -78,11 +75,10 @@ public class PlayingState implements IPlayerState {
     }
 
     /**
-     * @brief Torna alla traccia precedente usando la strategia di riproduzione attiva.
-     *        Aggiorna solo la traccia corrente nel context senza avviare l'audio:
-     *        l'avvio è responsabilità del controller tramite startTrackPlayback().
-     * @param queue   Lista delle tracce disponibili nel container attivo.
-     * @param current Traccia attualmente in riproduzione.
+     * @brief Ritorna alla traccia precedente sfruttando la strategia di riproduzione attiva.
+     *
+     * Calcola la traccia precedente tramite il PlaybackContext. Se disponibile, aggiorna 
+     * il brano corrente del player; se l'inizio della coda è stato raggiunto (restituisce null), invoca lo stop del player.
      */
     @Override
     public void previous() {

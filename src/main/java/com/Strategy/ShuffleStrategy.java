@@ -20,26 +20,33 @@ public class ShuffleStrategy implements IPlaybackStrategy {
     private Track currenTrack;
     private final Random random = new Random();
 
-
+    /**
+     * @brief Inizializza la coda di riproduzione e memorizza il riferimento al brano corrente.
+     * @param queue La lista di brani che costituirà la coda.
+     * @param currentTrack Il brano attualmente in esecuzione.
+     */
     @Override
     public void setQueue(List<Track> queue, Track currentTrack){
         this.queue = queue != null ? queue : new ArrayList<>();
         this.currenTrack=currentTrack;
     }
 
+    /**
+     * @brief Aggiorna la lista dei brani nella coda a runtime.
+     * @param updatedQueue La nuova lista di brani aggiornata.
+     */
     @Override
     public void updateQueue(List<Track> updatedQueue){
         this.queue = updatedQueue!= null ? updatedQueue : new ArrayList<>();
         
     }
-    /**
-     * @brief Restituisce un brano casuale dalla coda, escludendo il brano corrente.
-     *
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Un @ref Track scelto casualmente, o {@code null} se la coda è vuota.
-     */
     
+    /**
+     * @brief Restituisce un brano casuale dalla coda, escludendo quello corrente.
+     *
+     * @param current Il brano attualmente in riproduzione.
+     * @return Un Track scelto casualmente, il brano unico se la coda ha dimensione 1, oppure null se la coda è vuota.
+     */
     @Override
     public Track nextTrack(Track current){
      if (queue.isEmpty()) return null;
@@ -49,16 +56,17 @@ public class ShuffleStrategy implements IPlaybackStrategy {
         currenTrack=queue.get(nextIndex);
         return currenTrack;
     }
+    
+    
     /**
-     * @brief Equivalente a {@link #nextTrack}: restituisce un brano casuale.
-     *        Non esiste una storia della riproduzione casuale, quindi "precedente"
-     *        si comporta come "successivo".
+     * @brief Restituisce un brano casuale delegando il comportamento a nextTrack.
      *
-     * @param queue   Lista ordinata dei brani nella coda di riproduzione.
-     * @param current Brano attualmente in riproduzione.
-     * @return Un @ref Track scelto casualmente.
+     * Non essendoci una cronologia dei brani passati memorizzata in questa strategia,
+     * il comando precedente genera un nuovo brano casuale.
+     *
+     * @param current Il brano attualmente in riproduzione.
+     * @return Un Track scelto casualmente.
      */
-
     @Override
     public Track previousTrack(Track current){
         return nextTrack(current);
@@ -66,11 +74,11 @@ public class ShuffleStrategy implements IPlaybackStrategy {
     }
 
     /**
-     * @brief Restituisce un indice casuale diverso da {@code excludeIndex}.
+     * @brief Estrae un indice casuale valido all'interno della coda, escludendo l'indice specificato.
      *
-     * @param queue        Lista da cui pescare l'indice.
-     * @param excludeIndex Indice da escludere (il brano corrente).
-     * @return Indice casuale valido, diverso da {@code excludeIndex}.
+     * @param queue La lista dalla quale estrarre l'indice.
+     * @param excludeIndex L'indice da escludere (corrispondente al brano corrente).
+     * @return Un valore intero che rappresenta l'indice estratto.
      */
     private int pickRandomIndex(List<Track> queue, int excludeIndex) {
         int index;
