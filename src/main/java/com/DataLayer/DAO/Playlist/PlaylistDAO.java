@@ -29,14 +29,14 @@ public class PlaylistDAO implements IPlaylistDAO {
 
         String sql = "INSERT INTO playlists (id, name, play_count) VALUES (?, ?, ?);";
 
-        //Salvo i dati della playlist
+        // Salvo i dati della playlist
         Connection c = DatabaseManager.getConnection();
         try (PreparedStatement st = c.prepareStatement(sql)) {
             setPlaylistParameters(st, playlist);
             st.executeUpdate();
         }
 
-        //Salvo l'associazione di tutti i brani contenuti in questa playlist
+        // Salvo l'associazione di tutti i brani contenuti in questa playlist
         String sqlRelation = "INSERT INTO playlist_tracks (playlist_id, track_id) VALUES (?, ?);";
         try (PreparedStatement st = c.prepareStatement(sqlRelation)) {
             for (Track t : playlist.getTracks()) {
@@ -106,6 +106,29 @@ public class PlaylistDAO implements IPlaylistDAO {
             }
         }
         return topPlaylists;
+    }
+
+    public void addTrackToPlaylist(String playlistId, String trackId) throws Exception {
+        String sql = "INSERT INTO playlist_tracks (playlist_id, track_id) VALUES (?, ?);";
+
+        Connection c = DatabaseManager.getConnection();
+        try(PreparedStatement st = c.prepareStatement(sql)){
+            st.setString(1, playlistId);
+            st.setString(2, trackId);
+
+            st.executeUpdate();
+        }
+    }
+
+    public void removeTrackFromPlaylist(String playlistId, String trackId) throws Exception {
+        String sql = "DELETE FROM playlist_tracks WHERE playlist_id = ? AND track_id = ?;";
+        Connection c = DatabaseManager.getConnection();
+        try (PreparedStatement st = c.prepareStatement(sql)) {
+            st.setString(1, playlistId);
+            st.setString(2, trackId);
+
+            st.executeUpdate();
+        }
     }
 
     private void loadTracks(Playlist p) throws Exception {

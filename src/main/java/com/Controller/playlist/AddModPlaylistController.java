@@ -75,7 +75,7 @@ public class AddModPlaylistController {
             }
 
             if (isEditMode) {
-                ICommand modifyCommand = new ModifyPlaylist(mainController.getPlaylistCatalog(), currentPlaylist, name);
+                ICommand modifyCommand = new ModifyPlaylist(mainController.getPlaylistCatalog(), currentPlaylist, name, mainController.getPlaylistDAO());
 
                 if(mainController != null){
                     mainController.getUndoManager().executeCommand(modifyCommand);
@@ -85,7 +85,7 @@ public class AddModPlaylistController {
             } else {
                 Playlist newPlaylist = new Playlist(name);
 
-                ICommand addCommand = new AddPlaylist(mainController.getPlaylistCatalog(), newPlaylist);
+                ICommand addCommand = new AddPlaylist(mainController.getPlaylistCatalog(), newPlaylist, mainController.getPlaylistDAO());
                 mainController.getUndoManager().executeCommand(addCommand);
 
                 mainController.openPlaylistView(newPlaylist);

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
@@ -20,6 +21,7 @@ public class ModifyTrackTest {
     private Library library;
     private Track t;
     private TrackFactory factory;
+    private TrackDAO trackDAO;
 
     /**
      * @brief Inizializza un oggetto Library e un oggetto Track validi prima di ogni
@@ -43,7 +45,7 @@ public class ModifyTrackTest {
     @Test
     public void testLibraryUpdateTrack_executeAndUndo() {
         ICommand updateCommand = new ModifyTrack(library, t, "Bohemian Rhapsody Cover", "Queen", 1975, "Rock", 200,
-                "A Night at the Opera", "dummy.mp3", null);
+                "A Night at the Opera", "dummy.mp3", null, trackDAO);
 
         // Fase di execute
         updateCommand.execute();

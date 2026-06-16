@@ -433,8 +433,8 @@ public class PlayerController {
     private void handlePlaybackFinished() {
         Track current = mainController.getPlayerContext().getCurrentTrack();
         current.incrementPlayCount();
-        
-        if (loopMode) { 
+
+        if (loopMode) {
             if (current != null) {
                 startTrackPlayback(current);
             }
@@ -455,6 +455,14 @@ public class PlayerController {
         if (next != null) {
             handleNext(null);
         } else {
+            ITrackContainer container = getActiveContainer();
+            // Aggiorno il contatore delle riproduzioni della playlist dato che arrivato qui
+            // sono terminate tutte le canzoni contenute in essa
+            if (container instanceof Playlist) {
+                Playlist activePlaylist = (Playlist) container;
+                activePlaylist.incrementPlayCount();
+            }
+
             stopSong();
             trackFinished = true;
             mainController.getPlayerContext().stop();
@@ -651,7 +659,8 @@ public class PlayerController {
      */
     public void handleTrackModified(Track modifiedTrack) {
         Track current = mainController.getPlayerContext().getCurrentTrack();
-        if (current == null || current != modifiedTrack) return;
+        if (current == null || current != modifiedTrack)
+            return;
 
         mainController.getTimerManager().stop();
         if (current.getAudioSource() != null) {
@@ -674,10 +683,13 @@ public class PlayerController {
     }
 
     public boolean isNextAvailable() {
-        if (loopMode || loopPlaylistMode) return true;
-        if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy) return true;
+        if (loopMode || loopPlaylistMode)
+            return true;
+        if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy)
+            return true;
         Track current = mainController.getPlayerContext().getCurrentTrack();
-        if (current == null) return false;
+        if (current == null)
+            return false;
         List<Track> queue = getActiveQueue();
         int idx = queue.indexOf(current);
         return idx >= 0 && idx < queue.size() - 1;

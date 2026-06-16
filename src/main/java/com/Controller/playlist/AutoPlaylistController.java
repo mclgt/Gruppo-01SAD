@@ -123,7 +123,7 @@ public class AutoPlaylistController {
             playlist.addTrack(t);
         }
 
-        ICommand cmd = new AddPlaylist(mainController.getPlaylistCatalog(), playlist);
+        ICommand cmd = new AddPlaylist(mainController.getPlaylistCatalog(), playlist, mainController.getPlaylistDAO());
         mainController.getUndoManager().executeCommand(cmd);
 
         closeWindow();
