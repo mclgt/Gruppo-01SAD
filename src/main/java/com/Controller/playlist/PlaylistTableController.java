@@ -1,20 +1,21 @@
 package com.Controller.playlist;
 
+import java.util.Optional;
+
+import com.Command.ICommand;
+import com.Command.RemovePlaylist;
 import com.Controller.core.MainController;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
 import com.Model.Track;
 import com.Observer.IPlayerSubscriber;
-import com.Command.ICommand;
-import com.Command.RemovePlaylist;
-import javafx.scene.control.ButtonType;
-import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -158,4 +159,6 @@ public class PlaylistTableController implements IPlayerSubscriber {
     public void dispose() {
         mainController.getPlayerContext().unsubscribe(this);
     }
+
+    
 }

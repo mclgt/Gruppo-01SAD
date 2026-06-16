@@ -3,22 +3,23 @@ package com.Controller.track;
 import java.util.Optional;
 
 import com.Command.ICommand;
+import com.Command.MoveDownTrack;
+import com.Command.MoveUpTrack;
 import com.Command.RemoveTrack;
 import com.Controller.core.MainController;
 import com.Model.Track;
 import com.Observer.IPlayerSubscriber;
 
-import javafx.fxml.FXML;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-
 /**
  * @class TrackTableController
  * @brief COntroller per la gestione della tabella della libreria musicale.
@@ -36,6 +37,9 @@ public class TrackTableController implements IPlayerSubscriber {
 
     @FXML
     private Label lblTag;
+
+
+
 
     /**
      * @brief Inizializza il controller, configurando le colonne della tabella, i
@@ -63,15 +67,15 @@ public class TrackTableController implements IPlayerSubscriber {
         this.mainController = mainController;
         mainController.getPlayerContext().subscribe(this);
         this.trackTable = trackTable;
-        this.lblTagTitle = lblTagTitle;
-        this.lblTag = lblTag;
+        //this.lblTagTitle = lblTagTitle;
+       // this.lblTag = lblTag;
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
         trackTable.setItems(mainController.getLibrary().getTracks());
         detailPanel.setVisible(false);
-
+        mainController.setMoveButtonDisable(true, true);
         trackTable.setRowFactory(tv -> {
             TableRow<Track> row = new TableRow<>();
             row.itemProperty().addListener((observed, oldVal, newVal) -> {
@@ -96,6 +100,19 @@ public class TrackTableController implements IPlayerSubscriber {
                     && mainController.getPlayerContext().isPlaying();
             mainController.updatePlayPauseButton(selectedIsPlaying);
         });
+
+        trackTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldVal, newValue) -> {
+        int index = newValue.intValue();
+        int size = mainController.getLibrary().getTracksCount();
+        if (index == -1){
+            mainController.setMoveButtonDisable(true, true);
+        }
+        else{
+            mainController.setMoveButtonDisable(index == 0, index == size - 1);
+           
+        }
+        });
+
     }
 
     /**
@@ -212,4 +229,31 @@ public class TrackTableController implements IPlayerSubscriber {
     public void dispose() {
         mainController.getPlayerContext().unsubscribe(this);
     }
+
+    public void handleMoveUp(ActionEvent e){
+        Track selectedTrack = getSelectedTrack();
+        
+        if (selectedTrack != null){
+            int index = trackTable.getSelectionModel().getSelectedIndex();
+            if (index > 0){
+                ICommand moveUp = new MoveUpTrack(mainController.getLibrary().getTracks(), selectedTrack);
+                mainController.getUndoManager().executeCommand(moveUp);                trackTable.getSelectionModel().select(index-1);
+            }
+        }
+    }
+
+    public void handleMoveDown(ActionEvent e){
+        Track selectedTrack = getSelectedTrack();
+                
+        if (selectedTrack != null){
+            int index = trackTable.getSelectionModel().getSelectedIndex();
+            int size = mainController.getLibrary().getTracksCount();
+            if(index >= 0 && index < size-1){
+                ICommand moveDown = new MoveDownTrack(mainController.getLibrary().getTracks(), selectedTrack);
+                mainController.getUndoManager().executeCommand(moveDown);
+                trackTable.getSelectionModel().select(index+1);
+            }
+        }
+    }
+
 }

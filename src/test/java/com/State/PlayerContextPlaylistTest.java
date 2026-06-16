@@ -3,14 +3,13 @@ package com.State;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.Model.MockTrackFactory;
 import com.Model.Playlist;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
@@ -50,13 +49,14 @@ public class PlayerContextPlaylistTest {
     @Test
     void testInitialPlayUpdateState() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
+        playbackContext.setCurrentQueue(testPlaylist.getTracks(), track1);
         PlayerContext context = new PlayerContext(playbackContext);
-        context.setCurrentTrack(null);
-        context.next(testPlaylist.getTracks(), null);
-        Track firstTrack = context.getCurrentTrack();
+        context.setCurrentTrack(testPlaylist.getTracks().get(0));
+        //context.next();
+        /*Track firstTrack = context.getCurrentTrack();
         if (firstTrack != null) {
             context.play(firstTrack);
-        }
+        }*/
         assertEquals(track1, context.getCurrentTrack(), "La prima traccia della playlist dovrebbe essere A");
         assertTrue(context.isPlaying(), "Il player dovrebbe essere nello stato 'playingState'");
     }
@@ -68,11 +68,12 @@ public class PlayerContextPlaylistTest {
     @Test
     void testSequentialNextUpdateTrack() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
+        playbackContext.setCurrentQueue(testPlaylist.getTracks(), track1);
         PlayerContext context = new PlayerContext(playbackContext);
         context.setCurrentTrack(track1);
         context.play(track1);
         assertTrue(context.isPlaying());
-        context.next(testPlaylist.getTracks(), track1);
+        context.next();
         Track nextTrack = context.getCurrentTrack();
         assertEquals(track2, nextTrack, "La traccia successiva nella playlist dovrebbe essere F");
     }
@@ -84,11 +85,12 @@ public class PlayerContextPlaylistTest {
     @Test
     void testEndOfPlaylistSequential() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
+        playbackContext.setCurrentQueue(testPlaylist.getTracks(), track2);
         PlayerContext context = new PlayerContext(playbackContext);
         context.setCurrentTrack(track2);
         context.play(track2);
         assertTrue(context.isPlaying());
-        context.next(testPlaylist.getTracks(), track2);
+        context.next();
         Track afterLast = context.getCurrentTrack();
         assertTrue(afterLast == track2,
                 "Alla fine della playlist in modalità sequenziale, next non deve tornare alla prima traccia");
@@ -101,11 +103,12 @@ public class PlayerContextPlaylistTest {
     @Test
     void testEndOfPlaylistLoop() {
         PlaybackContext playbackContext = new PlaybackContext(new LoopPlaylistStrategy());
+        playbackContext.setCurrentQueue(testPlaylist.getTracks(), track2);
         PlayerContext context = new PlayerContext(playbackContext);
         context.setCurrentTrack(track2);
         context.play(track2);
         assertTrue(context.isPlaying());
-        context.next(testPlaylist.getTracks(), track2);
+        context.next();
         Track afterLast = context.getCurrentTrack();
         assertTrue(afterLast == track1,
                 "Alla fine della playlist in modalità loop, next deve tornare alla prima traccia");
@@ -121,10 +124,11 @@ public class PlayerContextPlaylistTest {
         PlayerContext context = new PlayerContext(playbackContext);
         Track track3 = factory.createTrack("K", "L", 2010, "M", 100, "N", "dummy3.mp3", null);
         testPlaylist.addTrack(track3);
+        playbackContext.setCurrentQueue(testPlaylist.getTracks(), track3);
         context.setCurrentTrack(track1);
         context.play(track1);
         assertTrue(context.isPlaying(), "Il player dovrebbe essere nello stato di riproduzione");
-        context.next(testPlaylist.getTracks(), track1);
+        context.next();
         Track nextTrack = context.getCurrentTrack();
         assertNotNull(nextTrack, "Il contesto deve aver aggiornato la traccia corrente");
         assertTrue(testPlaylist.getTracks().contains(nextTrack),

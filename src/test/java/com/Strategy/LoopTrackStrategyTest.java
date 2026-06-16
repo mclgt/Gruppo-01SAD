@@ -1,15 +1,15 @@
 package com.Strategy;
 
-import com.Model.Track;
-import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.Model.MockTrackFactory;
+import com.Model.Track;
+import com.Model.TrackFactory;
 
 /**
  * @class LoopTrackStrategyTest
@@ -51,7 +51,8 @@ public class LoopTrackStrategyTest {
     @Test
     void nextTrack_currentNull_returnsNull() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertNull(strategy.nextTrack(queue, null));
+        strategy.setQueue(queue, null);
+        assertNull(strategy.nextTrack(null));
     }
 
     /**
@@ -61,7 +62,8 @@ public class LoopTrackStrategyTest {
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
-        assertSame(track1, strategy.nextTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+        assertSame(track1, strategy.nextTrack(track1));
     }
 
     /**
@@ -71,7 +73,8 @@ public class LoopTrackStrategyTest {
     @Test
     void nextTrack_multipleTracks_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertSame(track2, strategy.nextTrack(queue, track2));
+        strategy.setQueue(queue, track2);
+        assertSame(track2, strategy.nextTrack(track2));
     }
 
     /**
@@ -81,7 +84,8 @@ public class LoopTrackStrategyTest {
     @Test
     void nextTrack_lastTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertSame(track3, strategy.nextTrack(queue, track3));
+        strategy.setQueue(queue, track3);
+        assertSame(track3, strategy.nextTrack(track3));
     }
 
     // -----------------------------------------------------------------------
@@ -94,7 +98,9 @@ public class LoopTrackStrategyTest {
     @Test
     void previousTrack_currentNull_returnsNull() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertNull(strategy.previousTrack(queue, null));
+        strategy.setQueue(queue, null);
+
+        assertNull(strategy.previousTrack( null));
     }
 
     /**
@@ -104,7 +110,9 @@ public class LoopTrackStrategyTest {
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
-        assertSame(track1, strategy.previousTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+
+        assertSame(track1, strategy.previousTrack(track1));
     }
 
     /**
@@ -114,7 +122,8 @@ public class LoopTrackStrategyTest {
     @Test
     void previousTrack_multipleTracks_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertSame(track2, strategy.previousTrack(queue, track2));
+        strategy.setQueue(queue, track2);
+        assertSame(track2, strategy.previousTrack(track2));
     }
 
     /**
@@ -124,6 +133,8 @@ public class LoopTrackStrategyTest {
     @Test
     void previousTrack_firstTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertSame(track1, strategy.previousTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+
+        assertSame(track1, strategy.previousTrack(track1));
     }
 }
