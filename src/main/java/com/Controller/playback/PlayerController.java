@@ -1,14 +1,11 @@
 package com.Controller.playback;
 
-import java.util.List;
-
 import com.Controller.core.MainController;
 import com.Controller.playlist.PlaylistController;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
-
-import com.Strategy.LoopPlaylistStrategy;
 import com.Model.Track;
+import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.LoopTrackStrategy;
 import com.Strategy.SequentialStrategy;
 import com.Strategy.ShuffleStrategy;
@@ -24,7 +21,7 @@ import javafx.scene.control.Slider;
  * @brief Gestisce la logica della riproduzione audio, il timer e l'interazione
  *        con l'interfaccia. La classe funge da controller per il sistema di
  *        riproduzione. Gestisce il flusso audio e coordina l'aggiornamento
- *        dell'interfaccia grafica in base allo stato del context e dela
+ *        dell'interfaccia grafica in base allo stato del context e della
  *        strategia di riproduzione selezionata.
  */
 public class PlayerController {
@@ -78,39 +75,74 @@ public class PlayerController {
 
     /**
      * @brief Imposta la modalità di riproduzione selezionata dal ComboBox.
+     * @param mode Stringa che rappresenta la modalità scelta
      */
     public void setPlaybackMode(String mode) {
+        Track currenTrack=mainController.getPlayerContext().getCurrentTrack();
         switch (mode) {
             case "Singola":
                 sequentialMode = false;
                 loopMode = false;
                 loopPlaylistMode = false;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy(),currenTrack);
                 break;
             case "Sequenziale":
                 sequentialMode = true;
                 loopMode = false;
                 loopPlaylistMode = false;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy(),currenTrack);
                 break;
             case "Loop brano":
                 sequentialMode = false;
                 loopMode = true;
                 loopPlaylistMode = false;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy(),currenTrack);
                 break;
             case "Shuffle":
                 sequentialMode = true;
                 loopMode = false;
                 loopPlaylistMode = false;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy(),currenTrack);
                 break;
             default:
                 break;
         }
-        mainController.updateNextButton();
     }
 
+    /**
+     * @brief Recupera la coda di riproduzione corretta basandosi sulla selezione corrente dell'interfaccia utente.
+     * Controlla in ordine gerarchico se è selezionata una traccia nella libreria generale,
+     * una traccia nella vista della playlist aperta, o una playlist intera dalla tabella.
+     * @return L'ObservableList di oggetti Track associata alla selezione corrente, oppure null.
+ */
+    private ObservableList<Track> getSelectedQueueFromUI(){
+        if(mainController.getTrackTableController().getSelectedTrack()!=null){
+            return (ObservableList<Track>) mainController.getLibrary().getTracks();
+        }
+        PlaylistController pc = mainController.getPlaylistController();
+        if (pc != null && pc.getCurrentPlaylist()!=null){
+            return (ObservableList<Track>) pc.getCurrentPlaylist().getTracks();
+        }
+        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
+        if(selectedPlaylist!=null){
+            return (ObservableList<Track>) selectedPlaylist.getTracks();
+        }
+        return activeContainer != null ? (ObservableList<Track>)activeContainer.getTracks() : null;
+    }
+
+    /**
+     * @brief Configura il motore di riproduzione e avvia il brano.
+     * Resetta lo stato di traccia terminata, imposta la coda corrente nel contesto di riproduzione
+     * e nel contesto del lettore, avviando infine l'effettiva esecuzione audio.
+     * @param queue La lista osservabile che costituisce la coda di riproduzione corrente.
+     * @param track La traccia specifica da avviare.
+ */
+    private void setupEngineAndPlay(ObservableList<Track> queue, Track track){
+        trackFinished=false;
+        mainController.getPlayerContext().getPlaybackContext().setCurrentQueue(queue, track);
+        mainController.getPlayerContext().setCurrentTrack(track);
+        startTrackPlayback(track);
+    }
     /**
      * @brief Gestisce l'avvio della riproduzione per il brano o la playlist
      *        selezionata
@@ -127,8 +159,7 @@ public class PlayerController {
                 return;
             }
             activeContainer = mainController.getLibrary();
-            trackFinished = false;
-            startTrackPlayback(selectedTrack);
+            setupEngineAndPlay(getSelectedQueueFromUI(), selectedTrack);
             return;
         }
 
@@ -142,8 +173,7 @@ public class PlayerController {
                 return;
             }
             activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
-            trackFinished = false;
-            startTrackPlayback(playlistViewTrack);
+            setupEngineAndPlay(getSelectedQueueFromUI(), playlistViewTrack);
             return;
         }
         PlaylistController openPc = mainController.getPlaylistController();
@@ -159,8 +189,7 @@ public class PlayerController {
                     return;
                 }
                 activeContainer = current;
-                trackFinished = false;
-                startTrackPlayback(firstTrack);
+                setupEngineAndPlay(getSelectedQueueFromUI(), firstTrack);
                 return;
             }
         }
@@ -181,190 +210,11 @@ public class PlayerController {
                         "Sto già eseguendo questo brano.");
                 return;
             }
-
-            startTrackPlayback(firstTrack);
+            setupEngineAndPlay(getSelectedQueueFromUI(), firstTrack);
             return;
         }
         mainController.getWindowManager().showWarning("Nessuna selezione",
                 "Seleziona una traccia dalla lista o una playlist per riprodurla.");
-    }
-
-    /**
-     * @brief Avvia la riproduzione in modalità sequenziale
-     * @param event pressione del pulsante
-     */
-    public void sequentialRip(ActionEvent event) {
-        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
-        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
-        if (selectedTrack != null) {
-            activeContainer = mainController.getLibrary();
-            trackFinished = false;
-            sequentialMode = true;
-            loopMode = false;
-            loopPlaylistMode = false;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
-            startTrackPlayback(selectedTrack);
-            return;
-        }
-        Track playlistViewTrack = getPlaylistViewSelectedTrack();
-        if (playlistViewTrack != null) {
-            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
-            trackFinished = false;
-            sequentialMode = true;
-            loopMode = false;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
-            startTrackPlayback(playlistViewTrack);
-            return;
-        }
-        PlaylistController openPc = mainController.getPlaylistController();
-        if (openPc != null) {
-            Playlist current = openPc.getCurrentPlaylist();
-            if (current != null && current.getTracksCount() > 0) {
-                activeContainer = current;
-                trackFinished = false;
-                sequentialMode = true;
-                loopMode = false;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
-                startTrackPlayback(current.getTracks().get(0));
-                return;
-            }
-        }
-        if (selectedPlaylist != null) {
-            if (selectedPlaylist.getTracksCount() == 0) {
-                mainController.getWindowManager().showWarning("Playlist vuota",
-                        "La playlist selezionata non ha brani.");
-                return;
-            }
-            activeContainer = selectedPlaylist;
-            trackFinished = false;
-            sequentialMode = true;
-            loopMode = false;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
-            Track firstTrack = activeContainer.getTracks().get(0);
-            startTrackPlayback(firstTrack);
-            return;
-        }
-
-        mainController.getWindowManager().showWarning("Nessuna selezione",
-                "Seleziona una traccia dalla lista o una playlist per avviare la riproduzione sequenziale.");
-    }
-
-    /**
-     * @brief Avvia la riproduzione in modalità loop (stesso brano ripetuto)
-     * @param event pressione del pulsante
-     */
-    public void loopRip(ActionEvent event) {
-        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
-        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
-        if (selectedTrack != null) {
-            activeContainer = mainController.getLibrary();
-            trackFinished = false;
-            sequentialMode = false;
-            loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
-            startTrackPlayback(selectedTrack);
-            return;
-        }
-        Track playlistViewTrack = getPlaylistViewSelectedTrack();
-        if (playlistViewTrack != null) {
-            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
-            trackFinished = false;
-            sequentialMode = false;
-            loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
-            startTrackPlayback(playlistViewTrack);
-            return;
-        }
-        PlaylistController openPc = mainController.getPlaylistController();
-        if (openPc != null) {
-            Playlist current = openPc.getCurrentPlaylist();
-            if (current != null && current.getTracksCount() > 0) {
-                activeContainer = current;
-                trackFinished = false;
-                sequentialMode = false;
-                loopMode = true;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
-                startTrackPlayback(current.getTracks().get(0));
-                return;
-            }
-        }
-        if (selectedPlaylist != null) {
-            if (selectedPlaylist.getTracksCount() == 0) {
-                mainController.getWindowManager().showWarning("Playlist vuota",
-                        "La playlist selezionata non ha brani.");
-                return;
-            }
-            activeContainer = selectedPlaylist;
-            trackFinished = false;
-            sequentialMode = false;
-            loopMode = true;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
-            Track firstTrack = activeContainer.getTracks().get(0);
-            startTrackPlayback(firstTrack);
-            return;
-        }
-
-        mainController.getWindowManager().showWarning("Nessuna selezione",
-                "Seleziona una traccia dalla lista per avviare la riproduzione in loop.");
-    }
-
-    /**
-     * @brief Avvia la riproduzione in modalità shuffle (ordine casuale)
-     * @param event pressione del pulsante
-     */
-    public void shuffleRip(ActionEvent event) {
-        Track selectedTrack = mainController.getTrackTableController().getSelectedTrack();
-        Playlist selectedPlaylist = mainController.getPlaylistTableController().getSelectedPlaylist();
-        if (selectedTrack != null) {
-            activeContainer = mainController.getLibrary();
-            trackFinished = false;
-            sequentialMode = true;
-            loopMode = false;
-            loopPlaylistMode = false;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
-            startTrackPlayback(selectedTrack);
-            return;
-        }
-        Track playlistViewTrack = getPlaylistViewSelectedTrack();
-        if (playlistViewTrack != null) {
-            activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
-            trackFinished = false;
-            sequentialMode = true;
-            loopMode = false;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
-            startTrackPlayback(playlistViewTrack);
-            return;
-        }
-        PlaylistController openPc = mainController.getPlaylistController();
-        if (openPc != null) {
-            Playlist current = openPc.getCurrentPlaylist();
-            if (current != null && current.getTracksCount() > 0) {
-                activeContainer = current;
-                trackFinished = false;
-                sequentialMode = true;
-                loopMode = false;
-                mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
-                startTrackPlayback(current.getTracks().get(0));
-                return;
-            }
-        }
-        if (selectedPlaylist != null) {
-            if (selectedPlaylist.getTracksCount() == 0) {
-                mainController.getWindowManager().showWarning("Playlist vuota",
-                        "La playlist selezionata non ha brani.");
-                return;
-            }
-            activeContainer = selectedPlaylist;
-            trackFinished = false;
-            sequentialMode = true;
-            loopMode = false;
-            mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
-            Track firstTrack = activeContainer.getTracks().get(0);
-            startTrackPlayback(firstTrack);
-            return;
-        }
-        mainController.getWindowManager().showWarning("Nessuna selezione",
-                "Seleziona una traccia dalla lista per avviare la riproduzione casuale.");
     }
 
     /**
@@ -448,19 +298,7 @@ public class PlayerController {
             mainController.updateNextButton();
             return;
         }
-        Track before = mainController.getPlayerContext().getCurrentTrack();
-        Track next = mainController.getPlayerContext().getPlaybackContext().nextTrack(getActiveQueue(), before);
-        if (next != null) {
-            handleNext(null);
-        } else {
-            stopSong();
-            trackFinished = true;
-            mainController.getPlayerContext().stop();
-            resetUI();
-            lblNowPlaying.setText("Canzone terminata");
-            mainController.updatePlayPauseButton(false);
-            mainController.updateNextButton();
-        }
+        handleNext(null);
     }
 
     /**
@@ -470,9 +308,7 @@ public class PlayerController {
     public void handleNext(ActionEvent event) {
         mainController.getTimerManager().stop();
         Track before = mainController.getPlayerContext().getCurrentTrack();
-        ObservableList<Track> queue = (activeContainer != null) ? activeContainer.getTracks()
-                : mainController.getLibrary().getTracks();
-        mainController.getPlayerContext().next(queue, before);
+        mainController.getPlayerContext().next();
         Track after = mainController.getPlayerContext().getCurrentTrack();
         boolean isLoopStrategy = mainController.getPlayerContext().getPlaybackContext()
                 .getStrategy() instanceof LoopPlaylistStrategy;
@@ -500,9 +336,7 @@ public class PlayerController {
     public void handlePrev(ActionEvent event) {
         mainController.getTimerManager().stop();
         Track before = mainController.getPlayerContext().getCurrentTrack();
-        ObservableList<Track> queue = (activeContainer != null) ? activeContainer.getTracks()
-                : mainController.getLibrary().getTracks();
-        mainController.getPlayerContext().previous(queue, before);
+        mainController.getPlayerContext().previous();
         Track after = mainController.getPlayerContext().getCurrentTrack();
 
         if (after != null && after != before) {
@@ -603,7 +437,7 @@ public class PlayerController {
         this.loopMode = false;
         this.sequentialMode = true;
         this.loopPlaylistMode = true;
-        mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy());
+        mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopPlaylistStrategy(), mainController.getPlayerContext().getCurrentTrack());
         Track currentTrack = mainController.getPlayerContext().getCurrentTrack();
         if (currentTrack != null && playlist.getTracks().contains(currentTrack)
                 && mainController.getPlayerContext().isPlaying()) {
@@ -621,17 +455,6 @@ public class PlayerController {
         Track startTrack = selectedTrack != null ? selectedTrack : playlist.getTracks().get(0);
         startTrackPlayback(startTrack);
         mainController.updateNextButton();
-    }
-
-    /**
-     * @brief Restituisce la lista di brani del container attivo.
-     *        Se nessun container è stato impostato, utilizza la libreria globale
-     *        come fallback.
-     * @return La List di Track su cui operano next, prev e
-     *         auto-avanzamento.
-     */
-    private List<Track> getActiveQueue() {
-        return activeContainer != null ? activeContainer.getTracks() : mainController.getLibrary().getTracks();
     }
 
     /**
@@ -676,8 +499,13 @@ public class PlayerController {
         if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy) return true;
         Track current = mainController.getPlayerContext().getCurrentTrack();
         if (current == null) return false;
-        List<Track> queue = getActiveQueue();
+        ObservableList<Track> queue = getSelectedQueueFromUI();
+        if(queue==null || queue.isEmpty()){
+            return false;
+        }
         int idx = queue.indexOf(current);
         return idx >= 0 && idx < queue.size() - 1;
+
     }
+
 }

@@ -5,13 +5,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
 
 /**
  * @class SequentialStrategyTest
@@ -44,6 +43,7 @@ public class SequentialStrategyTest {
         track3 = factory.createTrack("Canzone C", "Artista C", 2002, "Pop", 220, "Album C", "dummy3.mp3",
                 null);
         queue = Arrays.asList(track1, track2, track3);
+        strategy.setQueue(queue, track1);
     }
 
     // -----------------------------------------------------------------------
@@ -56,7 +56,8 @@ public class SequentialStrategyTest {
      */
     @Test
     public void testNextTrack_fromFirst_returnsSecond() {
-        assertEquals(track2, strategy.nextTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+        assertEquals(track2, strategy.nextTrack(track1));
     }
 
     /**
@@ -65,7 +66,8 @@ public class SequentialStrategyTest {
      */
     @Test
     public void testNextTrack_fromMiddle_returnsThird() {
-        assertEquals(track3, strategy.nextTrack(queue, track2));
+        strategy.setQueue(queue, track2);
+        assertEquals(track3, strategy.nextTrack(track2));
     }
 
     /**
@@ -74,7 +76,8 @@ public class SequentialStrategyTest {
      */
     @Test
     public void testNextTrack_fromLast_returnsNull() {
-        assertNull(strategy.nextTrack(queue, track3));
+        strategy.setQueue(queue, track3);
+        assertNull(strategy.nextTrack(track3));
     }
 
     /**
@@ -85,7 +88,7 @@ public class SequentialStrategyTest {
     public void testNextTrack_trackNotInQueue_returnsNull() {
         Track outsider = factory.createTrack("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy.mp3",
                 null);
-        assertNull(strategy.nextTrack(queue, outsider));
+        assertNull(strategy.nextTrack(outsider));
     }
 
     // -----------------------------------------------------------------------
@@ -98,7 +101,8 @@ public class SequentialStrategyTest {
      */
     @Test
     public void testPreviousTrack_fromLast_returnsMiddle() {
-        assertEquals(track2, strategy.previousTrack(queue, track3));
+        strategy.setQueue(queue, track3);
+        assertEquals(track2, strategy.previousTrack(track3));
     }
 
     /**
@@ -107,7 +111,8 @@ public class SequentialStrategyTest {
      */
     @Test
     public void testPreviousTrack_fromMiddle_returnsFirst() {
-        assertEquals(track1, strategy.previousTrack(queue, track2));
+        strategy.setQueue(queue, track2);
+        assertEquals(track1, strategy.previousTrack(track2));
     }
 
     /**
@@ -116,7 +121,8 @@ public class SequentialStrategyTest {
      */
     @Test
     public void testPreviousTrack_fromFirst_returnsNull() {
-        assertNull(strategy.previousTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+        assertNull(strategy.previousTrack(track1));
     }
 
     /**
@@ -127,6 +133,6 @@ public class SequentialStrategyTest {
     public void testPreviousTrack_trackNotInQueue_returnsNull() {
         Track outsider = factory.createTrack("Ghost", "Nobody", 1999, "Jazz", 180, "None", "dummy.mp3",
                 null);
-        assertNull(strategy.previousTrack(queue, outsider));
+        assertNull(strategy.previousTrack(outsider));
     }
 }
