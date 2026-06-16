@@ -431,8 +431,10 @@ public class PlayerController {
      *      ferma la riproduzione e resetta l'interfaccia.
      */
     private void handlePlaybackFinished() {
-        if (loopMode) {
-            Track current = mainController.getPlayerContext().getCurrentTrack();
+        Track current = mainController.getPlayerContext().getCurrentTrack();
+        current.incrementPlayCount();
+        
+        if (loopMode) { 
             if (current != null) {
                 startTrackPlayback(current);
             }
