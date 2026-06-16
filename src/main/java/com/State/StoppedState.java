@@ -1,7 +1,6 @@
 package com.State;
 
 import com.Model.Track;
-import java.util.List;
 
 public class StoppedState implements IPlayerState {
 
@@ -17,8 +16,8 @@ public class StoppedState implements IPlayerState {
     public void stop() {}
 
     @Override
-    public void next(List<Track> queue, Track current) {}
+    public void next() {}
 
     @Override
-    public void previous(List<Track> queue, Track current) {}
+    public void previous() {}
 }

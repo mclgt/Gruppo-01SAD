@@ -1,8 +1,8 @@
 package com.State;
 
-import com.Model.Track;
-import java.util.List;
 
+
+import com.Model.Track;
 /**
  * @class PlayingState
  * @brief Stato di riproduzione attiva nel pattern State del player.
@@ -37,15 +37,7 @@ public class PlayingState implements IPlayerState {
      */
     @Override
     public void play(Track track) {
-        Track previous = context.getCurrentTrack();
-        if (previous != null && previous.getAudioSource() != null) {
-            previous.getAudioSource().stopPlayback();
-        }
         context.setCurrentTrack(track);
-        if (track.getAudioSource() != null) {
-            track.getAudioSource().startPlayback(); // lazy load: RealTrack creato solo qui
-        }
-        System.out.println("Playing: " + track.getTitle());
     }
 
     /**
@@ -65,39 +57,37 @@ public class PlayingState implements IPlayerState {
     }
 
     /**
-     * @brief Avanza alla traccia successiva usando la strategia di riproduzione attiva.
-     *        Aggiorna solo la traccia corrente nel context senza avviare l'audio:
-     *        l'avvio è responsabilità del controller tramite startTrackPlayback().
-     *        In questo modo con LoopTrackStrategy (next restituisce la traccia corrente)
-     *        non viene riavviato l'audio, evitando il doppio loop prima del cambio modalità.
-     * @param queue   Lista delle tracce disponibili nel container attivo.
-     * @param current Traccia attualmente in riproduzione.
+     * @brief Avanza alla traccia successiva sfruttando la strategia di riproduzione attiva.
+     *
+     * Calcola la traccia successiva tramite il PlaybackContext. Se disponibile, aggiorna 
+     * il brano corrente del player; se la coda è terminata (restituisce null), invoca lo stop del player.
      */
     @Override
-    public void next(List<Track> queue, Track current) {
-        Track nextTrack = context.getPlaybackContext().nextTrack(queue, current);
+    public void next() {
+        Track nextTrack = context.getPlaybackContext().getStrategy().nextTrack(context.getCurrentTrack());
         if (nextTrack != null) {
             context.setCurrentTrack(nextTrack);
             System.out.println("Next track set: " + nextTrack.getTitle());
         } else {
+            context.stop();
             System.out.println("No next track available.");
         }
     }
 
     /**
-     * @brief Torna alla traccia precedente usando la strategia di riproduzione attiva.
-     *        Aggiorna solo la traccia corrente nel context senza avviare l'audio:
-     *        l'avvio è responsabilità del controller tramite startTrackPlayback().
-     * @param queue   Lista delle tracce disponibili nel container attivo.
-     * @param current Traccia attualmente in riproduzione.
+     * @brief Ritorna alla traccia precedente sfruttando la strategia di riproduzione attiva.
+     *
+     * Calcola la traccia precedente tramite il PlaybackContext. Se disponibile, aggiorna 
+     * il brano corrente del player; se l'inizio della coda è stato raggiunto (restituisce null), invoca lo stop del player.
      */
     @Override
-    public void previous(List<Track> queue, Track current) {
-        Track previousTrack = context.getPlaybackContext().previousTrack(queue, current);
+    public void previous() {
+        Track previousTrack = context.getPlaybackContext().getStrategy().previousTrack(context.getCurrentTrack());
         if (previousTrack != null) {
             context.setCurrentTrack(previousTrack);
             System.out.println("Previous track set: " + previousTrack.getTitle());
         } else {
+            context.stop();
             System.out.println("No previous track available.");
         }
     }

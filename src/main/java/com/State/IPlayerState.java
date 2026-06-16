@@ -1,6 +1,5 @@
 package com.State;
 
-import java.util.List;
 import com.Model.Track;
 
 public interface IPlayerState {
@@ -10,7 +9,7 @@ public interface IPlayerState {
 
     void stop();
 
-    void next(List<Track> queue, Track current);
+    void next();
 
-    void previous(List<Track> queue, Track current);
+    void previous();
 }

@@ -5,13 +5,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
 
 /**
  * @class PlaybackContextTest
@@ -39,14 +38,19 @@ public class PlaybackContextTest {
         }
 
         @Override
-        public Track nextTrack(List<Track> queue, Track current) {
+        public Track nextTrack(Track current) {
             return fixedNext;
         }
 
         @Override
-        public Track previousTrack(List<Track> queue, Track current) {
+        public Track previousTrack(Track current) {
             return fixedPrevious;
         }
+            @Override
+        public void setQueue(List<Track> queue, Track currentTrack) {}
+
+        @Override
+        public void updateQueue(List<Track> updatedQueue) {}
     }
 
     /**
@@ -56,14 +60,20 @@ public class PlaybackContextTest {
      */
     private static class DummyStrategyB implements IPlaybackStrategy {
         @Override
-        public Track nextTrack(List<Track> queue, Track current) {
+        public Track nextTrack( Track current) {
             return null;
         }
 
         @Override
-        public Track previousTrack(List<Track> queue, Track current) {
+        public Track previousTrack(Track current) {
             return null;
         }
+            @Override
+        public void setQueue(List<Track> queue, Track currentTrack) {}
+
+        @Override
+        public void updateQueue(List<Track> updatedQueue) {}
+        
     }
 
     private Track track1;

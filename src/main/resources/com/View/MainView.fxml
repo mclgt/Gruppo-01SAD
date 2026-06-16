@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,7 +17,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -64,6 +64,27 @@
                            </image>
                         </ImageView>
                      </graphic></Button>
+<<<<<<< HEAD
+                <TextField fx:id="searchField" prefWidth="180.0" promptText="Cerca..." />
+                  <Button fx:id="btnDownTrack" mnemonicParsing="false" onAction="#handleMoveDown">
+                     <graphic>
+                        <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" rotate="180.0">
+                           <image>
+                              <Image url="@arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button fx:id="btnUpTrack" mnemonicParsing="false" onAction="#handleMoveUp">
+                     <graphic>
+                        <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+=======
                 <TextField fx:id="searchField" promptText="Cerca..." prefWidth="180.0" />
                 <Button fx:id="btnAutoPlaylist" mnemonicParsing="false" onAction="#openAutoPlaylistWindow" text="Genera Playlist Automatica">
                      <graphic>
@@ -74,6 +95,7 @@
                         </ImageView>
                      </graphic>
                 </Button>
+>>>>>>> main
               </items>
             </ToolBar>
          </children>
