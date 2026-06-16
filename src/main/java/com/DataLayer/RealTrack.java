@@ -16,7 +16,7 @@ public class RealTrack implements IAudioTrack {
     private Clip audioClip; // Oggetto nativo di java che mantiene il buffer audio nella scheda audio
 
     /**
-     * @brief Costruttore -> inizializza l'oggetto con il percorso del file.
+     * @brief Costruttore: inizializza l'oggetto con il percorso del file.
      * @param filePath Percorso del file .wav da riprodurre.
      */
     public RealTrack(String filePath) {
@@ -28,27 +28,12 @@ public class RealTrack implements IAudioTrack {
      *        Cattura e gestisce le eccezioni di formato non supportato o file
      *        mancante.
      */
-    /*
-     * @Override
-     * public void load() {
-     * try {
-     * File audioFile = new File(filePath);
-     * AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-     * audioClip = AudioSystem.getClip();
-     * audioClip.open(audioStream);
-     * System.out.println("Audio caricato in memoria: " + filePath);
-     * } catch (UnsupportedAudioFileException | IOException |
-     * LineUnavailableException e) {
-     * System.err.println("Errore caricamento file audio: " + e.getMessage());
-     * }
-     * }
-     */
     @Override
     public void load() {
+        if (audioClip != null && audioClip.isOpen()) {
+            return;
+        }
         try {
-            // filePath DEVE essere il percorso assoluto (es.
-            // "C:\Users\miche\Downloads\brano.wav")
-            // NON un URI (file:/C:/...)
             File audioFile = new File(this.filePath);
 
             if (!audioFile.exists()) {

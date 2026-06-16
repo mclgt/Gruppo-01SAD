@@ -20,6 +20,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+
 /**
  * @class TrackTableController
  * @brief COntroller per la gestione della tabella della libreria musicale.
@@ -37,9 +38,6 @@ public class TrackTableController implements IPlayerSubscriber {
 
     @FXML
     private Label lblTag;
-
-
-
 
     /**
      * @brief Inizializza il controller, configurando le colonne della tabella, i
@@ -65,21 +63,22 @@ public class TrackTableController implements IPlayerSubscriber {
             Label lblTitle, Label lblAuthor, Label lblAlbum, Label lblGenre, Label lblDuration, Label lblYear,
             Label lblTagTitle, Label lblTag) {
         this.mainController = mainController;
-        mainController.getPlayerContext().subscribe(this);
+        mainController.getAppState().getPlayerContext().subscribe(this);
         this.trackTable = trackTable;
-        //this.lblTagTitle = lblTagTitle;
-       // this.lblTag = lblTag;
+        // this.lblTagTitle = lblTagTitle;
+        // this.lblTag = lblTag;
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
-        trackTable.setItems(mainController.getLibrary().getTracks());
+        trackTable.setItems(mainController.getAppState().getLibrary().getTracks());
         detailPanel.setVisible(false);
         mainController.setMoveButtonDisable(true, true);
         trackTable.setRowFactory(tv -> {
             TableRow<Track> row = new TableRow<>();
             row.itemProperty().addListener((observed, oldVal, newVal) -> {
-                if (newVal != null && newVal.equals(mainController.getPlayerContext().getCurrentTrack())) {
+                if (newVal != null
+                        && newVal.equals(mainController.getAppState().getPlayerContext().getCurrentTrack())) {
                     row.setStyle("-fx-background-color: #f5a747;");
                 } else {
                     row.setStyle("");
@@ -87,7 +86,7 @@ public class TrackTableController implements IPlayerSubscriber {
             });
             row.setOnMouseClicked(ev -> {
                 if (ev.getClickCount() == 2 && !row.isEmpty()) {
-                    mainController.getPlayerController().playSong();
+                    mainController.getAppState().getPlayerController().playSong();
                 }
             });
             return row;
@@ -96,21 +95,20 @@ public class TrackTableController implements IPlayerSubscriber {
         trackTable.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
             mainController.updateDetailPanel(newVal);
             boolean selectedIsPlaying = newVal != null
-                    && newVal == mainController.getPlayerContext().getCurrentTrack()
-                    && mainController.getPlayerContext().isPlaying();
+                    && newVal == mainController.getAppState().getPlayerContext().getCurrentTrack()
+                    && mainController.getAppState().getPlayerContext().isPlaying();
             mainController.updatePlayPauseButton(selectedIsPlaying);
         });
 
         trackTable.getSelectionModel().selectedIndexProperty().addListener((observable, oldVal, newValue) -> {
-        int index = newValue.intValue();
-        int size = mainController.getLibrary().getTracksCount();
-        if (index == -1){
-            mainController.setMoveButtonDisable(true, true);
-        }
-        else{
-            mainController.setMoveButtonDisable(index == 0, index == size - 1);
-           
-        }
+            int index = newValue.intValue();
+            int size = mainController.getAppState().getLibrary().getTracksCount();
+            if (index == -1) {
+                mainController.setMoveButtonDisable(true, true);
+            } else {
+                mainController.setMoveButtonDisable(index == 0, index == size - 1);
+
+            }
         });
 
     }
@@ -144,7 +142,8 @@ public class TrackTableController implements IPlayerSubscriber {
      * @param ev pressione sul pulsante di aggiunta
      */
     public void openAddTrackWindow(ActionEvent ev) {
-        mainController.getWindowManager().openWindow("/com/View/AddTrackView.fxml", "Aggiungi nuovo brano", null);
+        mainController.getAppState().getWindowManager().openTrackWindow("/com/View/AddTrackView.fxml",
+                "Aggiungi nuovo brano", null);
     }
 
     /**
@@ -155,12 +154,12 @@ public class TrackTableController implements IPlayerSubscriber {
     public void openModifyTrackView(ActionEvent ev) {
         Track selectedTrack = getSelectedTrack();
         if (selectedTrack == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
+            mainController.getAppState().getWindowManager().showWarning("Nessuna selezione",
                     "Seleziona una traccia dalla tabella da modificare.");
             return;
         }
 
-        mainController.getWindowManager().openWindow("/com/View/ModifyTrackView.fxml",
+        mainController.getAppState().getWindowManager().openTrackWindow("/com/View/ModifyTrackView.fxml",
                 "Modifica Brano - " + selectedTrack.getTitle(), selectedTrack);
     }
 
@@ -174,32 +173,33 @@ public class TrackTableController implements IPlayerSubscriber {
     public void handleRemoveTrack(ActionEvent ev) {
         Track selectedTrack = getSelectedTrack();
         if (selectedTrack == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
+            mainController.getAppState().getWindowManager().showWarning("Nessuna selezione",
                     "Seleziona una traccia dalla tabella da rimuovere.");
             return;
         }
-        Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma rimozione",
+        Optional<ButtonType> result = mainController.getAppState().getWindowManager().showConfirmation(
+                "Conferma rimozione",
                 "Rimozione dalla libreria e da tutte le playlist",
                 "Sei sicuro di voler rimuovere \"" + selectedTrack.getTitle() + "\"?", null);
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            ICommand removeCommand = new RemoveTrack(mainController.getLibrary(), selectedTrack,
-                    mainController.getPlaylistCatalog());
+            ICommand removeCommand = new RemoveTrack(mainController.getAppState().getLibrary(), selectedTrack,
+                    mainController.getAppState().getPlaylistCatalog());
 
-            boolean wasPlaying = mainController.getPlayerContext().isPlaying()
-                    && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
+            boolean wasPlaying = mainController.getAppState().getPlayerContext().isPlaying()
+                    && selectedTrack == mainController.getAppState().getPlayerContext().getCurrentTrack();
 
-            mainController.getDeletedPlayingStack().push(wasPlaying);
+            mainController.getAppState().getDeletedPlayingStack().push(wasPlaying);
             if (wasPlaying) {
-                mainController.getTimerManager().stop();
+                mainController.getAppState().getTimerManager().stop();
             }
 
-            int idx = mainController.getLibrary().getTracks().indexOf(selectedTrack);
-            mainController.getUndoManager().executeCommand(removeCommand);
+            int idx = mainController.getAppState().getLibrary().getTracks().indexOf(selectedTrack);
+            mainController.getAppState().getUndoManager().executeCommand(removeCommand);
             clearSelection();
 
             if (wasPlaying) {
-                mainController.getPlayerController().handleTrackRemoval(idx);
+                mainController.getAppState().getPlayerController().handleTrackRemoval(idx);
             }
         }
     }
@@ -213,7 +213,7 @@ public class TrackTableController implements IPlayerSubscriber {
     @Override
     public void onPlaybackChanged(Track newTrack) {
         Platform.runLater(() -> {
-            if(mainController != null){
+            if (mainController != null) {
                 mainController.updateTop();
             }
             trackTable.refresh();
@@ -225,31 +225,33 @@ public class TrackTableController implements IPlayerSubscriber {
      *        problemi di memoria.
      */
     public void dispose() {
-        mainController.getPlayerContext().unsubscribe(this);
+        mainController.getAppState().getPlayerContext().unsubscribe(this);
     }
 
-    public void handleMoveUp(ActionEvent e){
+    public void handleMoveUp(ActionEvent e) {
         Track selectedTrack = getSelectedTrack();
-        
-        if (selectedTrack != null){
+
+        if (selectedTrack != null) {
             int index = trackTable.getSelectionModel().getSelectedIndex();
-            if (index > 0){
-                ICommand moveUp = new MoveUpTrack(mainController.getLibrary().getTracks(), selectedTrack);
-                mainController.getUndoManager().executeCommand(moveUp);                trackTable.getSelectionModel().select(index-1);
+            if (index > 0) {
+                ICommand moveUp = new MoveUpTrack(mainController.getAppState().getLibrary().getTracks(), selectedTrack);
+                mainController.getAppState().getUndoManager().executeCommand(moveUp);
+                trackTable.getSelectionModel().select(index - 1);
             }
         }
     }
 
-    public void handleMoveDown(ActionEvent e){
+    public void handleMoveDown(ActionEvent e) {
         Track selectedTrack = getSelectedTrack();
-                
-        if (selectedTrack != null){
+
+        if (selectedTrack != null) {
             int index = trackTable.getSelectionModel().getSelectedIndex();
-            int size = mainController.getLibrary().getTracksCount();
-            if(index >= 0 && index < size-1){
-                ICommand moveDown = new MoveDownTrack(mainController.getLibrary().getTracks(), selectedTrack);
-                mainController.getUndoManager().executeCommand(moveDown);
-                trackTable.getSelectionModel().select(index+1);
+            int size = mainController.getAppState().getLibrary().getTracksCount();
+            if (index >= 0 && index < size - 1) {
+                ICommand moveDown = new MoveDownTrack(mainController.getAppState().getLibrary().getTracks(),
+                        selectedTrack);
+                mainController.getAppState().getUndoManager().executeCommand(moveDown);
+                trackTable.getSelectionModel().select(index + 1);
             }
         }
     }

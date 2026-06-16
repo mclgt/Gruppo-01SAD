@@ -1,11 +1,6 @@
 package com.Controller.track;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import com.Command.AddTrack;
 import com.Command.ICommand;
@@ -157,11 +152,12 @@ public class AddModTrackController implements ITrackImporter {
             finalFilePathForDB = originalFilePath;
 
             if (isEditMode) {
-                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author,
+                ICommand modifyCommand = new ModifyTrack(mainController.getAppState().getLibrary(), trackToModify,
+                        title, author,
                         year, genre, duration, album, originalFilePath, tag);
 
                 if (mainController != null) {
-                    mainController.getUndoManager().executeCommand(modifyCommand);
+                    mainController.getAppState().getUndoManager().executeCommand(modifyCommand);
                     mainController.notifyTrackModified(trackToModify);
                 }
             } else {
@@ -169,16 +165,16 @@ public class AddModTrackController implements ITrackImporter {
                         finalFilePathForDB, tag);
 
                 if (mainController != null) {
-                    ICommand addCommand = new AddTrack(mainController.getLibrary(), newTrack);
-                    mainController.getUndoManager().executeCommand(addCommand);
+                    ICommand addCommand = new AddTrack(mainController.getAppState().getLibrary(), newTrack);
+                    mainController.getAppState().getUndoManager().executeCommand(addCommand);
                 }
             }
             closeWindow();
         } catch (NumberFormatException ex) {
-            mainController.getWindowManager().showError("Errore nell'inserimento dei dati numerici",
+            mainController.getAppState().getWindowManager().showError("Errore nell'inserimento dei dati numerici",
                     "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
         } catch (IllegalArgumentException ex) {
-            mainController.getWindowManager().showError("Dati non vallidi", ex.getMessage());
+            mainController.getAppState().getWindowManager().showError("Dati non vallidi", ex.getMessage());
         }
     }
 
@@ -189,7 +185,6 @@ public class AddModTrackController implements ITrackImporter {
      */
     @FXML
     public void handleSelectFile(ActionEvent event) {
-        // Recupera la finestra attuale
         Window currentWindow = ((Node) event.getSource()).getScene().getWindow();
 
         File selectedFile = selectAudioFile(currentWindow);
