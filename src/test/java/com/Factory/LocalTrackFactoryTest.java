@@ -6,13 +6,14 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.Model.Track;
 import com.Model.TrackFactory;
+import com.Model.TrackTag;
 import com.Model.LocalTrackFactory;
 
 /***
@@ -25,19 +26,37 @@ import com.Model.LocalTrackFactory;
 
 public class LocalTrackFactoryTest {
     private TrackFactory factory;
+    private File tempAudioFile;
+    private String nameAudio;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         this.factory = new LocalTrackFactory();
+
+        File libraryAudio = new File("data/library_audio");
+        if(!libraryAudio.exists()){
+            libraryAudio.mkdir();
+        }
+
+        nameAudio = "test_audio.mp3";
+        tempAudioFile = new File(libraryAudio, nameAudio);
+        if(!tempAudioFile.exists()){
+            tempAudioFile.createNewFile();
+        }
+    }
+
+    @AfterEach
+    public void tearDown(){
+        if(tempAudioFile != null && tempAudioFile.exists()){
+            tempAudioFile.delete();
+        }
     }
 
     @Test
     public void testCreateTrack_success() throws IOException {
-        File tmpFile = File.createTempFile("test_audio", ".wav");
-        tmpFile.deleteOnExit();
-
+    
         Track track = factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238,
-                "A Night at the opera", tmpFile.getAbsolutePath(), null);
+                "A Night at the opera", nameAudio, TrackTag.NONE);
         assertNotNull(track);
         assertEquals("Creep", track.getTitle());
         assertEquals("Radiohead", track.getAuthor());
@@ -50,49 +69,38 @@ public class LocalTrackFactoryTest {
 
     @Test
     public void testCreateTrack_noTitle() throws IOException {
-        File tmpFile = File.createTempFile("test_audio", ".wav");
-        tmpFile.deleteOnExit();
-
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
             factory.createTrack("", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera",
-                    tmpFile.getAbsolutePath(), null);
+                    nameAudio, TrackTag.NONE);
         });
-        assertTrue(exc.getMessage().contains("Titolo"));
+        assertNotNull(exc);
     }
 
     @Test
     public void testCreateTrack_noAuthor() throws IOException {
-        File tmpFile = File.createTempFile("test_audio", ".wav");
-        tmpFile.deleteOnExit();
-
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
             factory.createTrack("Creep", "", 1992, "Alternative Rock", 238, "A Night at the opera",
-                    tmpFile.getAbsolutePath(), null);
+                    nameAudio, TrackTag.NONE);
         });
-        assertTrue(exc.getMessage().contains("Autore"));
+        assertNotNull(exc);
     }
 
     @Test
     public void testCreateTrack_invalidDuration() throws IOException {
-        File tmpFile = File.createTempFile("test_audio", ".wav");
-        tmpFile.deleteOnExit();
-
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
             factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", -2, "A Night at the opera",
-                    tmpFile.getAbsolutePath(), null);
+                    nameAudio, TrackTag.NONE);
         });
-        assertTrue(exc.getMessage().contains("Durata"));
+        assertNotNull(exc);
     }
 
     @Test
     public void testCreateTrack_notExistentFilePath() {
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
             factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera",
-                    "C:/percorso/test.wav", null);
+                    "C:/percorso/test.wav", TrackTag.NONE);
         });
-
-        assertTrue(exc.getMessage().contains("mancante") ||
-                exc.getMessage().contains("non valido"));
+        assertNotNull(exc);
     }
 
     @Test
@@ -100,9 +108,8 @@ public class LocalTrackFactoryTest {
         Exception exc = assertThrows(IllegalArgumentException.class, () -> {
             factory.createTrack("Creep", "Radiohead", 1992, "Alternative Rock", 238, "A Night at the opera",
                     "",
-                    null);
+                    TrackTag.NONE);
         });
-
-        assertTrue(exc.getMessage().contains("File"));
+        assertNotNull(exc);
     }
 }

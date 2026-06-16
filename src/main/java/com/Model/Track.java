@@ -31,6 +31,7 @@ public class Track {
     private final StringProperty filePath = new SimpleStringProperty();
     private final ObjectProperty<TrackTag> tag = new SimpleObjectProperty<>(TrackTag.NONE);
     private final String id;
+    private int playCount = 0;
     private IAudioTrack audioSource;
 
     /**
@@ -96,6 +97,14 @@ public class Track {
         return tag.get();
     }
 
+    public String getId(){
+        return this.id;
+    }
+
+    public int getPlayCount(){
+        return this.playCount;
+    }
+
     public void setTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Il campo 'Titolo' non può essere vuoto");
@@ -141,6 +150,13 @@ public class Track {
 
     public void setTag(TrackTag tag) {
         this.tag.set(tag != null ? tag : TrackTag.NONE);
+    }
+
+    public void setPlayCount(int playCount){
+        if(playCount < 0){
+            throw new IllegalArgumentException("Il contatore delle riproduzioni non può essere negativo!");
+        }
+        this.playCount = playCount;
     }
     // getter per il binding grafico
 
@@ -200,6 +216,13 @@ public class Track {
         int min = totalSeconds / 60;
         int sec = totalSeconds % 60;
         return String.format("%02d:%02d", min, sec);
+    }
+
+    /**
+     * @brief Incrementa di 1 unità il numero di riproduzioni del brano.
+     */
+    public void incrementPlayCount() {
+        this.playCount++;
     }
 
     /**

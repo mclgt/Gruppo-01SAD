@@ -39,7 +39,9 @@ public class LocalTrackFactory extends TrackFactory {
     @Override
     public Track instantiateTrack(String title, String author, int year, String genre, int duration, String album,
             String filePath, TrackTag tag) {
-        File audioFile = new File(filePath);
+        File libraryAudio = new File("data/library_audio");
+        File audioFile = new File(libraryAudio, filePath.trim());
+
         if (!audioFile.exists() || !audioFile.isFile()) {
             throw new IllegalArgumentException("Errore: file audio mancante o non valido: " + filePath);
         }

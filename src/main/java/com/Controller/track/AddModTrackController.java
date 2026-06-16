@@ -1,6 +1,11 @@
 package com.Controller.track;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import com.Command.AddTrack;
 import com.Command.ICommand;
@@ -135,7 +140,10 @@ public class AddModTrackController implements ITrackImporter {
             String author = txtAuthor.getText();
             String genre = txtGenre.getText();
             String album = txtAlbum.getText();
-            String filePath = txtFilePath.getText();
+
+            String originalFilePath = txtFilePath.getText();
+            String finalFilePathForDB = originalFilePath;
+
             TrackTag tag = (tagCombo != null) ? tagCombo.getValue() : TrackTag.NONE;
             int duration = 0;
             if (txtDuration.getText() != null && !txtDuration.getText().isEmpty()) {
@@ -146,16 +154,32 @@ public class AddModTrackController implements ITrackImporter {
                 year = Integer.parseInt(txtYear.getText());
             }
 
+            if (!isEditMode && originalFilePath != null && !originalFilePath.isEmpty()) {
+                File sourceFile = new File(originalFilePath);
+
+                if (sourceFile.exists()) {
+                    File libraryAudio = new File("data/library_audio");
+                    if (!libraryAudio.exists()) {
+                        libraryAudio.mkdir();
+                    }
+
+                    Path destPath = Paths.get("data/library_audio", sourceFile.getName());
+                    Files.copy(sourceFile.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
+                    finalFilePathForDB = sourceFile.getName();
+                }
+            }
+
             if (isEditMode) {
                 ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author,
-                        year, genre, duration, album, filePath, tag);
+                        year, genre, duration, album, originalFilePath, tag);
 
                 if (mainController != null) {
                     mainController.getUndoManager().executeCommand(modifyCommand);
+                    mainController.notifyTrackModified(trackToModify);
                 }
             } else {
-                Track newTrack = this.factory.createTrack(title, author, year, genre, duration, album, filePath,
-                        tag);
+                Track newTrack = this.factory.createTrack(title, author, year, genre, duration, album,
+                        finalFilePathForDB, tag);
 
                 if (mainController != null) {
                     ICommand addCommand = new AddTrack(mainController.getLibrary(), newTrack);
@@ -168,6 +192,10 @@ public class AddModTrackController implements ITrackImporter {
                     "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
         } catch (IllegalArgumentException ex) {
             mainController.getWindowManager().showError("Dati non vallidi", ex.getMessage());
+        } catch (IOException ex) {
+            mainController.getWindowManager().showError("Errore file",
+                    "Impossibile copiare il file audio nella libreria");
+            ex.printStackTrace();
         }
     }
 

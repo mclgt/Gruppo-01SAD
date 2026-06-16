@@ -76,17 +76,25 @@ public class TrackTableController implements IPlayerSubscriber {
             TableRow<Track> row = new TableRow<>();
             row.itemProperty().addListener((observed, oldVal, newVal) -> {
                 if (newVal != null && newVal.equals(mainController.getPlayerContext().getCurrentTrack())) {
-                    row.setStyle("-fx-background-color: #f5a747;"); // cambia colore
+                    row.setStyle("-fx-background-color: #f5a747;");
                 } else {
                     row.setStyle("");
                 }
-
+            });
+            row.setOnMouseClicked(ev -> {
+                if (ev.getClickCount() == 2 && !row.isEmpty()) {
+                    mainController.getPlayerController().playSong();
+                }
             });
             return row;
         });
 
         trackTable.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, newVal) -> {
             mainController.updateDetailPanel(newVal);
+            boolean selectedIsPlaying = newVal != null
+                    && newVal == mainController.getPlayerContext().getCurrentTrack()
+                    && mainController.getPlayerContext().isPlaying();
+            mainController.updatePlayPauseButton(selectedIsPlaying);
         });
     }
 
@@ -188,6 +196,9 @@ public class TrackTableController implements IPlayerSubscriber {
     @Override
     public void onPlaybackChanged(Track newTrack) {
         Platform.runLater(() -> {
+            if(mainController != null){
+                mainController.updateTop();
+            }
             trackTable.refresh();
         });
     }
