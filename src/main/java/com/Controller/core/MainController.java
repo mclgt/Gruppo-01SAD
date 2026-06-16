@@ -1,8 +1,12 @@
 package com.Controller.core;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.Command.UndoManager;
 import com.Controller.playback.PlaybackTimerManager;
@@ -13,6 +17,9 @@ import com.Controller.playlist.PlaylistTableController;
 import com.Controller.track.SearchController;
 import com.Controller.track.TrackTableController;
 import com.Controller.util.WindowManager;
+import com.DataLayer.DAO.DatabaseManager;
+import com.DataLayer.DAO.Playlist.PlaylistDAO;
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Library;
 import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
@@ -23,18 +30,22 @@ import com.State.PlayerContext;
 import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -61,13 +72,7 @@ public class MainController {
     @FXML
     private Slider progressSlider;
     @FXML
-    private Button btnPlay;
-    @FXML
-    private Button btnUndo;
-    @FXML
-    private Button btnAddToPlaylist;
-    @FXML
-    private Button btnAddTrack, btnEditTrack, btnRemoveTrack;
+    private Button btnPlay, btnUndo, btnAddToPlaylist, btnAddTrack, btnEditTrack, btnRemoveTrack, btnNext;
     @FXML
     private Label lblTagTitle;
     @FXML
@@ -79,6 +84,28 @@ public class MainController {
 
     @FXML
     private TextField searchField;
+
+    @FXML
+    private ComboBox<String> playbackModeCombo;
+
+    @FXML
+    private Label lblEmptyHistoryMessage;
+    @FXML
+    private HBox frequentlyPlayedContainer;
+
+    @FXML
+    private TableView<Track> frequentlyPlayedTable;
+    @FXML
+    private TableColumn<Track, String> topTitleCol, topAuthorCol;
+    @FXML
+    private TableColumn<Track, Integer> topCountCol;
+
+    @FXML
+    private TableView<Playlist> frequentlyPlayedPlaylistTable;
+    @FXML
+    private TableColumn<Playlist, String> topPlaylistNameCol;
+    @FXML
+    private TableColumn<Playlist, Integer> topPlaylistCountCol;
 
     private PlaylistController playlistController;
 
@@ -96,11 +123,24 @@ public class MainController {
     private SearchController searchController = new SearchController();
 
     private Library trackList = new Library();
-    private TrackFactory factory;
+
+    private final TrackDAO trackDAO;
+    private final PlaylistDAO playlistDAO;
 
     public MainController(TrackFactory factory) {
-        this.factory = factory;
         windowManager = new WindowManager(this, factory);
+
+        this.trackDAO = new TrackDAO(factory);
+        this.playlistDAO = new PlaylistDAO(trackDAO);
+
+        try {
+            this.trackList.getTracks().addAll(trackDAO.getAll());
+            this.playlistCatalog.getPlaylists().addAll(playlistDAO.getAll());
+            System.out.println("Ripristino iniziale tramite DAO completato con successo.");
+        } catch (Exception e) {
+            System.err.println("Impossibile caricare i dati storici dal file DB all'avvio:");
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -127,33 +167,125 @@ public class MainController {
         searchController.init(trackList.getTracks(), trackTable);
         searchController.bindSearchField(searchField);
 
-        String dummyPath;
-        try {
-            dummyPath = java.nio.file.Paths.get(getClass().getResource("/com/dummy.mp3").toURI()).toString();
-        } catch (Exception e) {
-            dummyPath = "dummy.mp3";
+        playbackModeCombo.setItems(FXCollections.observableArrayList(
+                "Singola", "Sequenziale", "Loop brano", "Shuffle"));
+        playbackModeCombo.setValue("Singola");
+        playbackModeCombo.setOnAction(e -> playerController.setPlaybackMode(playbackModeCombo.getValue()));
+
+        topTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        topAuthorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
+        topCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
+
+        topPlaylistNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        topPlaylistCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
+
+        if (playlistList != null) {
+            playlistList.setItems(playlistCatalog.getPlaylists());
         }
 
-        trackList.addTrack(factory.instantiateTrack("Bohemian Rhapsody",    "Queen",             1975, "Rock",            354, "A Night at the Opera",   dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Hotel California",      "Eagles",            1976, "Rock",            391, "Hotel California",        dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Stairway to Heaven",    "Led Zeppelin",      1971, "Rock",            482, "Led Zeppelin IV",         dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Smells Like Teen Spirit","Nirvana",          1991, "Grunge",          301, "Nevermind",               dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Billie Jean",           "Michael Jackson",   1982, "Pop",             294, "Thriller",                dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Like a Rolling Stone",  "Bob Dylan",         1965, "Folk Rock",       369, "Highway 61 Revisited",    dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Purple Haze",           "Jimi Hendrix",      1967, "Psychedelic Rock",170, "Are You Experienced",     dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Johnny B. Goode",       "Chuck Berry",       1958, "Rock and Roll",   162, "Chuck Berry Is on Top",   dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("What's Going On",       "Marvin Gaye",       1971, "Soul",            235, "What's Going On",         dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Superstition",          "Stevie Wonder",     1972, "Funk",            245, "Talking Book",            dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Good Vibrations",       "The Beach Boys",    1966, "Pop",             215, "Smiley Smile",            dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Imagine",               "John Lennon",       1971, "Pop",             187, "Imagine",                 dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Respect",               "Aretha Franklin",   1967, "Soul",            147, "I Never Loved a Man",     dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Johnny Guitar",         "Peggy Lee",         1954, "Jazz",            181, "Black Coffee",            dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Blue Suede Shoes",      "Elvis Presley",     1956, "Rock and Roll",   140, "Elvis Presley",           dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Born to Run",           "Bruce Springsteen", 1975, "Rock",            270, "Born to Run",             dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Yesterday",             "The Beatles",       1965, "Pop",             125, "Help!",                   dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Lose Yourself",         "Eminem",            2002, "Hip-Hop",         326, "8 Mile Soundtrack",       dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Blinding Lights",       "The Weeknd",        2019, "Synth-Pop",       200, "After Hours",             dummyPath, TrackTag.NONE));
-        trackList.addTrack(factory.instantiateTrack("Shape of You",          "Ed Sheeran",        2017, "Pop",             234, "Divide",                  dummyPath, TrackTag.NONE));
+        updateTop();
+    }
+
+    /**
+     * @brief Aggiorna lo stato visivo dei tab Frequently Played (US-21)
+     *        Compatibile con versioni Java 11+ tramite
+     *        .collect(Collectors.toList())
+     */
+    public void updateTop() {
+        try {
+            List<Track> topTracks = this.trackDAO.getFrequentlyPlayed(5);
+            List<Playlist> topPlaylists = this.playlistDAO.getFrequentlyPlayed(5);
+
+            boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) ||
+                    topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
+
+            if (hasHistory) {
+                if (lblEmptyHistoryMessage != null) {
+                    lblEmptyHistoryMessage.setVisible(false);
+                    lblEmptyHistoryMessage.setManaged(false);
+                }
+                if (frequentlyPlayedContainer != null) {
+                    frequentlyPlayedContainer.setVisible(true);
+                    frequentlyPlayedContainer.setManaged(true);
+                }
+
+                List<Track> filteredTracks = topTracks.stream()
+                        .filter(t -> t.getPlayCount() > 0)
+                        .collect(Collectors.toList());
+                frequentlyPlayedTable.setItems(FXCollections.observableArrayList(filteredTracks));
+
+                List<Playlist> filteredPlaylists = topPlaylists.stream()
+                        .filter(p -> p.getPlayCount() > 0)
+                        .collect(Collectors.toList());
+                frequentlyPlayedPlaylistTable.setItems(FXCollections.observableArrayList(filteredPlaylists));
+            } else {
+                if (frequentlyPlayedContainer != null) {
+                    frequentlyPlayedContainer.setVisible(false);
+                    frequentlyPlayedContainer.setManaged(false);
+                }
+                if (lblEmptyHistoryMessage != null) {
+                    lblEmptyHistoryMessage.setVisible(true);
+                    lblEmptyHistoryMessage.setManaged(true);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Errore nell'aggiornamento grafico del Frequently Played: " + e.getMessage());
+        }
+    }
+
+    /**
+     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo
+     *        tramite Transazione (Commit).
+     *        Invocato esclusivamente dal metodo stop() della classe Main.
+     */
+    public void saveDB() {
+        System.out.println("Inizio esportazione massiva dello stato RAM sul database...");
+        Connection c = null;
+        try {
+            c = DatabaseManager.getConnection();
+            c.setAutoCommit(false); // Avviamo la transazione sicura
+
+            try (Statement st = c.createStatement()) {
+                st.executeUpdate("DELETE FROM tracks;");
+                st.executeUpdate("DELETE FROM playlists;");
+            }
+
+            for (Track track : this.trackList.getTracks()) {
+                this.trackDAO.save(track);
+            }
+
+            for (Playlist playlist : this.playlistCatalog.getPlaylists()) {
+                this.playlistDAO.save(playlist);
+            }
+
+            c.commit(); // Scrittura fisica bloccata sul file db
+            System.out.println("Sincronizzazione finale completata. File SQLite aggiornato.");
+        } catch (Exception e) {
+            System.err.println("Errore durante la persistenza di chiusura dei DAO:");
+            e.printStackTrace();
+            if (c != null) {
+                try {
+                    c.rollback();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } finally {
+            try {
+                if (c != null)
+                    c.setAutoCommit(true);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public List<Track> getFrequentlyPlayedTracks(int limit) throws Exception {
+        return this.trackDAO.getFrequentlyPlayed(limit);
+    }
+
+    public List<Playlist> getFrequentlyPlayedPlaylists(int limit) throws Exception {
+        return this.playlistDAO.getFrequentlyPlayed(limit);
     }
 
     /**
@@ -225,6 +357,11 @@ public class MainController {
         trackList.addTrack(track);
     }
 
+    public void notifyTrackModified(Track track) {
+        playerController.handleTrackModified(track);
+        updateDetailPanel(track);
+    }
+
     /**
      * @brief Gestisce l'evento di pressione sul pulsante di undo.
      *        Richiama il metodo undo() dell'UndoManager, che si occupa di
@@ -253,7 +390,12 @@ public class MainController {
     @FXML
     public void togglePlayPause() {
         Track current = playerContext.getCurrentTrack();
-        if (current != null && !playerController.isTrackFinished()) {
+        Track librarySelected = trackTableController.getSelectedTrack();
+        Track playlistSelected = playlistController != null ? playlistController.getSelectedTrack() : null;
+        Track selected = librarySelected != null ? librarySelected : playlistSelected;
+
+        if (current != null && !playerController.isTrackFinished()
+                && (selected == null || selected == current)) {
             playerController.pauseSong();
         } else {
             playerController.playSong();
@@ -271,19 +413,10 @@ public class MainController {
         }
     }
 
-    @FXML
-    public void sequentialRip(ActionEvent ev) {
-        playerController.sequentialRip(ev);
-    }
-
-    @FXML
-    public void loopRip(ActionEvent ev) {
-        playerController.loopRip(ev);
-    }
-
-    @FXML
-    public void shuffleRip(ActionEvent ev) {
-        playerController.shuffleRip(ev);
+    public void updateNextButton() {
+        if (btnNext != null) {
+            btnNext.setDisable(!playerController.isNextAvailable());
+        }
     }
 
     @FXML
@@ -309,6 +442,11 @@ public class MainController {
     @FXML
     public void openAddPlaylistView(ActionEvent ev) {
         windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
+    }
+
+    @FXML
+    public void openAutoPlaylistWindow(ActionEvent ev) {
+        windowManager.openAutoPlaylistWindow(this);
     }
 
     public void openPlaylistView(Playlist selectedPlaylist) {
@@ -382,6 +520,12 @@ public class MainController {
 
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
+        javafx.scene.Node node = (javafx.scene.Node) ev.getTarget();
+        while (node != null) {
+            if (node instanceof javafx.scene.control.Control)
+                return;
+            node = node.getParent();
+        }
         trackTableController.clearSelection();
         playlistTableController.clearSelection();
     }

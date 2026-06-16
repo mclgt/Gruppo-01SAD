@@ -77,6 +77,41 @@ public class PlayerController {
     }
 
     /**
+     * @brief Imposta la modalità di riproduzione selezionata dal ComboBox.
+     */
+    public void setPlaybackMode(String mode) {
+        switch (mode) {
+            case "Singola":
+                sequentialMode = false;
+                loopMode = false;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+                break;
+            case "Sequenziale":
+                sequentialMode = true;
+                loopMode = false;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new SequentialStrategy());
+                break;
+            case "Loop brano":
+                sequentialMode = false;
+                loopMode = true;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new LoopTrackStrategy());
+                break;
+            case "Shuffle":
+                sequentialMode = true;
+                loopMode = false;
+                loopPlaylistMode = false;
+                mainController.getPlayerContext().getPlaybackContext().setStrategy(new ShuffleStrategy());
+                break;
+            default:
+                break;
+        }
+        mainController.updateNextButton();
+    }
+
+    /**
      * @brief Gestisce l'avvio della riproduzione per il brano o la playlist
      *        selezionata
      */
@@ -93,8 +128,6 @@ public class PlayerController {
             }
             activeContainer = mainController.getLibrary();
             trackFinished = false;
-            sequentialMode = false;
-            loopMode = false;
             startTrackPlayback(selectedTrack);
             return;
         }
@@ -110,8 +143,6 @@ public class PlayerController {
             }
             activeContainer = mainController.getPlaylistController().getCurrentPlaylist();
             trackFinished = false;
-            sequentialMode = false;
-            loopMode = false;
             startTrackPlayback(playlistViewTrack);
             return;
         }
@@ -129,8 +160,6 @@ public class PlayerController {
                 }
                 activeContainer = current;
                 trackFinished = false;
-                sequentialMode = false;
-                loopMode = false;
                 startTrackPlayback(firstTrack);
                 return;
             }
@@ -145,7 +174,6 @@ public class PlayerController {
 
             activeContainer = selectedPlaylist;
             trackFinished = false;
-            sequentialMode = false;
             Track firstTrack = activeContainer.getTracks().get(0);
             if (mainController.getPlayerContext().isPlaying()
                     && firstTrack == mainController.getPlayerContext().getCurrentTrack() && !trackFinished) {
@@ -361,6 +389,8 @@ public class PlayerController {
                     lblCurrentTime.setText(timer.getFormattedTime(elapsed));
                 },
                 this::handlePlaybackFinished);
+
+        mainController.updateNextButton();
     }
 
     /**
@@ -408,6 +438,16 @@ public class PlayerController {
             }
             return;
         }
+        if (!sequentialMode) {
+            stopSong();
+            trackFinished = true;
+            mainController.getPlayerContext().stop();
+            resetUI();
+            lblNowPlaying.setText("Canzone terminata");
+            mainController.updatePlayPauseButton(false);
+            mainController.updateNextButton();
+            return;
+        }
         Track before = mainController.getPlayerContext().getCurrentTrack();
         Track next = mainController.getPlayerContext().getPlaybackContext().nextTrack(getActiveQueue(), before);
         if (next != null) {
@@ -419,8 +459,8 @@ public class PlayerController {
             resetUI();
             lblNowPlaying.setText("Canzone terminata");
             mainController.updatePlayPauseButton(false);
+            mainController.updateNextButton();
         }
-
     }
 
     /**
@@ -449,6 +489,7 @@ public class PlayerController {
             mainController.getPlayerContext().stop();
             resetUI();
             mainController.updatePlayPauseButton(false);
+            mainController.updateNextButton();
         }
     }
 
@@ -458,8 +499,6 @@ public class PlayerController {
      */
     public void handlePrev(ActionEvent event) {
         mainController.getTimerManager().stop();
-        sequentialMode = true;
-        loopMode = false;
         Track before = mainController.getPlayerContext().getCurrentTrack();
         ObservableList<Track> queue = (activeContainer != null) ? activeContainer.getTracks()
                 : mainController.getLibrary().getTracks();
@@ -581,6 +620,7 @@ public class PlayerController {
         loopMode = false;
         Track startTrack = selectedTrack != null ? selectedTrack : playlist.getTracks().get(0);
         startTrackPlayback(startTrack);
+        mainController.updateNextButton();
     }
 
     /**
@@ -603,10 +643,41 @@ public class PlayerController {
     }
 
     /**
+     * @brief Ferma la riproduzione se il brano modificato è quello corrente.
+     *        Da chiamare dopo ogni modifica tramite ModifyTrack.
+     * @param modifiedTrack Il brano appena modificato.
+     */
+    public void handleTrackModified(Track modifiedTrack) {
+        Track current = mainController.getPlayerContext().getCurrentTrack();
+        if (current == null || current != modifiedTrack) return;
+
+        mainController.getTimerManager().stop();
+        if (current.getAudioSource() != null) {
+            current.getAudioSource().stopPlayback();
+        }
+        mainController.getPlayerContext().stop();
+        mainController.getPlayerContext().setCurrentTrack(null);
+        trackFinished = true;
+        resetUI();
+        lblNowPlaying.setText("Nessuna traccia in riproduzione");
+        mainController.updatePlayPauseButton(false);
+    }
+
+    /**
      * @brief Restituisce il contenitore attivo.
      * @return ITrackContainer corrente.
      */
     public ITrackContainer getActiveContainer() {
         return this.activeContainer;
+    }
+
+    public boolean isNextAvailable() {
+        if (loopMode || loopPlaylistMode) return true;
+        if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy) return true;
+        Track current = mainController.getPlayerContext().getCurrentTrack();
+        if (current == null) return false;
+        List<Track> queue = getActiveQueue();
+        int idx = queue.indexOf(current);
+        return idx >= 0 && idx < queue.size() - 1;
     }
 }

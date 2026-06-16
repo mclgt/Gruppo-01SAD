@@ -111,6 +111,7 @@ public class SearchController {
      */
     public void resetContext(ObservableList<Track> list, TableView<Track> table) {
         init(list, table);
+        trackableTable.setItems(originalList);
         if (boundField != null) {
             boundField.clear();
         }
