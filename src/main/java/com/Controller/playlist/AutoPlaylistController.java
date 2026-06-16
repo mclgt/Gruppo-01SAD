@@ -100,8 +100,7 @@ public class AutoPlaylistController {
         String name = txtName.getText().trim();
 
         try {
-            AutoPlaylistService.validateName(name,
-                    mainController.getPlaylistCatalog().getPlaylists());
+            AutoPlaylistService.validateName(name,mainController.getPlaylistCatalog().getPlaylists());
         } catch (IllegalArgumentException ex) {
             mainController.getWindowManager().showWarning("Nome non valido", ex.getMessage());
             return;
