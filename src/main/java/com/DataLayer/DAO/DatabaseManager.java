@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseManager {
-    private static final String DB_URL = "jdbc:sqlite:data/musicplayer.db";
+    private static String DB_URL = "jdbc:sqlite:data/musicplayer.db";
     private static Connection connection = null;
 
     private DatabaseManager() {}
@@ -34,5 +34,13 @@ public class DatabaseManager {
                 e.printStackTrace();
             }
         }
+    }
+
+    // Metodo speciale solo per i test JUnit
+    public static void setTestMode(boolean isTest) {
+        if (isTest) {
+            DB_URL = "jdbc:sqlite::memory:"; // Database temporaneo in RAM
+        }
+        closeConnection(); // Forza la riapertura con il nuovo URL
     }
 }

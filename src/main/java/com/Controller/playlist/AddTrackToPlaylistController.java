@@ -58,7 +58,7 @@ public class AddTrackToPlaylistController {
                 mainController.getWindowManager().showWarning("Brano duplicato",
                         "Il brano '" + track.getTitle() + "' è già presente.");
             } else {
-                ICommand addCommand = new AddTrack(targetPlaylist, track);
+                ICommand addCommand = new AddTrack(targetPlaylist, track, mainController.getTrackDAO());
                 mainController.getUndoManager().executeCommand(addCommand);
                 addedCount++;
             }
@@ -89,7 +89,7 @@ public class AddTrackToPlaylistController {
                 mainController.getWindowManager().showWarning("Brano Duplicato",
                         "Il brano '" + track.getTitle() + "' è già presente.");
             } else {
-                ICommand addCmd = new AddTrack(targetPlaylist, track);
+                ICommand addCmd = new AddTrack(targetPlaylist, track, mainController.getTrackDAO());
                 mainController.getUndoManager().executeCommand(addCmd);
                 addedCount++;
             }

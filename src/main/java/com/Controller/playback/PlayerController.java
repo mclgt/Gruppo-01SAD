@@ -1,5 +1,7 @@
 package com.Controller.playback;
 
+import java.util.List;
+
 import com.Controller.core.MainController;
 import com.Controller.playlist.PlaylistController;
 import com.Model.ITrackContainer;
@@ -281,8 +283,10 @@ public class PlayerController {
      *      ferma la riproduzione e resetta l'interfaccia.
      */
     private void handlePlaybackFinished() {
+        Track current = mainController.getPlayerContext().getCurrentTrack();
+        current.incrementPlayCount();
+
         if (loopMode) {
-            Track current = mainController.getPlayerContext().getCurrentTrack();
             if (current != null) {
                 startTrackPlayback(current);
             }
@@ -297,6 +301,27 @@ public class PlayerController {
             mainController.updatePlayPauseButton(false);
             mainController.updateNextButton();
             return;
+        }
+        Track before = mainController.getPlayerContext().getCurrentTrack();
+        Track next = mainController.getPlayerContext().getPlaybackContext().nextTrack(getSelectedQueueFromUI(), before);
+        if (next != null) {
+            handleNext(null);
+        } else {
+            ITrackContainer container = getActiveContainer();
+            // Aggiorno il contatore delle riproduzioni della playlist dato che arrivato qui
+            // sono terminate tutte le canzoni contenute in essa
+            if (container instanceof Playlist) {
+                Playlist activePlaylist = (Playlist) container;
+                activePlaylist.incrementPlayCount();
+            }
+
+            stopSong();
+            trackFinished = true;
+            mainController.getPlayerContext().stop();
+            resetUI();
+            lblNowPlaying.setText("Canzone terminata");
+            mainController.updatePlayPauseButton(false);
+            mainController.updateNextButton();
         }
         handleNext(null);
     }
@@ -472,7 +497,8 @@ public class PlayerController {
      */
     public void handleTrackModified(Track modifiedTrack) {
         Track current = mainController.getPlayerContext().getCurrentTrack();
-        if (current == null || current != modifiedTrack) return;
+        if (current == null || current != modifiedTrack)
+            return;
 
         mainController.getTimerManager().stop();
         if (current.getAudioSource() != null) {
@@ -495,9 +521,12 @@ public class PlayerController {
     }
 
     public boolean isNextAvailable() {
-        if (loopMode || loopPlaylistMode) return true;
-        if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy) return true;
+        if (loopMode || loopPlaylistMode)
+            return true;
+        if (mainController.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy)
+            return true;
         Track current = mainController.getPlayerContext().getCurrentTrack();
+
         if (current == null) return false;
         ObservableList<Track> queue = getSelectedQueueFromUI();
         if(queue==null || queue.isEmpty()){

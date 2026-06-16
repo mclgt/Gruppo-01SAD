@@ -2,7 +2,6 @@ package com.Controller.core;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Statement;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -237,34 +236,32 @@ public class MainController {
     }
 
     /**
-     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo
-     *        tramite Transazione (Commit).
-     *        Invocato esclusivamente dal metodo stop() della classe Main.
+     * @brief Esegue una sincronizzazione di sicurezza (Fallback) alla chiusura.
+     * Dato che l'app è in Real-Time, i database dovrebbero essere già allineati.
+     * Questo metodo fa un semplice UPDATE (non distruttivo) di tutto ciò che è in RAM
+     * per catturare eventuali modifiche sfuggite.
      */
     public void saveDB() {
-        System.out.println("Inizio esportazione massiva dello stato RAM sul database...");
+        System.out.println("Avvio fallback di chiusura ...");
         Connection c = null;
         try {
             c = DatabaseManager.getConnection();
             c.setAutoCommit(false); // Avviamo la transazione sicura
 
-            try (Statement st = c.createStatement()) {
-                st.executeUpdate("DELETE FROM tracks;");
-                st.executeUpdate("DELETE FROM playlists;");
+            for(Track track : this.trackList.getTracks()){
+                this.trackDAO.update(track);
             }
 
-            for (Track track : this.trackList.getTracks()) {
-                this.trackDAO.save(track);
+            for(Playlist playlist : this.playlistCatalog.getPlaylists()){
+                this.playlistDAO.update(playlist);
             }
 
-            for (Playlist playlist : this.playlistCatalog.getPlaylists()) {
-                this.playlistDAO.save(playlist);
-            }
+            c.commit();
+            System.out.println("Chiusura sicura completata. Tutti i dati sono allineati.");
 
-            c.commit(); // Scrittura fisica bloccata sul file db
-            System.out.println("Sincronizzazione finale completata. File SQLite aggiornato.");
+
         } catch (Exception e) {
-            System.err.println("Errore durante la persistenza di chiusura dei DAO:");
+            System.err.println("Errore durante la sincronizzazione di sicurezza: ");
             e.printStackTrace();
             if (c != null) {
                 try {
@@ -298,6 +295,14 @@ public class MainController {
      */
     public Library getLibrary() {
         return trackList;
+    }
+
+    public PlaylistDAO getPlaylistDAO(){
+        return playlistDAO;
+    }
+
+    public TrackDAO getTrackDAO(){
+        return trackDAO;
     }
 
     public Button getBtnAddToPlaylist() {
@@ -363,6 +368,24 @@ public class MainController {
     public void notifyTrackModified(Track track) {
         playerController.handleTrackModified(track);
         updateDetailPanel(track);
+
+        updateTop();
+
+        if(trackTable != null){
+            trackTable.refresh();
+        }
+
+        if(frequentlyPlayedTable != null){
+            frequentlyPlayedTable.refresh();
+        }
+
+        if(frequentlyPlayedPlaylistTable != null){
+            frequentlyPlayedPlaylistTable.refresh();
+        }
+
+        if(playlistController != null && playlistController.getPlaylistTrackList() != null){
+            playlistController.getPlaylistTrackList().refresh();
+        }
     }
 
     /**
@@ -381,6 +404,7 @@ public class MainController {
             playerController.setTrackFinished(false);
             playerContext.setCurrentTrack(null);
         }
+        updateTop();
     }
 
     /**

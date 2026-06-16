@@ -208,7 +208,7 @@ public class PlaylistController implements IPlayerSubscriber {
                                 + selectedTrack.getTitle() + "\" dalla playlist \"" + currentPlaylist.getName() + "\"?",
                         null);
         if (result.isPresent() && result.get().getText().equals("OK")) {
-            ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
+            ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack, mainController.getTrackDAO());
             boolean wasPlaying = mainController.getPlayerContext().isPlaying()
                     && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
             mainController.getDeletedPlayingStack().push(wasPlaying);
