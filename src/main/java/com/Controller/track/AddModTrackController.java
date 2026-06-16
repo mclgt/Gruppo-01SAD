@@ -154,20 +154,7 @@ public class AddModTrackController implements ITrackImporter {
                 year = Integer.parseInt(txtYear.getText());
             }
 
-            if (!isEditMode && originalFilePath != null && !originalFilePath.isEmpty()) {
-                File sourceFile = new File(originalFilePath);
-
-                if (sourceFile.exists()) {
-                    File libraryAudio = new File("data/library_audio");
-                    if (!libraryAudio.exists()) {
-                        libraryAudio.mkdir();
-                    }
-
-                    Path destPath = Paths.get("data/library_audio", sourceFile.getName());
-                    Files.copy(sourceFile.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
-                    finalFilePathForDB = sourceFile.getName();
-                }
-            }
+            finalFilePathForDB = originalFilePath;
 
             if (isEditMode) {
                 ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author,
@@ -192,10 +179,6 @@ public class AddModTrackController implements ITrackImporter {
                     "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
         } catch (IllegalArgumentException ex) {
             mainController.getWindowManager().showError("Dati non vallidi", ex.getMessage());
-        } catch (IOException ex) {
-            mainController.getWindowManager().showError("Errore file",
-                    "Impossibile copiare il file audio nella libreria");
-            ex.printStackTrace();
         }
     }
 

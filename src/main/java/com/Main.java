@@ -41,11 +41,12 @@ public class Main extends Application {
     @Override
     public void stop() throws Exception {
         System.out.println("Rilevata chiusura dell'applicazione. Avvio sincronizzazione database...");
-        
+
         if (mainController != null) {
+            mainController.getTimerManager().stop();
             mainController.saveDB();
         }
-        
+
         // Rilascio definitivo e chiusura sicura delle risorse
         DatabaseManager.closeConnection();
         super.stop();

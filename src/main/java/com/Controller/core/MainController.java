@@ -192,45 +192,47 @@ public class MainController {
      *        .collect(Collectors.toList())
      */
     public void updateTop() {
-        try {
-            List<Track> topTracks = this.trackDAO.getFrequentlyPlayed(5);
-            List<Playlist> topPlaylists = this.playlistDAO.getFrequentlyPlayed(5);
+        javafx.application.Platform.runLater(() -> {
+            try {
+                List<Track> topTracks = this.trackDAO.getFrequentlyPlayed(5);
+                List<Playlist> topPlaylists = this.playlistDAO.getFrequentlyPlayed(5);
 
-            boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) ||
-                    topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
+                boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) ||
+                        topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
 
-            if (hasHistory) {
-                if (lblEmptyHistoryMessage != null) {
-                    lblEmptyHistoryMessage.setVisible(false);
-                    lblEmptyHistoryMessage.setManaged(false);
-                }
-                if (frequentlyPlayedContainer != null) {
-                    frequentlyPlayedContainer.setVisible(true);
-                    frequentlyPlayedContainer.setManaged(true);
-                }
+                if (hasHistory) {
+                    if (lblEmptyHistoryMessage != null) {
+                        lblEmptyHistoryMessage.setVisible(false);
+                        lblEmptyHistoryMessage.setManaged(false);
+                    }
+                    if (frequentlyPlayedContainer != null) {
+                        frequentlyPlayedContainer.setVisible(true);
+                        frequentlyPlayedContainer.setManaged(true);
+                    }
 
-                List<Track> filteredTracks = topTracks.stream()
-                        .filter(t -> t.getPlayCount() > 0)
-                        .collect(Collectors.toList());
-                frequentlyPlayedTable.setItems(FXCollections.observableArrayList(filteredTracks));
+                    List<Track> filteredTracks = topTracks.stream()
+                            .filter(t -> t.getPlayCount() > 0)
+                            .collect(Collectors.toList());
+                    frequentlyPlayedTable.setItems(FXCollections.observableArrayList(filteredTracks));
 
-                List<Playlist> filteredPlaylists = topPlaylists.stream()
-                        .filter(p -> p.getPlayCount() > 0)
-                        .collect(Collectors.toList());
-                frequentlyPlayedPlaylistTable.setItems(FXCollections.observableArrayList(filteredPlaylists));
-            } else {
-                if (frequentlyPlayedContainer != null) {
-                    frequentlyPlayedContainer.setVisible(false);
-                    frequentlyPlayedContainer.setManaged(false);
+                    List<Playlist> filteredPlaylists = topPlaylists.stream()
+                            .filter(p -> p.getPlayCount() > 0)
+                            .collect(Collectors.toList());
+                    frequentlyPlayedPlaylistTable.setItems(FXCollections.observableArrayList(filteredPlaylists));
+                } else {
+                    if (frequentlyPlayedContainer != null) {
+                        frequentlyPlayedContainer.setVisible(false);
+                        frequentlyPlayedContainer.setManaged(false);
+                    }
+                    if (lblEmptyHistoryMessage != null) {
+                        lblEmptyHistoryMessage.setVisible(true);
+                        lblEmptyHistoryMessage.setManaged(true);
+                    }
                 }
-                if (lblEmptyHistoryMessage != null) {
-                    lblEmptyHistoryMessage.setVisible(true);
-                    lblEmptyHistoryMessage.setManaged(true);
-                }
+            } catch (Exception e) {
+                System.err.println("Errore nell'aggiornamento grafico del Frequently Played: " + e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Errore nell'aggiornamento grafico del Frequently Played: " + e.getMessage());
-        }
+        });
     }
 
     /**
