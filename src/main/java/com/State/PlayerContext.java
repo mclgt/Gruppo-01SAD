@@ -1,11 +1,11 @@
 package com.State;
 
-import com.Strategy.PlaybackContext;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.Model.Track;
 import com.Observer.IPlayerSubscriber;
-
-import java.util.List;
-import java.util.ArrayList;
+import com.Strategy.PlaybackContext;
 
 /**
  * @class PlayerContext
@@ -153,7 +153,6 @@ public class PlayerContext {
      * @brief Ferma la riproduzione delegando allo stato corrente.
      */
     public void stop() {
-        this.currentTrack = null;
         currentState.stop();
         notifySubscribers();
     }
@@ -164,14 +163,18 @@ public class PlayerContext {
      * @param queue   La lista completa delle tracce disponibili.
      * @param current La traccia attualmente in riproduzione.
      */
-    public void next(List<Track> queue, Track current) {
-        Track nexTrack = this.playbackContext.nextTrack(queue, current);
+    public void next() {
+        /*Track nexTrack = this.playbackContext.nextTrack(queue, current);
         if (nexTrack != null) {
             this.setCurrentTrack(nexTrack);
             notifySubscribers();
         }
         if (currentState != null) {
             currentState.next(queue, current);
+        }*/
+        if(currentState!=null){
+            currentState.next();
+            notifySubscribers();
         }
     }
 
@@ -181,13 +184,17 @@ public class PlayerContext {
      * @param queue   La lista completa delle tracce disponibili.
      * @param current La traccia attualmente in riproduzione.
      */
-    public void previous(List<Track> queue, Track current) {
-        Track prevTrack = this.playbackContext.previousTrack(queue, current);
+    public void previous() {
+       /* Track prevTrack = this.playbackContext.previousTrack(queue, current);
         if (prevTrack != null) {
             this.setCurrentTrack(prevTrack);
             notifySubscribers();
         }
-        currentState.previous(queue, current);
+        currentState.previous(queue, current);*/
+        if(currentState!=null){
+            currentState.previous();
+            notifySubscribers();
+        }
     }
 
     /**

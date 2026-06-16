@@ -5,13 +5,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
 import com.Strategy.IPlaybackStrategy;
 import com.Strategy.PlaybackContext;
 
@@ -48,14 +47,19 @@ public class PlayingStateTest {
         }
 
         @Override
-        public Track nextTrack(List<Track> queue, Track current) {
+        public Track nextTrack(Track current) {
             return nextResult;
         }
 
         @Override
-        public Track previousTrack(List<Track> queue, Track current) {
+        public Track previousTrack(Track current) {
             return prevResult;
         }
+        @Override
+        public void setQueue(List<Track> queue, Track currentTrack) {}
+
+        @Override
+        public void updateQueue(List<Track> updatedQueue) {}
     }
 
     private Track track1;
@@ -176,7 +180,7 @@ public class PlayingStateTest {
         // imposta manualmente track1 come traccia corrente di partenza
         ctx.setCurrentTrack(track1);
 
-        state.next(queue, track1);
+        state.next();
 
         // la strategia ha restituito track2, quindi il contesto deve averla impostata come corrente
         assertEquals(track2, ctx.getCurrentTrack());
@@ -197,11 +201,11 @@ public class PlayingStateTest {
         ctx.setCurrentTrack(track1);
 
         // primo next: track1 -> track2
-        state.next(queue, track1);
+        state.next();
         assertEquals(track2, ctx.getCurrentTrack());
 
         // secondo next: lo stub restituisce di nuovo track2, quindi rimane su track2
-        state.next(queue, track2);
+        state.next();
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
@@ -219,7 +223,7 @@ public class PlayingStateTest {
         ctx.setCurrentTrack(track1);
 
         // next() chiamato ma la strategia restituisce null -> PlayingState non aggiorna la traccia
-        state.next(queue, track1);
+        state.next();
 
         // track1 deve rimanere corrente perché non c'era traccia successiva
         assertEquals(track1, ctx.getCurrentTrack());
@@ -237,7 +241,7 @@ public class PlayingStateTest {
         PlayerContext ctx = contextWith(track2, null);
         PlayingState state = new PlayingState(ctx);
 
-        assertDoesNotThrow(() -> state.next(queue, track1));
+        assertDoesNotThrow(() -> state.next());
     }
 
     // -----------------------------------------------------------------------
@@ -258,7 +262,7 @@ public class PlayingStateTest {
         // parte da track2 come corrente
         ctx.setCurrentTrack(track2);
 
-        state.previous(queue, track2);
+        state.previous();
 
         // la strategia ha restituito track1, quindi deve diventare la traccia corrente
         assertEquals(track1, ctx.getCurrentTrack());
@@ -278,7 +282,7 @@ public class PlayingStateTest {
         ctx.setCurrentTrack(track2);
 
         // previous() chiamato ma la strategia restituisce null -> PlayingState non aggiorna la traccia
-        state.previous(queue, track2);
+        state.previous();
 
         // track2 deve rimanere corrente perché non c'era traccia precedente
         assertEquals(track2, ctx.getCurrentTrack());
@@ -296,7 +300,7 @@ public class PlayingStateTest {
         PlayerContext ctx = contextWith(null, track1);
         PlayingState state = new PlayingState(ctx);
 
-        assertDoesNotThrow(() -> state.previous(queue, track2));
+        assertDoesNotThrow(() -> state.previous());
     }
 
     /**
@@ -311,7 +315,7 @@ public class PlayingStateTest {
         PlayerContext ctx = contextWith(null, null);
         PlayingState state = new PlayingState(ctx);
 
-        assertDoesNotThrow(() -> state.previous(queue, track1));
+        assertDoesNotThrow(() -> state.previous());
     }
 
     // -----------------------------------------------------------------------

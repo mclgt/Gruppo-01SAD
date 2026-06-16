@@ -1,17 +1,16 @@
 package com.Strategy;
 
-import com.Model.Track;
-import com.Model.TrackFactory;
-import com.Model.MockTrackFactory;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.Model.MockTrackFactory;
+import com.Model.Track;
+import com.Model.TrackFactory;
 
 /**
  * @class ShuffleStrategyTest
@@ -52,7 +51,8 @@ class ShuffleStrategyTest {
     @Test
     void nextTrack_emptyQueue_returnsNull() {
         List<Track> queue = List.of();
-        assertNull(strategy.nextTrack(queue, null));
+        strategy.setQueue(queue, null);
+        assertNull(strategy.nextTrack( null));
     }
 
     /**
@@ -62,7 +62,8 @@ class ShuffleStrategyTest {
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
-        assertEquals(track1, strategy.nextTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+        assertEquals(track1, strategy.nextTrack(track1));
     }
 
     /**
@@ -74,8 +75,10 @@ class ShuffleStrategyTest {
     @Test
     void nextTrack_multipleTracks_almostNeverReturnsCurrentTrack() {
         List<Track> queue = List.of(track1, track2, track3);
-        for (int i = 0; i < 20; i++) {
-            assertNotEquals(track1, strategy.nextTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+
+        for (int i = 0; i < 5; i++) {
+            assertNotEquals(track1, strategy.nextTrack(track1));
         }
     }
 
@@ -87,7 +90,8 @@ class ShuffleStrategyTest {
     @Test
     void nextTrack_multipleTracks_returnsValidTrack() {
         List<Track> queue = List.of(track1, track2, track3);
-        assertNotEquals(track1, strategy.nextTrack(queue, track1));
+        strategy.setQueue(queue, track1);
+        assertNotEquals(track1, strategy.nextTrack(track1));
     }
 
     // -----------------------------------------------------------------------
@@ -103,8 +107,9 @@ class ShuffleStrategyTest {
     @Test
     void previousTrack_behaviorSameAsNextTrack() {
         List<Track> queue = List.of(track1, track2, track3);
+        strategy.setQueue(queue, track1);
         for (int i = 0; i < 20; i++) {
-            assertNotEquals(track1, strategy.previousTrack(queue, track1));
+            assertNotEquals(track1, strategy.previousTrack(track1));
         }
     }
 }

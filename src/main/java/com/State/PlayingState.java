@@ -1,8 +1,8 @@
 package com.State;
 
-import com.Model.Track;
-import java.util.List;
 
+
+import com.Model.Track;
 /**
  * @class PlayingState
  * @brief Stato di riproduzione attiva nel pattern State del player.
@@ -37,15 +37,7 @@ public class PlayingState implements IPlayerState {
      */
     @Override
     public void play(Track track) {
-        Track previous = context.getCurrentTrack();
-        if (previous != null && previous.getAudioSource() != null) {
-            previous.getAudioSource().stopPlayback();
-        }
         context.setCurrentTrack(track);
-        if (track.getAudioSource() != null) {
-            track.getAudioSource().startPlayback(); // lazy load: RealTrack creato solo qui
-        }
-        System.out.println("Playing: " + track.getTitle());
     }
 
     /**
@@ -74,12 +66,13 @@ public class PlayingState implements IPlayerState {
      * @param current Traccia attualmente in riproduzione.
      */
     @Override
-    public void next(List<Track> queue, Track current) {
-        Track nextTrack = context.getPlaybackContext().nextTrack(queue, current);
+    public void next() {
+        Track nextTrack = context.getPlaybackContext().getStrategy().nextTrack(context.getCurrentTrack());
         if (nextTrack != null) {
             context.setCurrentTrack(nextTrack);
             System.out.println("Next track set: " + nextTrack.getTitle());
         } else {
+            context.stop();
             System.out.println("No next track available.");
         }
     }
@@ -92,12 +85,13 @@ public class PlayingState implements IPlayerState {
      * @param current Traccia attualmente in riproduzione.
      */
     @Override
-    public void previous(List<Track> queue, Track current) {
-        Track previousTrack = context.getPlaybackContext().previousTrack(queue, current);
+    public void previous() {
+        Track previousTrack = context.getPlaybackContext().getStrategy().previousTrack(context.getCurrentTrack());
         if (previousTrack != null) {
             context.setCurrentTrack(previousTrack);
             System.out.println("Previous track set: " + previousTrack.getTitle());
         } else {
+            context.stop();
             System.out.println("No previous track available.");
         }
     }

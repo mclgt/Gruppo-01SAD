@@ -1,7 +1,8 @@
 package com.Strategy;
 
-import com.Model.Track;
 import java.util.List;
+
+import com.Model.Track;
 
 /**
  * @class LoopStrategy
@@ -12,6 +13,15 @@ import java.util.List;
  */
 public class LoopTrackStrategy implements IPlaybackStrategy {
 
+    @Override
+    public void setQueue(List<Track> queue, Track currentTrack){
+        
+    }
+
+    @Override
+    public void updateQueue(List<Track> updatedQueue){
+        
+    }
     /**
      * @brief Restituisce il brano corrente (loop sul singolo brano).
      *
@@ -20,10 +30,11 @@ public class LoopTrackStrategy implements IPlaybackStrategy {
      * @return Lo stesso brano corrente.
      */
     @Override
-    public Track nextTrack(List<Track> queue, Track current) {
+    public Track nextTrack(Track current) {
         return current;
     }
 
+    
     /**
      * @brief Restituisce il brano corrente (loop sul singolo brano).
      *
@@ -32,8 +43,9 @@ public class LoopTrackStrategy implements IPlaybackStrategy {
      * @return Lo stesso brano corrente.
      */
     @Override
-    public Track previousTrack(List<Track> queue, Track current) {
+    public Track previousTrack(Track current) {
         return current;
     }
 
+    
 }

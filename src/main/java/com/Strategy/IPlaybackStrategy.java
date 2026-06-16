@@ -1,6 +1,7 @@
 package com.Strategy;
 
 import java.util.List;
+
 import com.Model.Track;
 
 /**
@@ -12,6 +13,9 @@ import com.Model.Track;
  */
 public interface IPlaybackStrategy {
 
+    void setQueue(List<Track> queue, Track currentTrack);
+
+    void updateQueue(List<Track> updatedQueue);
     /**
      * @brief Restituisce il brano successivo nella coda.
      *
@@ -19,7 +23,8 @@ public interface IPlaybackStrategy {
      * @param current Brano attualmente in riproduzione.
      * @return Il brano successivo, o {@code null} se la riproduzione deve fermarsi.
      */
-    Track nextTrack(List<Track> queue, Track current);
+
+    Track nextTrack(Track current);
 
     /**
      * @brief Restituisce il brano precedente nella coda.
@@ -28,5 +33,6 @@ public interface IPlaybackStrategy {
      * @param current Brano attualmente in riproduzione.
      * @return Il brano precedente, o {@code null} se la riproduzione deve fermarsi.
      */
-    Track previousTrack(List<Track> queue, Track current);
+
+    Track previousTrack(Track current);
 }

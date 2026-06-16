@@ -45,20 +45,30 @@ public class PausedStateTest {
     private static class DummyStrategy implements IPlaybackStrategy {
         private final Track nextResult;
         private final Track prevResult;
-
-        DummyStrategy(Track nextResult, Track prevResult) {
+        private List<Track> queue;
+        DummyStrategy(Track nextResult, Track prevResult, List<Track> q) {
             this.nextResult = nextResult;
             this.prevResult = prevResult;
+            setQueue(q, null);
         }
 
         @Override
-        public Track nextTrack(List<Track> queue, Track current) {
+        public Track nextTrack(Track track) {
             return nextResult;
         }
 
         @Override
-        public Track previousTrack(List<Track> queue, Track current) {
+        public Track previousTrack(Track track) {
             return prevResult;
+        }
+        @Override
+        public void setQueue(List<Track> queue, Track currentTrack) {
+            this.queue=queue;
+        }
+
+        @Override
+        public void updateQueue(List<Track> updatedQueue) {
+            this.queue=updatedQueue;
         }
     }
 
@@ -89,7 +99,7 @@ public class PausedStateTest {
      *        tested.
      */
     private PlayerContext pausedContextWith(Track currentTrack, Track nextTrack, Track prevTrack) {
-        PlaybackContext pb = new PlaybackContext(new DummyStrategy(nextTrack, prevTrack));
+        PlaybackContext pb = new PlaybackContext(new DummyStrategy(nextTrack, prevTrack, queue));
         PlayerContext ctx = new PlayerContext(pb);
         // avvia la riproduzione per impostare una traccia corrente
         ctx.play(currentTrack);
@@ -268,7 +278,7 @@ public class PausedStateTest {
 
         // la strategia restituirà track2 come traccia successiva
         PlayerContext ctx = pausedContextWith(track1, track2, null);
-        ctx.next(queue, track1);
+        ctx.next();
 
         assertFalse(ctx.isPaused());
     }
@@ -281,7 +291,7 @@ public class PausedStateTest {
         System.out.println("[TEST PausedState] next() -> deve riportare il player nello stato di riproduzione");
 
         PlayerContext ctx = pausedContextWith(track1, track2, null);
-        ctx.next(queue, track1);
+        ctx.next();
 
         assertTrue(ctx.isPlaying());
     }
@@ -298,8 +308,8 @@ public class PausedStateTest {
 
         // DummyStrategy restituisce track2: ci si aspetta che diventi la traccia corrente
         PlayerContext ctx = pausedContextWith(track1, track2, null);
-        ctx.next(queue, track1);
-
+        
+        ctx.next();
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
@@ -314,7 +324,7 @@ public class PausedStateTest {
 
         // null come next: la strategia segnala che non è disponibile alcuna traccia successiva
         PlayerContext ctx = pausedContextWith(track1, null, null);
-        ctx.next(queue, track1);
+        ctx.next();
 
         // deve uscire dalla pausa anche in questo caso
         assertFalse(ctx.isPaused());
@@ -328,7 +338,7 @@ public class PausedStateTest {
         System.out.println("[TEST PausedState] next() -> non deve lanciare eccezioni");
 
         PlayerContext ctx = pausedContextWith(track1, track2, null);
-        assertDoesNotThrow(() -> ctx.next(queue, track1));
+        assertDoesNotThrow(() -> ctx.next());
     }
 
     // -----------------------------------------------------------------------
@@ -344,7 +354,7 @@ public class PausedStateTest {
 
         // la strategia restituirà track1 come traccia precedente
         PlayerContext ctx = pausedContextWith(track2, null, track1);
-        ctx.previous(queue, track2);
+        ctx.previous();
 
         assertFalse(ctx.isPaused());
     }
@@ -358,7 +368,7 @@ public class PausedStateTest {
         System.out.println("[TEST PausedState] previous() -> deve riportare il player nello stato di riproduzione");
 
         PlayerContext ctx = pausedContextWith(track2, null, track1);
-        ctx.previous(queue, track2);
+        ctx.previous();
 
         assertTrue(ctx.isPlaying());
     }
@@ -375,7 +385,7 @@ public class PausedStateTest {
 
         // era in pausa su track2, DummyStrategy restituisce track1 come precedente
         PlayerContext ctx = pausedContextWith(track2, null, track1);
-        ctx.previous(queue, track2);
+        ctx.previous();
 
         assertEquals(track1, ctx.getCurrentTrack());
     }
@@ -391,7 +401,7 @@ public class PausedStateTest {
 
         // null come previous: la strategia segnala che non è disponibile alcuna traccia precedente
         PlayerContext ctx = pausedContextWith(track2, null, null);
-        ctx.previous(queue, track2);
+        ctx.previous();
 
         // deve uscire dalla pausa anche senza una traccia precedente
         assertFalse(ctx.isPaused());
@@ -405,6 +415,6 @@ public class PausedStateTest {
         System.out.println("[TEST PausedState] previous() -> non deve lanciare eccezioni");
 
         PlayerContext ctx = pausedContextWith(track2, null, track1);
-        assertDoesNotThrow(() -> ctx.previous(queue, track2));
+        assertDoesNotThrow(() -> ctx.previous());
     }
 }

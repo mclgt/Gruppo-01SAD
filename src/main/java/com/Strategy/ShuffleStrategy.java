@@ -1,8 +1,10 @@
 package com.Strategy;
 
-import com.Model.Track;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import com.Model.Track;
 /**
  * @class ShuffleStrategy
  * @brief Strategia di riproduzione casuale (shuffle).
@@ -14,8 +16,22 @@ import java.util.Random;
  */
 public class ShuffleStrategy implements IPlaybackStrategy {
 
+    private List<Track> queue = new ArrayList<>();
+    private Track currenTrack;
     private final Random random = new Random();
 
+
+    @Override
+    public void setQueue(List<Track> queue, Track currentTrack){
+        this.queue = queue != null ? queue : new ArrayList<>();
+        this.currenTrack=currentTrack;
+    }
+
+    @Override
+    public void updateQueue(List<Track> updatedQueue){
+        this.queue = updatedQueue!= null ? updatedQueue : new ArrayList<>();
+        
+    }
     /**
      * @brief Restituisce un brano casuale dalla coda, escludendo il brano corrente.
      *
@@ -23,13 +39,16 @@ public class ShuffleStrategy implements IPlaybackStrategy {
      * @param current Brano attualmente in riproduzione.
      * @return Un @ref Track scelto casualmente, o {@code null} se la coda è vuota.
      */
+    
     @Override
-    public Track nextTrack(List<Track> queue, Track current) {
-        if (queue.isEmpty()) return null;
+    public Track nextTrack(Track current){
+     if (queue.isEmpty()) return null;
         if (queue.size() == 1) return queue.get(0);
-        return queue.get(pickRandomIndex(queue, queue.indexOf(current)));
+        int excludeIndex=current != null ? queue.indexOf(current) : -1;
+        int nextIndex=pickRandomIndex(queue, excludeIndex);
+        currenTrack=queue.get(nextIndex);
+        return currenTrack;
     }
-
     /**
      * @brief Equivalente a {@link #nextTrack}: restituisce un brano casuale.
      *        Non esiste una storia della riproduzione casuale, quindi "precedente"
@@ -39,9 +58,11 @@ public class ShuffleStrategy implements IPlaybackStrategy {
      * @param current Brano attualmente in riproduzione.
      * @return Un @ref Track scelto casualmente.
      */
+
     @Override
-    public Track previousTrack(List<Track> queue, Track current) {
-        return nextTrack(queue, current);
+    public Track previousTrack(Track current){
+        return nextTrack(current);
+        
     }
 
     /**

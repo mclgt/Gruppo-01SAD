@@ -1,7 +1,9 @@
 package com.Strategy;
 
-import com.Model.Track;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.Model.Track;
 
 /**
  * @class SequentialStrategy
@@ -12,6 +14,29 @@ import java.util.List;
  */
 public class SequentialStrategy implements IPlaybackStrategy {
 
+    private List<Track> queue = new ArrayList<>();
+    private int currentIndex = -1;
+
+
+    @Override
+    public void setQueue(List<Track> queue, Track currentTrack){
+        this.queue = queue != null ? queue : new ArrayList<>();
+        if(currentTrack!=null){
+            this.currentIndex=this.queue.indexOf(currentTrack);
+        }
+        else{
+            this.currentIndex=0;
+        }
+    }
+
+    @Override
+    public void updateQueue(List<Track> updatedQueue){
+        Track currentTrack = (currentIndex >= 0 && currentIndex < queue.size()) ? queue.get(currentIndex) : null;
+        this.queue = updatedQueue!= null ? updatedQueue : new ArrayList<>();
+        if (currentTrack != null){
+            this.currentIndex=this.queue.indexOf(currentTrack);
+        }
+    }
     /**
      * @brief Restituisce il brano successivo nella coda.
      *
@@ -22,21 +47,25 @@ public class SequentialStrategy implements IPlaybackStrategy {
      * @param current Brano attualmente in riproduzione.
      * @return Il brano successivo, oppure {@code null} se si è a fine coda.
      */
-    @Override
-    public Track nextTrack(List<Track> queue, Track current) {
-        if (queue == null || queue.isEmpty()) {
-            return null;
-        }
-        if (current == null) {
-            return queue.get(0);
-        }
-        int currentIndex = queue.indexOf(current);
-        if (currentIndex == -1 || currentIndex >= queue.size() - 1) {
-            return null;
-        }
-        return queue.get(currentIndex + 1);
-    }
+    
 
+    @Override
+    public Track nextTrack(Track current){
+        if(queue.isEmpty()){
+            return null;
+        }
+        if (current != null){
+            if(!queue.contains(current)){
+                return null;
+            }
+            this.currentIndex = queue.indexOf(current);
+        }
+        if(currentIndex < queue.size()-1){
+            currentIndex++;
+            return queue.get(currentIndex);
+        }
+        return null;
+    }
     /**
      * @brief Restituisce il brano precedente nella coda.
      *
@@ -47,12 +76,19 @@ public class SequentialStrategy implements IPlaybackStrategy {
      * @param current Brano attualmente in riproduzione.
      * @return Il brano precedente, oppure {@code null} se si è a inizio coda.
      */
+  
     @Override
-    public Track previousTrack(List<Track> queue, Track current) {
-        int currentIndex = queue.indexOf(current);
-        if (currentIndex <= 0) {
+    public Track previousTrack(Track current){
+        if(queue.isEmpty()){
             return null;
         }
-        return queue.get(currentIndex - 1);
+        if(current!=null){
+            this.currentIndex=queue.indexOf(current);
+        }
+        if(currentIndex > 0){
+            currentIndex--;
+            return queue.get(currentIndex);
+        }
+        return null;
     }
 }
