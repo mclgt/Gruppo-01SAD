@@ -1,7 +1,6 @@
 package com.State;
 
 import com.Model.Track;
-import java.util.List;
 
 //questo stato rappresenta il player in pausa, l'ho aggiunto per gestire correttamente
 //la pausa all'interno del pattern State già esistente
@@ -38,15 +37,21 @@ public class PausedState implements IPlayerState {
     //se premo next mentre sono in pausa torno a PlayingState e passo alla traccia successiva
     //la traccia viene scelta dalla strategy corrente (loop, shuffle o sequential)
     @Override
-    public void next(List<Track> queue, Track current) {
+    public void next() {
         context.setState(context.getPlayingState());
-        context.next(queue, current);
+        Track nextTrack = context.getPlaybackContext().getStrategy().nextTrack(context.getCurrentTrack());
+        if(nextTrack!=null){
+            context.setCurrentTrack(nextTrack);
+        }
     }
 
     //stesso comportamento di next ma per la traccia precedente
     @Override
-    public void previous(List<Track> queue, Track current) {
+    public void previous() {
         context.setState(context.getPlayingState());
-        context.previous(queue, current);
+        Track previousTrack = context.getPlaybackContext().getStrategy().previousTrack(context.getCurrentTrack());
+        if(previousTrack!=null){
+            context.setCurrentTrack(previousTrack);
+        }
     }
 }

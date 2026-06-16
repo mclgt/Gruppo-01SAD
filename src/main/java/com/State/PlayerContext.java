@@ -1,11 +1,11 @@
 package com.State;
 
-import com.Strategy.PlaybackContext;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.Model.Track;
 import com.Observer.IPlayerSubscriber;
-
-import java.util.List;
-import java.util.ArrayList;
+import com.Strategy.PlaybackContext;
 
 /**
  * @class PlayerContext
@@ -153,41 +153,29 @@ public class PlayerContext {
      * @brief Ferma la riproduzione delegando allo stato corrente.
      */
     public void stop() {
-        this.currentTrack = null;
         currentState.stop();
         notifySubscribers();
     }
 
     /**
-     * @brief Calcola e passa alla traccia successiva utilizzando la trategia
-     *        attiva, delengando allo stato corrente l'esecuzione.
-     * @param queue   La lista completa delle tracce disponibili.
-     * @param current La traccia attualmente in riproduzione.
+     * @brief Avanza alla traccia successiva delegando l'azione allo stato attivo e notificando i subscriber.
      */
-    public void next(List<Track> queue, Track current) {
-        Track nexTrack = this.playbackContext.nextTrack(queue, current);
-        if (nexTrack != null) {
-            this.setCurrentTrack(nexTrack);
+    public void next() {
+        if(currentState!=null){
+            currentState.next();
             notifySubscribers();
-        }
-        if (currentState != null) {
-            currentState.next(queue, current);
         }
     }
 
     /**
-     * @brief Calcola e torna alla traccia precedente utilizzando la strategia
-     *        attiva, delegando allo stato corrente l'esecuzione.
-     * @param queue   La lista completa delle tracce disponibili.
-     * @param current La traccia attualmente in riproduzione.
+     * @brief Ritorna alla traccia precedente delegando l'azione allo stato attivo e notificando i subscriber.
      */
-    public void previous(List<Track> queue, Track current) {
-        Track prevTrack = this.playbackContext.previousTrack(queue, current);
-        if (prevTrack != null) {
-            this.setCurrentTrack(prevTrack);
+    public void previous() {
+
+        if(currentState!=null){
+            currentState.previous();
             notifySubscribers();
         }
-        currentState.previous(queue, current);
     }
 
     /**
