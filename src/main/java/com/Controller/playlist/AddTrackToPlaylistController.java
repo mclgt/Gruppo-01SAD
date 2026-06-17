@@ -40,33 +40,7 @@ public class AddTrackToPlaylistController {
     public void initData(MainController mainController, Playlist targetPlaylist) {
         this.mainController = mainController;
         this.targetPlaylist = targetPlaylist;
-        trackListView.setItems(mainController.getLibrary().getTracks());
-    }
-
-    @FXML
-    public void handleAddToPlaylist(ActionEvent ev) {
-        var selectedTracks = trackListView.getSelectionModel().getSelectedItems();
-
-        if (selectedTracks.isEmpty()) {
-            mainController.getWindowManager().showWarning("Attenzione", "Seleziona almeno un brano da aggiungere.");
-            return;
-        }
-
-        int addedCount = 0;
-        for (Track track : selectedTracks) {
-            if (targetPlaylist.getTracks().contains(track)) {
-                mainController.getWindowManager().showWarning("Brano duplicato",
-                        "Il brano '" + track.getTitle() + "' è già presente.");
-            } else {
-                ICommand addCommand = new AddTrack(targetPlaylist, track);
-                mainController.getUndoManager().executeCommand(addCommand);
-                addedCount++;
-            }
-        }
-
-        if (addedCount > 0) {
-            closeWindow();
-        }
+        trackListView.setItems(mainController.getAppState().getLibrary().getTracks());
     }
 
     @FXML
@@ -79,18 +53,19 @@ public class AddTrackToPlaylistController {
         var selectedTracks = trackListView.getSelectionModel().getSelectedItems();
 
         if (selectedTracks.isEmpty()) {
-            mainController.getWindowManager().showWarning("Attenzione", "Seleziona almeno un brano da aggiungere.");
+            mainController.getAppState().getWindowManager().showWarning("Attenzione",
+                    "Seleziona almeno un brano da aggiungere.");
             return;
         }
 
         int addedCount = 0;
         for (Track track : selectedTracks) {
             if (targetPlaylist.getTracks().contains(track)) {
-                mainController.getWindowManager().showWarning("Brano Duplicato",
+                mainController.getAppState().getWindowManager().showWarning("Brano Duplicato",
                         "Il brano '" + track.getTitle() + "' è già presente.");
             } else {
-                ICommand addCmd = new AddTrack(targetPlaylist, track);
-                mainController.getUndoManager().executeCommand(addCmd);
+                ICommand addCmd = new AddTrack(targetPlaylist, track, mainController.getAppState().getTrackDAO());
+                mainController.getAppState().getUndoManager().executeCommand(addCmd);
                 addedCount++;
             }
         }

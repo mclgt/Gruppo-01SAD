@@ -46,9 +46,9 @@ public class PlaylistTableController implements IPlayerSubscriber {
             TableColumn<Playlist, String> nameCol) {
         this.mainController = controller;
         this.playlistList = playlistList;
-        mainController.getPlayerContext().subscribe(this);
+        mainController.getAppState().getPlayerContext().subscribe(this);
         nameCol.setCellValueFactory(cellData -> cellData.getValue().getNameProperty());
-        playlistList.setItems(mainController.getPlaylistCatalog().getPlaylists());
+        playlistList.setItems(mainController.getAppState().getPlaylistCatalog().getPlaylists());
 
         playlistList.setOnMouseClicked((MouseEvent ev) -> {
             if (ev.getClickCount() == 2) {
@@ -62,8 +62,9 @@ public class PlaylistTableController implements IPlayerSubscriber {
         playlistList.setRowFactory(tv -> {
             TableRow<Playlist> row = new TableRow<>();
             row.itemProperty().addListener((observed, oldVal, newVal) -> {
-                Track current = mainController.getPlayerContext().getCurrentTrack();
-                ITrackContainer activeContainer = mainController.getPlayerController().getActiveContainer();
+                Track current = mainController.getAppState().getPlayerContext().getCurrentTrack();
+                ITrackContainer activeContainer = mainController.getAppState().getPlayerController()
+                        .getActiveContainer();
                 if (newVal != null && current != null && newVal.equals(activeContainer)) {
                     row.setStyle("-fx-background-color: #f5a747;"); // cambia colore
                 } else {
@@ -89,10 +90,11 @@ public class PlaylistTableController implements IPlayerSubscriber {
     public void openModPlaylistView(ActionEvent ev) {
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if (selectedPlaylist != null) {
-            mainController.getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml",
+            mainController.getAppState().getWindowManager().openPlaylistWindow("/com/View/ModifyPlaylistView.fxml",
                     "Modifica Playlist", selectedPlaylist, mainController);
         } else {
-            mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da modificare");
+            mainController.getAppState().getWindowManager().showWarning("Attenzione",
+                    "Seleziona prima una playlist da modificare");
         }
     }
 
@@ -125,16 +127,21 @@ public class PlaylistTableController implements IPlayerSubscriber {
     public void handleDeletePlaylist(ActionEvent ev) {
         Playlist selectedPlaylist = playlistList.getSelectionModel().getSelectedItem();
         if (selectedPlaylist != null) {
-            Optional<ButtonType> result = mainController.getWindowManager().showConfirmation("Conferma eliminazione",
+            Optional<ButtonType> result = mainController.getAppState().getWindowManager().showConfirmation(
+                    "Conferma eliminazione",
                     "Eliminazione della playlist",
                     "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                ICommand removeCmd = new RemovePlaylist(mainController.getPlaylistCatalog(), selectedPlaylist);
-                mainController.getUndoManager().executeCommand(removeCmd);
+                ICommand removeCmd = new RemovePlaylist(mainController.getAppState().getPlaylistCatalog(),
+                        selectedPlaylist, mainController.getAppState().getPlaylistDAO());
+                mainController.getAppState().getUndoManager().executeCommand(removeCmd);
                 mainController.restoreMainLibraryView();
+
+                mainController.updateTop();
             }
         } else {
-            mainController.getWindowManager().showWarning("Attenzione", "Seleziona prima una playlist da eliminare");
+            mainController.getAppState().getWindowManager().showWarning("Attenzione",
+                    "Seleziona prima una playlist da eliminare");
         }
     }
 
@@ -155,8 +162,7 @@ public class PlaylistTableController implements IPlayerSubscriber {
      * @brief RImuove il controller dalla lista dei subsciber del PlayerContext
      */
     public void dispose() {
-        mainController.getPlayerContext().unsubscribe(this);
+        mainController.getAppState().getPlayerContext().unsubscribe(this);
     }
 
-    
 }

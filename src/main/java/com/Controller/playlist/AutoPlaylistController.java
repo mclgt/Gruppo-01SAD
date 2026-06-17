@@ -27,21 +27,28 @@ import java.util.List;
  */
 public class AutoPlaylistController {
 
-    @FXML private TextField txtName;
-    @FXML private ComboBox<String> comboAnno;
-    @FXML private ComboBox<String> comboGenre;
-    @FXML private ComboBox<String> comboTag;
-    @FXML private Button btnGenerate;
-    @FXML private Button btnCancel;
-    @FXML private Label lblNoTracks;
+    @FXML
+    private TextField txtName;
+    @FXML
+    private ComboBox<String> comboAnno;
+    @FXML
+    private ComboBox<String> comboGenre;
+    @FXML
+    private ComboBox<String> comboTag;
+    @FXML
+    private Button btnGenerate;
+    @FXML
+    private Button btnCancel;
+    @FXML
+    private Label lblNoTracks;
 
     private MainController mainController;
 
     @FXML
     public void initialize() {
         btnGenerate.setDisable(true);
-        txtName.textProperty().addListener((obs, oldVal, newVal) ->
-                btnGenerate.setDisable(newVal == null || newVal.trim().isEmpty()));
+        txtName.textProperty().addListener(
+                (obs, oldVal, newVal) -> btnGenerate.setDisable(newVal == null || newVal.trim().isEmpty()));
     }
 
     /**
@@ -54,18 +61,18 @@ public class AutoPlaylistController {
     }
 
     private void populateCombos() {
-        List<Track> tracks = mainController.getLibrary().getTracks();
+        List<Track> tracks = mainController.getAppState().getLibrary().getTracks();
 
         // Anno: valori unici dalla libreria, ordinati decrescenti
         List<String> years = new ArrayList<>();
         years.add(AutoPlaylistService.ANY);
         tracks.stream()
-              .map(Track::getYear)
-              .filter(y -> y > 0)
-              .distinct()
-              .sorted((a, b) -> b - a)
-              .map(String::valueOf)
-              .forEach(years::add);
+                .map(Track::getYear)
+                .filter(y -> y > 0)
+                .distinct()
+                .sorted((a, b) -> b - a)
+                .map(String::valueOf)
+                .forEach(years::add);
         comboAnno.setItems(FXCollections.observableArrayList(years));
         comboAnno.setValue(AutoPlaylistService.ANY);
 
@@ -73,11 +80,11 @@ public class AutoPlaylistController {
         List<String> genres = new ArrayList<>();
         genres.add(AutoPlaylistService.ANY);
         tracks.stream()
-              .map(Track::getGenre)
-              .filter(g -> g != null && !g.trim().isEmpty())
-              .distinct()
-              .sorted()
-              .forEach(genres::add);
+                .map(Track::getGenre)
+                .filter(g -> g != null && !g.trim().isEmpty())
+                .distinct()
+                .sorted()
+                .forEach(genres::add);
         comboGenre.setItems(FXCollections.observableArrayList(genres));
         comboGenre.setValue(AutoPlaylistService.ANY);
 
@@ -100,14 +107,14 @@ public class AutoPlaylistController {
         String name = txtName.getText().trim();
 
         try {
-            AutoPlaylistService.validateName(name,mainController.getPlaylistCatalog().getPlaylists());
+            AutoPlaylistService.validateName(name, mainController.getAppState().getPlaylistCatalog().getPlaylists());
         } catch (IllegalArgumentException ex) {
-            mainController.getWindowManager().showWarning("Nome non valido", ex.getMessage());
+            mainController.getAppState().getWindowManager().showWarning("Nome non valido", ex.getMessage());
             return;
         }
 
         List<Track> filtered = AutoPlaylistService.filter(
-                mainController.getLibrary().getTracks(),
+                mainController.getAppState().getLibrary().getTracks(),
                 comboAnno.getValue(),
                 comboGenre.getValue(),
                 comboTag.getValue());
@@ -123,11 +130,12 @@ public class AutoPlaylistController {
             playlist.addTrack(t);
         }
 
-        ICommand cmd = new AddPlaylist(mainController.getPlaylistCatalog(), playlist);
-        mainController.getUndoManager().executeCommand(cmd);
+        ICommand cmd = new AddPlaylist(mainController.getAppState().getPlaylistCatalog(), playlist,
+                mainController.getAppState().getPlaylistDAO());
+        mainController.getAppState().getUndoManager().executeCommand(cmd);
 
         closeWindow();
-        mainController.getWindowManager().showInfo("Playlist creata",
+        mainController.getAppState().getWindowManager().showInfo("Playlist creata",
                 "La playlist \"" + name + "\" è stata creata con " + filtered.size() + " brani.");
     }
 

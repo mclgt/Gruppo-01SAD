@@ -1,5 +1,6 @@
 package com;
 
+import com.Controller.core.AppState;
 import com.Controller.core.MainController;
 import com.DataLayer.DAO.DatabaseManager;
 import com.Model.LocalTrackFactory;
@@ -17,22 +18,17 @@ public class Main extends Application {
     @Override
     public void start(Stage pStage) throws Exception {
         TrackFactory factory = new LocalTrackFactory();
+        AppState appState = new AppState(factory);
+        try {
+            appState.loadData();
+        } catch (Exception e) {
+            System.err.println("Attenzione: Errore durante il caricamento iniziale del database.");
+            e.printStackTrace();
+        }
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/MainView.fxml"));
-
-        loader.setControllerFactory(controllerClass -> {
-            if (controllerClass == MainController.class) {
-                this.mainController = new MainController(factory);
-                return this.mainController;
-            }
-
-            try {
-                return controllerClass.getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         Parent p = loader.load();
+        this.mainController = loader.getController();
+        this.mainController.init(appState);
         pStage.setTitle("Riproduttore musicale");
         pStage.setScene(new Scene(p, 1000, 650));
         pStage.show();
@@ -41,11 +37,12 @@ public class Main extends Application {
     @Override
     public void stop() throws Exception {
         System.out.println("Rilevata chiusura dell'applicazione. Avvio sincronizzazione database...");
-        
-        if (mainController != null) {
+
+        if (mainController != null && mainController.getAppState() != null) {
+            mainController.getAppState().getTimerManager().stop();
             mainController.saveDB();
         }
-        
+
         // Rilascio definitivo e chiusura sicura delle risorse
         DatabaseManager.closeConnection();
         super.stop();

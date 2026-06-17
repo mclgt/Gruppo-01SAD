@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
@@ -21,6 +22,7 @@ public class AddTrackTest {
     private Library l;
     private Track t;
     private TrackFactory factory;
+    private TrackDAO trackDAO;
 
     @BeforeEach
     public void setUp() {
@@ -32,7 +34,7 @@ public class AddTrackTest {
 
     @Test
     public void testAddTrack_executeAndUndo() {
-        ICommand addCommand = new AddTrack(l, t);
+        ICommand addCommand = new AddTrack(l, t, trackDAO);
 
         // Fase di execute
         addCommand.execute();

@@ -75,8 +75,11 @@ public class PlaylistController implements IPlayerSubscriber {
         playlistTrackList.setRowFactory(tv -> {
             TableRow<Track> row = new TableRow<>();
             row.itemProperty().addListener((observed, oldVal, newVal) -> {
-                Track current = (mainController != null) ? mainController.getPlayerContext().getCurrentTrack() : null;
-                ITrackContainer activeContainer = mainController.getPlayerController().getActiveContainer();
+                Track current = (mainController != null)
+                        ? mainController.getAppState().getPlayerContext().getCurrentTrack()
+                        : null;
+                ITrackContainer activeContainer = mainController.getAppState().getPlayerController()
+                        .getActiveContainer();
                 boolean isSameTrack = (newVal != null && newVal.equals(current));
                 boolean isSamePlaylist = (currentPlaylist != null && currentPlaylist.equals(activeContainer));
                 if (isSameTrack && isSamePlaylist) {
@@ -89,17 +92,16 @@ public class PlaylistController implements IPlayerSubscriber {
             return row;
         });
         playlistTrackList.getSelectionModel().selectedIndexProperty().addListener((observable, oldVal, newValue) -> {
-        int index = newValue.intValue();
-        int size = getCurrentPlaylist().getTracksCount();
-        if (index == -1){
-            btnDownTrackInPlaylist.setDisable(true);
-            btnUpTrackInPlaylist.setDisable(true);
-        }
-        else{
-            btnDownTrackInPlaylist.setDisable(index == size - 1);
-            btnUpTrackInPlaylist.setDisable(index == 0);
-           
-        }
+            int index = newValue.intValue();
+            int size = getCurrentPlaylist().getTracksCount();
+            if (index == -1) {
+                btnDownTrackInPlaylist.setDisable(true);
+                btnUpTrackInPlaylist.setDisable(true);
+            } else {
+                btnDownTrackInPlaylist.setDisable(index == size - 1);
+                btnUpTrackInPlaylist.setDisable(index == 0);
+
+            }
         });
     }
 
@@ -109,7 +111,7 @@ public class PlaylistController implements IPlayerSubscriber {
      */
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
-        this.mainController.getPlayerContext().subscribe(this);
+        this.mainController.getAppState().getPlayerContext().subscribe(this);
     }
 
     /**
@@ -198,28 +200,29 @@ public class PlaylistController implements IPlayerSubscriber {
         Track selectedTrack = playlistTrackList.getSelectionModel().getSelectedItem();
 
         if (selectedTrack == null) {
-            mainController.getWindowManager().showWarning("Nessuna selezione",
+            mainController.getAppState().getWindowManager().showWarning("Nessuna selezione",
                     "Seleziona prima una traccia da rimuovere dalla playlist");
             return;
         }
-        Optional<ButtonType> result = mainController.getWindowManager()
+        Optional<ButtonType> result = mainController.getAppState().getWindowManager()
                 .showConfirmation(
                         "Rimuovi brano", "Rimozione brano da playlist", "Sei sicuro di voler rimuovere \""
                                 + selectedTrack.getTitle() + "\" dalla playlist \"" + currentPlaylist.getName() + "\"?",
                         null);
         if (result.isPresent() && result.get().getText().equals("OK")) {
-            ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack);
-            boolean wasPlaying = mainController.getPlayerContext().isPlaying()
-                    && selectedTrack == mainController.getPlayerContext().getCurrentTrack();
-            mainController.getDeletedPlayingStack().push(wasPlaying);
+            ICommand removeCommand = new RemoveTrack(this.currentPlaylist, selectedTrack,
+                    mainController.getAppState().getTrackDAO());
+            boolean wasPlaying = mainController.getAppState().getPlayerContext().isPlaying()
+                    && selectedTrack == mainController.getAppState().getPlayerContext().getCurrentTrack();
+            mainController.getAppState().getDeletedPlayingStack().push(wasPlaying);
             if (wasPlaying) {
-                mainController.getTimerManager().stop();
+                mainController.getAppState().getTimerManager().stop();
             }
             int idx = this.currentPlaylist.getTracks().indexOf(selectedTrack);
-            mainController.getUndoManager().executeCommand(removeCommand);
+            mainController.getAppState().getUndoManager().executeCommand(removeCommand);
             playlistTrackList.getSelectionModel().clearSelection();
             if (wasPlaying) {
-                mainController.getPlayerController().handleTrackRemoval(idx);
+                mainController.getAppState().getPlayerController().handleTrackRemoval(idx);
             }
         }
     }
@@ -230,7 +233,7 @@ public class PlaylistController implements IPlayerSubscriber {
      */
     @FXML
     public void handleLoopPlaylist(ActionEvent ev) {
-        mainController.getPlayerController().loopPlaylistRip(this.currentPlaylist);
+        mainController.getAppState().getPlayerController().loopPlaylistRip(this.currentPlaylist);
     }
 
     /**
@@ -253,20 +256,20 @@ public class PlaylistController implements IPlayerSubscriber {
      */
     public void dispose() {
         if (mainController != null) {
-            mainController.getPlayerContext().unsubscribe(this);
+            mainController.getAppState().getPlayerContext().unsubscribe(this);
         }
     }
 
     @FXML
     private void handleMoveUpPlaylist(ActionEvent event) {
-       Track selectedTrack = getSelectedTrack();
-        
-        if (selectedTrack != null){
+        Track selectedTrack = getSelectedTrack();
+
+        if (selectedTrack != null) {
             int index = playlistTrackList.getSelectionModel().getSelectedIndex();
-            if (index > 0){
+            if (index > 0) {
                 ICommand moveUp = new MoveUpTrack(getCurrentPlaylist().getTracks(), selectedTrack);
-                mainController.getUndoManager().executeCommand(moveUp);           
-                playlistTrackList.getSelectionModel().select(index-1);
+                mainController.getAppState().getUndoManager().executeCommand(moveUp);
+                playlistTrackList.getSelectionModel().select(index - 1);
             }
         }
     }
@@ -274,14 +277,14 @@ public class PlaylistController implements IPlayerSubscriber {
     @FXML
     private void handleMoveDownPlaylist(ActionEvent event) {
         Track selectedTrack = getSelectedTrack();
-                
-        if (selectedTrack != null){
+
+        if (selectedTrack != null) {
             int index = playlistTrackList.getSelectionModel().getSelectedIndex();
             int size = getCurrentPlaylist().getTracksCount();
-            if(index >= 0 && index < size-1){
+            if (index >= 0 && index < size - 1) {
                 ICommand moveDown = new MoveDownTrack(getCurrentPlaylist().getTracks(), selectedTrack);
-                mainController.getUndoManager().executeCommand(moveDown);
-                playlistTrackList.getSelectionModel().select(index+1);
+                mainController.getAppState().getUndoManager().executeCommand(moveDown);
+                playlistTrackList.getSelectionModel().select(index + 1);
             }
         }
     }

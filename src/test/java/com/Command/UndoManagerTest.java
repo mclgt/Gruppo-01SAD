@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackFactory;
@@ -24,6 +25,7 @@ public class UndoManagerTest {
     private Library library;
     private Track track;
     private TrackFactory factory;
+    private TrackDAO trackDAO;
 
     @BeforeEach
     public void setUp() {
@@ -48,7 +50,7 @@ public class UndoManagerTest {
      */
     @Test
     public void testExecuteCommandEnablesUndoAndRunsAction() {
-        ICommand addCommand = new AddTrack(library, track);
+        ICommand addCommand = new AddTrack(library, track, trackDAO);
 
         undoManager.executeCommand(addCommand);
 
@@ -63,7 +65,7 @@ public class UndoManagerTest {
      */
     @Test
     public void testUndoPopsAndReversesAction() {
-        ICommand addCommand = new AddTrack(library, track);
+        ICommand addCommand = new AddTrack(library, track, trackDAO);
 
         undoManager.executeCommand(addCommand);
         undoManager.undo();
@@ -77,7 +79,7 @@ public class UndoManagerTest {
      */
     @Test
     public void testClearHistory() {
-        ICommand addCommand = new AddTrack(library, track);
+        ICommand addCommand = new AddTrack(library, track, trackDAO);
         undoManager.executeCommand(addCommand);
 
         undoManager.clear();
