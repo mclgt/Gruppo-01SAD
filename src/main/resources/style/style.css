@@ -1,5 +1,5 @@
 .root {
-    /* --- Palette colori (variabili "looked-up") --- */
+
     -color-primary:        #2196f3;
     -color-primary-dark:   #1976d2;
     -color-primary-light:  #e3f2fd;
@@ -31,22 +31,18 @@
     -fx-text-fill: -color-text;
 }
 
-/* Classe aggiuntiva per i titoli (es. Intestazione FXML) */
+
 .label-heading {
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: -color-primary;
 }
 
-/* ===========================================================
-   BUTTONS
-   =========================================================== */
 
-/* Stile base per tutti i bottoni */
 .button {
     -fx-background-color: #f2f2f2;
     -fx-text-fill: -color-text;
-    -fx-background-radius: 8;   /* Arrotondamento aumentato a 8px per un look più moderno */
+    -fx-background-radius: 8;   
     -fx-border-radius: 8;
     -fx-border-color: #d9d9d9;
     -fx-border-width: 1;
@@ -62,9 +58,7 @@
     -fx-background-color: #d8d8d8;
 }
 
-/* --- CLASSI DI STILE (styleClass) PER I PULSANTI --- */
 
-/* styleClass="btn-primary" -> Pulsante principale (es. Salva) */
 .button.btn-primary {
     -fx-background-color: -color-primary;
     -fx-text-fill: white;
@@ -76,20 +70,18 @@
     -fx-background-color: -color-primary-dark;
 }
 
-/* styleClass="btn-pill" -> Pulsanti ad angoli completamente arrotondati (capsula) */
+
 .button.btn-pill {
     -fx-background-radius: 20;
     -fx-border-radius: 20;
 }
 
-/* styleClass="btn-compact" -> Per bottoni piccoli o di selezione file (es. il bottone "...") */
 .button.btn-compact {
     -fx-padding: 5 10 5 10;
     -fx-background-radius: 6;
     -fx-border-radius: 6;
 }
 
-/* Pseudo-classi native mantenute per compatibilità tastiera/default */
 .button:default {
     -fx-background-color: -color-primary;
     -fx-text-fill: white;
@@ -109,7 +101,6 @@
     -fx-background-color: -color-bg-hover;
 }
 
-/* Pulsanti icona generici */
 .tool-bar .button {
     -fx-background-color: #d8d8d8;
     -fx-border-color: #747474;
@@ -122,7 +113,6 @@
     -fx-background-color: #e0e0e0;
 }
 
-/* Pulsanti completamente circolari tramite ID */
 #btnAddPlaylist, #btnModPlaylist, #btnDeletePlaylist, #btnPrev, #btnNext {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -135,9 +125,6 @@
     -fx-background-color: #e3e3e3;
 }
 
-/* ===========================================================
-   CAMPI DI TESTO E COMBOBOX (Migliorata)
-   =========================================================== */
 
 .text-field {
     -fx-background-color: white;
@@ -156,37 +143,32 @@
     -fx-text-fill: -color-text-muted;
 }
 
-/* --- COMBOBOX STRUTTURA INTERNA RIEMPITA --- */
 .combo-box, .combo-box-base {
-    -fx-background-color: white; /* Sfondo del contenitore intero */
+    -fx-background-color: white; 
     -fx-border-color: #cfd8dc;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
-    -fx-padding: 0; /* Azzeriamo il padding esterno per non creare disallineamenti con le celle interne */
+    -fx-padding: 0;
 }
 
-/* Sfondo della cella di testo interna della combobox */
 .combo-box .list-cell {
-    -fx-background-color: transparent; /* Eredita lo sfondo bianco del contenitore */
+    -fx-background-color: transparent; 
     -fx-padding: 5 8 5 8;
     -fx-text-fill: -color-text;
-    -fx-background-radius: 5 0 0 5; /* Arrotonda solo il lato sinistro interno */
+    -fx-background-radius: 5 0 0 5; 
 }
 
-/* Sfondo del bottone con la freccia a destra */
 .combo-box .arrow-button {
-    -fx-background-color: transparent; /* Uniforma il colore del quadratino della freccia */
-    -fx-background-radius: 0 5 5 0;    /* Arrotonda solo il lato destro interno */
+    -fx-background-color: transparent; 
+    -fx-background-radius: 0 5 5 0;   
     -fx-padding: 5 8 5 8;
 }
 
-/* Gestione del Focus sull'intero blocco ComboBox */
 .combo-box:focused {
     -fx-border-color: -color-primary;
     -fx-background-color: white;
 }
 
-/* Stile del menu a tendina (Popup) quando viene aperto */
 .combo-box-popup .list-view {
     -fx-background-color: white;
     -fx-border-color: -color-border;
@@ -204,10 +186,6 @@
     -fx-text-fill: white;
 }
 
-
-/* ===========================================================
-   TABLEVIEW / LISTVIEW
-   =========================================================== */
 
 .table-view, .list-view {
     -fx-background-color: white;
@@ -267,9 +245,6 @@
     -fx-text-fill: white;
 }
 
-/* ===========================================================
-   SLIDER (barra di avanzamento brano)
-   =========================================================== */
 
 .slider .track {
     -fx-background-color: #e0e0e0;
@@ -286,9 +261,7 @@
     -fx-background-color: -color-primary-dark;
 }
 
-/* ===========================================================
-   SCROLLBAR
-   =========================================================== */
+
 
 .scroll-bar {
     -fx-background-color: transparent;
@@ -303,9 +276,6 @@
     -fx-background-color: #a8a8a8;
 }
 
-/* ===========================================================
-   MENUBAR / TOOLBAR
-   =========================================================== */
 
 .menu-bar {
     -fx-background-color: #fafafa;
@@ -318,9 +288,6 @@
     -fx-padding: 6 10 6 10;
 }
 
-/* ===========================================================
-   CONTROLLI DI RIPRODUZIONE (bottom bar - MainController)
-   =========================================================== */
 
 #btnPlay {
     -fx-background-color: -color-primary;
@@ -347,17 +314,13 @@
     -fx-text-fill: -color-text-subtle;
 }
 
-/* ===========================================================
-   PANNELLO DETTAGLI BRANO (right - MainController)
-   =========================================================== */
+
 
 #detailPanel .label {
     -fx-text-fill: -color-text;
 }
 
-/* ===========================================================
-   MESSAGGI DI STATO / ERRORE
-   =========================================================== */
+
 
 #lblNoTracks {
     -fx-text-fill: -color-danger;
