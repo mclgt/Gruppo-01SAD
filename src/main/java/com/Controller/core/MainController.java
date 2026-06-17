@@ -5,9 +5,11 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.Controller.navigation.ViewNavigator;
+import com.Controller.playlist.PlaylistController;
 import com.DataLayer.DAO.DatabaseManager;
 import com.Model.Playlist;
 import com.Model.Track;
+import com.Model.TrackFactory;
 import com.Model.TrackTag;
 
 import javafx.collections.FXCollections;
@@ -122,7 +124,9 @@ public class MainController {
                 lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
         appState.getPlayerController().init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         appState.getPlaylistTableController().init(this, playlistList, nameCol);
-        mainContentView = centerContentArea.getChildren().get(0);
+        appState.getPlayerContext().subscribe(appState.getPlaylistTableController());
+        appState.getPlayerContext().subscribe(appState.getTrackTableController());
+        appState.getPlaylistTableController().init(this, playlistList, nameCol);
         if (!centerContentArea.getChildren().isEmpty()) {
             mainContentView = centerContentArea.getChildren().get(0);
         }
@@ -196,16 +200,17 @@ public class MainController {
             c.setAutoCommit(false); // Avviamo la transazione sicura
 
             try (Statement st = c.createStatement()) {
+                st.executeUpdate("DELETE FROM playlist_tracks;");
                 st.executeUpdate("DELETE FROM tracks;");
                 st.executeUpdate("DELETE FROM playlists;");
             }
 
             for (Track track : appState.getLibrary().getTracks()) {
-                appState.getTrackDAO().update(track);
+                appState.getTrackDAO().save(track);
             }
 
             for (Playlist playlist : appState.getPlaylistCatalog().getPlaylists()) {
-                appState.getPlaylistDAO().update(playlist);
+                appState.getPlaylistDAO().save(playlist);
             }
 
             c.commit(); // Scrittura fisica bloccata sul file db
@@ -274,7 +279,13 @@ public class MainController {
      */
     @FXML
     public void togglePlayPause() {
-        appState.getPlayerController().togglePlayPause(appState.getPlayerContext(), trackTable);
+        TableView<Track> activeTable = trackTable;
+        PlaylistController activePlaylist = appState.getPlaylistController();
+        if (activePlaylist != null) {
+            activeTable = activePlaylist.getPlaylistTrackList();
+        }
+
+        appState.getPlayerController().togglePlayPause(appState.getPlayerContext(), activeTable);
     }
 
     /**

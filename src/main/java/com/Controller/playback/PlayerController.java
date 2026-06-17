@@ -6,6 +6,7 @@ import com.Controller.playlist.PlaylistController;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
 import com.Model.Track;
+import com.Observer.IPlayerSubscriber;
 import com.State.PlayerContext;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.LoopTrackStrategy;
@@ -266,6 +267,10 @@ public class PlayerController {
     private void startTrackPlayback(Track track) {
         trackFinished = false;
         AppState appState = mainController.getAppState();
+        Track current = appState.getPlayerContext().getCurrentTrack();
+        if (current != null && current != track && current.getAudioSource() != null) {
+            current.getAudioSource().stopPlayback();
+        }
         appState.getPlayerContext().play(track);
         mainController.updatePlayPauseButton(true);
         updateNowPlaying();
@@ -327,7 +332,9 @@ public class PlayerController {
     private void handlePlaybackFinished() {
         AppState appState = mainController.getAppState();
         Track current = appState.getPlayerContext().getCurrentTrack();
-        current.incrementPlayCount();
+        if (current != null) {
+            current.incrementPlayCount();
+        }
         if (loopMode) {
             if (current != null) {
                 startTrackPlayback(current);
