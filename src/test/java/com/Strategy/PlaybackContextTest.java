@@ -12,22 +12,8 @@ import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-/**
- * @class PlaybackContextTest
- * @brief Test class for PlaybackContext.
- *        Verifies that the Context correctly delegates to strategies
- *        and that runtime strategy switching works as expected.
- *        Strategies used are hand-written dummy stubs, without any mocking
- *        framework.
- */
 public class PlaybackContextTest {
 
-    /**
-     * @brief Stub strategy A: always returns a fixed next track and a fixed
-     *        previous track.
-     *        Used to verify that the Context actually delegates calls to the
-     *        strategy.
-     */
     private static class DummyStrategyA implements IPlaybackStrategy {
         private final Track fixedNext;
         private final Track fixedPrevious;
@@ -53,11 +39,6 @@ public class PlaybackContextTest {
         public void updateQueue(List<Track> updatedQueue) {}
     }
 
-    /**
-     * @brief Stub strategy B: always returns null, simulating end/beginning of
-     *        queue.
-     *        Used to verify behavior after a runtime strategy switch.
-     */
     private static class DummyStrategyB implements IPlaybackStrategy {
         @Override
         public Track nextTrack( Track current) {
@@ -73,7 +54,7 @@ public class PlaybackContextTest {
 
         @Override
         public void updateQueue(List<Track> updatedQueue) {}
-        
+
     }
 
     private Track track1;
@@ -82,9 +63,6 @@ public class PlaybackContextTest {
     private List<Track> queue;
     private TrackFactory factory;
 
-    /**
-     * @brief Inizializza tre tracce dummy e la coda prima di ogni test.
-     */
     @BeforeEach
     public void setUp() {
         factory = new MockTrackFactory();
@@ -101,10 +79,6 @@ public class PlaybackContextTest {
     // Test per il costruttore e getStrategy()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifica che la strategia passata al costruttore venga memorizzata
-     *        e restituita da getStrategy().
-     */
     @Test
     public void testConstructor_strategyIsStored() {
         DummyStrategyA strategyA = new DummyStrategyA(track2, track1);
@@ -116,9 +90,6 @@ public class PlaybackContextTest {
     // Test per setStrategy()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifica che setStrategy() sostituisca la strategia corrente a runtime.
-     */
     @Test
     public void testSetStrategy_replacesStrategy() {
         PlaybackContext context = new PlaybackContext(new DummyStrategyA(track2, track1));
@@ -131,19 +102,12 @@ public class PlaybackContextTest {
     // Test per nextTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifica che nextTrack() deleghi la chiamata alla strategia corrente.
-     */
     @Test
     public void testNextTrack_delegatesToStrategy() {
         PlaybackContext context = new PlaybackContext(new DummyStrategyA(track2, track1));
         assertEquals(track2, context.nextTrack(queue, track1));
     }
 
-    /**
-     * @brief Verifies that nextTrack() uses the new strategy after a runtime
-     *        switch.
-     */
     @Test
     public void testNextTrack_afterStrategyChange_usesNewStrategy() {
         PlaybackContext context = new PlaybackContext(new DummyStrategyA(track2, track1));
@@ -155,20 +119,12 @@ public class PlaybackContextTest {
     // Test per previousTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that previousTrack() delegates the call to the current
-     *        strategy.
-     */
     @Test
     public void testPreviousTrack_delegatesToStrategy() {
         PlaybackContext context = new PlaybackContext(new DummyStrategyA(track2, track1));
         assertEquals(track1, context.previousTrack(queue, track2));
     }
 
-    /**
-     * @brief Verifies that previousTrack() uses the new strategy after a runtime
-     *        switch.
-     */
     @Test
     public void testPreviousTrack_afterStrategyChange_usesNewStrategy() {
         PlaybackContext context = new PlaybackContext(new DummyStrategyA(track2, track1));

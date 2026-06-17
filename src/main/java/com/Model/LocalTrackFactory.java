@@ -39,7 +39,6 @@ public class LocalTrackFactory extends TrackFactory {
     @Override
     public Track instantiateTrack(String title, String author, int year, String genre, int duration, String album,
             String filePath, TrackTag tag) {
-        // File libraryAudio = new File("data/library_audio");
         File audioFile = new File(filePath);
 
         if (!audioFile.exists() || !audioFile.isFile()) {

@@ -15,23 +15,12 @@ import com.Strategy.PlaybackContext;
 import com.Strategy.SequentialStrategy;
 import com.Strategy.ShuffleStrategy;
 
-/**
- * @class PlayerContextPlaylistTest
- * @brief Test class for verifying playback logic with Playlists.
- *        Verifies that PlayerContext interacts correctly with a Playlist,
- *        using the right playback strategy and ensuring correct track
- *        advancement.
- */
 public class PlayerContextPlaylistTest {
     private Playlist testPlaylist;
     private Track track1;
     private Track track2;
     private TrackFactory factory;
 
-    /**
-     * @brief Sets up the test fixtures: a playback context and a populated
-     *        playlist.
-     */
     @BeforeEach
     void setUp() {
         factory = new MockTrackFactory();
@@ -42,10 +31,6 @@ public class PlayerContextPlaylistTest {
         testPlaylist.addTrack(track2);
     }
 
-    /**
-     * @brief Verifies that starting playback from an empty/initial state loads the
-     *        first available track.
-     */
     @Test
     void testInitialPlayUpdateState() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
@@ -61,10 +46,6 @@ public class PlayerContextPlaylistTest {
         assertTrue(context.isPlaying(), "Il player dovrebbe essere nello stato 'playingState'");
     }
 
-    /**
-     * @brief Verifica che, data una traccia in riproduzione, il comando 'next' avanzi correttamente
-     *        la traccia corrente alla successiva nella playlist.
-     */
     @Test
     void testSequentialNextUpdateTrack() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
@@ -78,10 +59,6 @@ public class PlayerContextPlaylistTest {
         assertEquals(track2, nextTrack, "La traccia successiva nella playlist dovrebbe essere F");
     }
 
-    /**
-     * @brief Verifica il comportamento alla fine della playlist in modalità sequenziale.
-     *        Il player non deve ciclare automaticamente alla prima traccia.
-     */
     @Test
     void testEndOfPlaylistSequential() {
         PlaybackContext playbackContext = new PlaybackContext(new SequentialStrategy());
@@ -96,10 +73,6 @@ public class PlayerContextPlaylistTest {
                 "Alla fine della playlist in modalità sequenziale, next non deve tornare alla prima traccia");
     }
 
-    /**
-     * @brief Verifica il comportamento alla fine della playlist in modalità loop.
-     *        Il player deve tornare automaticamente alla prima traccia.
-     */
     @Test
     void testEndOfPlaylistLoop() {
         PlaybackContext playbackContext = new PlaybackContext(new LoopPlaylistStrategy());
@@ -114,10 +87,6 @@ public class PlayerContextPlaylistTest {
                 "Alla fine della playlist in modalità loop, next deve tornare alla prima traccia");
     }
 
-    /**
-     * Verifies that the shuffle strategy picks a valid track from the playlist and
-     * keeps the player playing.
-     */
     @Test
     void testShuffleStrategy() {
         PlaybackContext playbackContext = new PlaybackContext(new ShuffleStrategy());

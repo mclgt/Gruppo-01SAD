@@ -13,14 +13,23 @@ import com.Model.Track;
  */
 public class LoopTrackStrategy implements IPlaybackStrategy {
 
+    /**
+     * @brief No-op: la strategia di loop sul singolo brano non necessita di una coda.
+     * @param queue         Ignorato.
+     * @param currentTrack  Ignorato.
+     */
     @Override
     public void setQueue(List<Track> queue, Track currentTrack){
-        
+
     }
 
+    /**
+     * @brief No-op: la strategia di loop sul singolo brano non gestisce una coda.
+     * @param updatedQueue Ignorato.
+     */
     @Override
     public void updateQueue(List<Track> updatedQueue){
-        
+
     }
     /**
      * @brief Restituisce il brano corrente per consentire la ripetizione infinita.
