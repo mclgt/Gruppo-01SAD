@@ -133,6 +133,13 @@ public class MainController {
         if (!centerContentArea.getChildren().isEmpty()) {
             mainContentView = centerContentArea.getChildren().get(0);
         }
+        topTitleCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("title"));
+        topAuthorCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("author"));
+        topCountCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("playCount"));
+
+        topPlaylistNameCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("name"));
+        topPlaylistCountCol.setCellValueFactory(new javafx.scene.control.cell.PropertyValueFactory<>("playCount"));
+        updateTop();
     }
 
     /**
