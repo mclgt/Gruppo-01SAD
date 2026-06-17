@@ -14,7 +14,11 @@ import com.Model.TrackFactory;
 import com.Model.MockTrackFactory;
 
 /**
- * @brief Definizione della classe di unit test per la rimozione delle tracce.
+ * @class RemoveTrackTest
+ * @brief Classe di test per verificare la rimozione di un brano musicale e
+ *        l'integrazione con l'UndoManager.
+ *        L'uso di un MockTrackFactory garantisce che i brani creati per
+ *        il test siano fittizi e non richiedano l'accesso al file system.
  */
 public class RemoveTrackTest {
 
@@ -26,6 +30,14 @@ public class RemoveTrackTest {
     private Track track3;
     private TrackFactory factory;
 
+    /**
+     * @brief Metodo di configurazione iniziale (Setup dell'ambiente di test).
+     *        Viene eseguito automaticamente prima di ogni test.
+     *        Prepara un ambiente isolato: inizializza il mock factory, crea un
+     *        contenitore
+     *        vuoto (Library), istanzia il gestore degli undo e genera tre tracce
+     *        fittizie di prova per popolare la libreria.
+     */
     @BeforeEach
     public void setUp() {
         factory = new MockTrackFactory();
@@ -39,6 +51,23 @@ public class RemoveTrackTest {
                 null);
     }
 
+    /**
+     * @brief Testa l'esecuzione della rimozione di una traccia e il successivo
+     *        annullamento (undo).
+     * 
+     *        Popolamento e Verifica Iniziale: Inserisce le tre tracce fittizie nel
+     *        contenitore
+     *        ed esegue un cast a Library per verificare esplicitamente che il
+     *        conteggio sia 3
+     *        e che la traccia selezionata (track2) si trovi nella posizione attesa.
+     *        Execute: Instanzia il comando RemoveTrack per eliminare track2 e lo fa
+     *        eseguire dall'UndoManager. Asserisce che la dimensione della libreria
+     *        scenda a 2
+     *        e che la traccia eliminata non sia più presente.
+     *        Undo: Richiama l'annullamento dell'operazione. Verifica che la traccia
+     *        venga correttamente reinserita, riportando la dimensione totale della
+     *        libreria a 3.
+     */
     @Test
     public void testRemoveTrackCommand() {
         container.addTrack(track1);
