@@ -240,6 +240,8 @@ public class TrackTableController implements IPlayerSubscriber {
                 ICommand moveUp = new MoveUpTrack(mainController.getAppState().getLibrary().getTracks(), selectedTrack);
                 mainController.getAppState().getUndoManager().executeCommand(moveUp);
                 trackTable.getSelectionModel().select(index - 1);
+                mainController.updateNextButton();
+                mainController.updatePrevButton();
             }
         }
     }
@@ -255,6 +257,8 @@ public class TrackTableController implements IPlayerSubscriber {
                         selectedTrack);
                 mainController.getAppState().getUndoManager().executeCommand(moveDown);
                 trackTable.getSelectionModel().select(index + 1);
+                mainController.updateNextButton();
+                mainController.updatePrevButton();
             }
         }
     }

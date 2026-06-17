@@ -68,7 +68,7 @@ public class PlayerController {
         var timerManager = appState.getTimerManager();
         var playerContext = appState.getPlayerContext();
         Track selectedTrack = trackTable.getSelectionModel().getSelectedItem();
-        if (playerContext.isPlaying()) {
+        if (playerContext.isPlaying() && playerContext.getCurrentTrack() != null) {
             playerContext.pause();
             timerManager.pause();
             mainController.updatePlayPauseButton(false);
@@ -297,6 +297,7 @@ public class PlayerController {
                 this::handlePlaybackFinished);
 
         mainController.updateNextButton();
+        mainController.updatePrevButton();
     }
 
     /**
@@ -357,6 +358,7 @@ public class PlayerController {
             lblNowPlaying.setText("Canzone terminata");
             mainController.updatePlayPauseButton(false);
             mainController.updateNextButton();
+        mainController.updatePrevButton();
             return;
         }
         handleNext(null);
@@ -388,6 +390,7 @@ public class PlayerController {
             resetUI();
             mainController.updatePlayPauseButton(false);
             mainController.updateNextButton();
+        mainController.updatePrevButton();
         }
     }
 
@@ -522,6 +525,7 @@ public class PlayerController {
         Track startTrack = selectedTrack != null ? selectedTrack : playlist.getTracks().get(0);
         setupEngineAndPlay(playlist.getTracks(), startTrack);
         mainController.updateNextButton();
+        mainController.updatePrevButton();
     }
 
     /**
@@ -573,12 +577,25 @@ public class PlayerController {
         if (current == null)
             return false;
         ObservableList<Track> queue = getSelectedQueueFromUI();
-        if (queue == null || queue.isEmpty()) {
+        if (queue == null || queue.isEmpty())
             return false;
-        }
         int idx = queue.indexOf(current);
         return idx >= 0 && idx < queue.size() - 1;
+    }
 
+    public boolean isPrevAvailable() {
+        AppState appState = mainController.getAppState();
+        if (loopMode || loopPlaylistMode)
+            return true;
+        if (appState.getPlayerContext().getPlaybackContext().getStrategy() instanceof ShuffleStrategy)
+            return true;
+        Track current = appState.getPlayerContext().getCurrentTrack();
+        if (current == null)
+            return false;
+        ObservableList<Track> queue = getSelectedQueueFromUI();
+        if (queue == null || queue.isEmpty())
+            return false;
+        return queue.indexOf(current) > 0;
     }
 
 }

@@ -52,9 +52,11 @@ public class Main extends Application {
     }
 
     /**
-     * @brief Eseguito automaticamente dal runtime JavaFX alla chiusura della finestra.
+     * @brief Eseguito automaticamente dal runtime JavaFX alla chiusura della
+     *        finestra.
      *        Ferma il timer di riproduzione, salva tutti i dati nel database
-     *        tramite {@link MainController#saveDB()} e chiude la connessione SQLite.
+     *        tramite {@link MainController#saveDB()} e chiude la connessione
+     *        SQLite.
      * @throws Exception In caso di errori durante la sincronizzazione.
      */
     @Override
@@ -72,7 +74,8 @@ public class Main extends Application {
     }
 
     /**
-     * @brief Metodo main: delega il lancio al runtime JavaFX tramite {@link Application#launch}.
+     * @brief Metodo main: delega il lancio al runtime JavaFX tramite
+     *        {@link Application#launch}.
      * @param args Argomenti della riga di comando (non utilizzati).
      */
     public static void main(String[] args) {

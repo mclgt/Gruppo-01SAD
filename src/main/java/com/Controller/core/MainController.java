@@ -56,7 +56,7 @@ public class MainController {
     @FXML
     private Slider progressSlider;
     @FXML
-    private Button btnPlay, btnUndo, btnAddToPlaylist, btnAddTrack, btnEditTrack, btnRemoveTrack, btnNext;
+    private Button btnPlay, btnUndo, btnAddToPlaylist, btnAddTrack, btnEditTrack, btnRemoveTrack, btnNext, btnPrev;
     @FXML
     private Label lblTagTitle;
     @FXML
@@ -346,6 +346,12 @@ public class MainController {
         }
     }
 
+    public void updatePrevButton() {
+        if (btnPrev != null) {
+            btnPrev.setDisable(!appState.getPlayerController().isPrevAvailable());
+        }
+    }
+
     /**
      * @brief Gestisce il click sul pulsante "Successivo": avanza al brano seguente
      *        secondo la modalità di riproduzione attiva.
@@ -427,38 +433,12 @@ public class MainController {
      * @param selectedPlaylist La playlist a cui aggiungere i brani.
      */
     public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
-        /*
-         * if (selectedPlaylist != null) {
-         * try {
-         * FXMLLoader loader = new
-         * FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
-         * Parent root = loader.load();
-         *
-         * AddTrackToPlaylistController controller = loader.getController();
-         * controller.initData(this, selectedPlaylist);
-         *
-         * Stage stage = new Stage();
-         * stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
-         * stage.setScene(new Scene(root));
-         * stage.show();
-         * } catch (Exception ex) {
-         * ex.printStackTrace();
-         * }
-         * } else {
-         * System.out.println("Nessuna playlist selezionata!");
-         * }
-         */
         appState.getWindowManager().openAddTrackToPlaylistWindow(selectedPlaylist);
     }
 
     /**
      * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
      *        chiudendo di fatto la vista della playlist corrente.
-     */
-    /*
-     * public PlaylistController getPlaylistController() {
-     * return appState.playlistController;
-     * }
      */
     public void restoreMainLibraryView() {
         navigator.restoreMainLibraryView(mainContentView);
