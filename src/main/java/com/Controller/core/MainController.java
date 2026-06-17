@@ -87,7 +87,20 @@ public class MainController {
 
     private AppState appState;
     private ViewNavigator navigator;
+    private javafx.scene.Node mainContentView;
 
+    /**
+     * @brief Inizializza i componenti dell'interfaccia grafica e i
+     *        sotto-controller.
+     *        Crea il @ref PlayerContext con strategia sequenziale di default,
+     *        inizializza
+     * @ref TrackTableController, @ref PlayerController e @ref
+     *      PlaylistTableController
+     *      passando i riferimenti ai componenti FXML. Carica inoltre un set di
+     *      brani
+     *      demo nella libreria per facilitare i test sull'interfaccia.
+     */
+    @FXML
     public void init(AppState appState) {
         this.appState = appState;
         this.navigator = new ViewNavigator(centerContentArea, this);
@@ -109,23 +122,10 @@ public class MainController {
                 lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
         appState.getPlayerController().init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         appState.getPlaylistTableController().init(this, playlistList, nameCol);
-        updateTop();
-    }
-
-    /**
-     * @brief Inizializza i componenti dell'interfaccia grafica e i
-     *        sotto-controller.
-     *        Crea il @ref PlayerContext con strategia sequenziale di default,
-     *        inizializza
-     * @ref TrackTableController, @ref PlayerController e @ref
-     *      PlaylistTableController
-     *      passando i riferimenti ai componenti FXML. Carica inoltre un set di
-     *      brani
-     *      demo nella libreria per facilitare i test sull'interfaccia.
-     */
-    @FXML
-    public void initialize() {
-
+        mainContentView = centerContentArea.getChildren().get(0);
+        if (!centerContentArea.getChildren().isEmpty()) {
+            mainContentView = centerContentArea.getChildren().get(0);
+        }
     }
 
     /**
@@ -371,7 +371,7 @@ public class MainController {
      */
 
     public void restoreMainLibraryView() {
-        navigator.restoreMainLibraryView(trackTable);
+        navigator.restoreMainLibraryView(mainContentView);
     }
 
     @FXML
