@@ -58,8 +58,10 @@ public class TrackProxy implements IAudioTrack {
         }
     }
 
-    // delega la pausa alla traccia reale se è già stata istanziata (lazy load già
-    // avvenuto)
+    /**
+     * @brief Mette in pausa il brano delegando l'azione alla traccia reale.
+     * * Il comando viene inoltrato solo se il caricamento iniziale (Lazy Load) è già avvenuto.
+     */
     @Override
     public void pausePlayback() {
         if (realTrack != null) {
@@ -67,8 +69,9 @@ public class TrackProxy implements IAudioTrack {
         }
     }
 
-    // delega la ripresa alla traccia reale, riprende dalla posizione nel buffer
-    // audio
+    /**
+     * @brief Riprende la riproduzione audio a partire dal punto di interruzione memorizzato nel buffer della traccia reale.
+     */
     @Override
     public void resumePlayback() {
         if (realTrack != null) {

@@ -70,4 +70,34 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>metrics</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.github.mauricioaniche</groupId>
+                    <artifactId>ck</artifactId>
+                    <version>0.7.0</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <configuration>
+                            <mainClass>com.github.mauricioaniche.ck.Runner</mainClass>
+                            <arguments>
+                                <argument>${project.basedir}/src/main/java</argument>
+                                <argument>false</argument>
+                                <argument>0</argument>
+                                <argument>false</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
