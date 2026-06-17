@@ -12,9 +12,26 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * @class Main
+ * @brief Punto di ingresso dell'applicazione JavaFX.
+ *
+ *        Inizializza l'AppState (libreria, DAO, factory) e carica la vista
+ *        principale tramite FXMLLoader. Al momento della chiusura,
+ *        sincronizza il database e rilascia tutte le risorse.
+ *
+ * @see AppState
+ * @see MainController
+ */
 public class Main extends Application {
     private MainController mainController;
 
+    /**
+     * @brief Avvia l'applicazione: inizializza AppState, carica il file FXML
+     *        della vista principale e mostra la finestra.
+     * @param pStage Lo Stage primario fornito dal runtime JavaFX.
+     * @throws Exception In caso di errori nel caricamento dell'FXML.
+     */
     @Override
     public void start(Stage pStage) throws Exception {
         TrackFactory factory = new LocalTrackFactory();
@@ -34,6 +51,12 @@ public class Main extends Application {
         pStage.show();
     }
 
+    /**
+     * @brief Eseguito automaticamente dal runtime JavaFX alla chiusura della finestra.
+     *        Ferma il timer di riproduzione, salva tutti i dati nel database
+     *        tramite {@link MainController#saveDB()} e chiude la connessione SQLite.
+     * @throws Exception In caso di errori durante la sincronizzazione.
+     */
     @Override
     public void stop() throws Exception {
         System.out.println("Rilevata chiusura dell'applicazione. Avvio sincronizzazione database...");
@@ -48,6 +71,10 @@ public class Main extends Application {
         super.stop();
     }
 
+    /**
+     * @brief Metodo main: delega il lancio al runtime JavaFX tramite {@link Application#launch}.
+     * @param args Argomenti della riga di comando (non utilizzati).
+     */
     public static void main(String[] args) {
         launch(args);
     }

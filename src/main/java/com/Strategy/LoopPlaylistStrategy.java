@@ -25,11 +25,7 @@ public class LoopPlaylistStrategy implements IPlaybackStrategy {
      */
     @Override
     public void setQueue(List<Track> queue, Track currentTrack){
-        this.queue = queue /**
-             * @brief Inizializza la coda di riproduzione e imposta l'indice del brano corrente.
-             * * @param queue La lista di brani che costituirà la coda.
-             * @param currentTrack Il brano attualmente in riproduzione da cui sincronizzare l'indice.
-             */!= null ? queue : new ArrayList<>();
+        this.queue = queue != null ? queue : new ArrayList<>();
         if(currentTrack!=null){
             this.currentIndex=this.queue.indexOf(currentTrack);
         }
