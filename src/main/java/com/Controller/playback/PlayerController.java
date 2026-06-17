@@ -344,25 +344,12 @@ public class PlayerController {
             mainController.updateNextButton();
             return;
         }
-        Track before = appState.getPlayerContext().getCurrentTrack();
-        Track next = appState.getPlayerContext().getPlaybackContext().nextTrack(getSelectedQueueFromUI(), before);
-        if (next != null) {
-            handleNext(null);
-        } else {
-            ITrackContainer container = getActiveContainer();
-            if (container instanceof Playlist) {
-                Playlist activePlaylist = (Playlist) container;
-                activePlaylist.incrementPlayCount();
-            }
-            stopSong();
-            trackFinished = true;
-            appState.getPlayerContext().stop();
-            resetUI();
-            lblNowPlaying.setText("Canzone terminata");
-            mainController.updatePlayPauseButton(false);
-            mainController.updateNextButton();
-        }
         handleNext(null);
+        ITrackContainer container = getActiveContainer();
+        if (container instanceof Playlist) {
+            Playlist activePlaylist = (Playlist) container;
+            activePlaylist.incrementPlayCount();
+        }
     }
 
     /**
