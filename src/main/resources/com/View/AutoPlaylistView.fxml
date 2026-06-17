@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefWidth="440.0" spacing="20.0" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+<VBox prefWidth="440.0" spacing="20.0" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/13" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.Controller.playlist.AutoPlaylistController">
    <padding>
       <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />

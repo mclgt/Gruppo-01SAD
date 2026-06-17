@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane onMouseClicked="#handleBackgroundClick" prefHeight="650.0" prefWidth="1000.0" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.core.MainController">
+<BorderPane onMouseClicked="#handleBackgroundClick" prefHeight="650.0" prefWidth="1000.0" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/13" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.core.MainController">
    
    <top>
       <VBox BorderPane.alignment="CENTER">
