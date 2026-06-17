@@ -51,7 +51,7 @@ public class PlaylistDAOTest {
         if (!libreriaDir.exists())
             libreriaDir.mkdirs();
 
-        dummy = new File(libreriaDir, "test.mp3");
+        dummy = new File(libreriaDir, "Test.wav");
         if (!dummy.exists())
             dummy.createNewFile();
     }
@@ -82,9 +82,10 @@ public class PlaylistDAOTest {
 
     @Test
     public void testSavePlaylistWithTracks() throws Exception {
-        Track track1 = factory.createTrack("Song 1", "Auth 1", 2020, "Pop", 100, "", "test.mp3", TrackTag.NONE);
+        String path = dummy.getAbsolutePath();
+        Track track1 = factory.createTrack("Song 1", "Auth 1", 2020, "Pop", 100, "", path, TrackTag.NONE);
         trackDAO.save(track1);
-        
+
         Playlist playlist = new Playlist("My playlist");
         playlist.addTrack(track1);
 
@@ -93,7 +94,8 @@ public class PlaylistDAOTest {
 
         assertEquals(1, savedPlaylists.size());
         assertEquals("My playlist", savedPlaylists.get(0).getName());
-        assertEquals(1, savedPlaylists.get(0).getTracks().size(), "La playlist recuperata dovrebbe contenere 1 traccia.");
+        assertEquals(1, savedPlaylists.get(0).getTracks().size(),
+                "La playlist recuperata dovrebbe contenere 1 traccia.");
         assertEquals("Song 1", savedPlaylists.get(0).getTracks().get(0).getTitle());
     }
 }

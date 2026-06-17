@@ -1,11 +1,6 @@
 package com.Controller.track;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import com.Command.AddTrack;
 import com.Command.ICommand;
@@ -154,27 +149,16 @@ public class AddModTrackController implements ITrackImporter {
                 year = Integer.parseInt(txtYear.getText());
             }
 
-            if (!isEditMode && originalFilePath != null && !originalFilePath.isEmpty()) {
-                File sourceFile = new File(originalFilePath);
-
-                if (sourceFile.exists()) {
-                    File libraryAudio = new File("data/library_audio");
-                    if (!libraryAudio.exists()) {
-                        libraryAudio.mkdir();
-                    }
-
-                    Path destPath = Paths.get("data/library_audio", sourceFile.getName());
-                    Files.copy(sourceFile.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
-                    finalFilePathForDB = sourceFile.getName();
-                }
-            }
+            finalFilePathForDB = originalFilePath;
 
             if (isEditMode) {
-                ICommand modifyCommand = new ModifyTrack(mainController.getLibrary(), trackToModify, title, author,
-                        year, genre, duration, album, originalFilePath, tag, mainController.getTrackDAO());
+                ICommand modifyCommand = new ModifyTrack(mainController.getAppState().getLibrary(), trackToModify,
+                        title, author,
+                        year, genre, duration, album, originalFilePath, tag,
+                        mainController.getAppState().getTrackDAO());
 
                 if (mainController != null) {
-                    mainController.getUndoManager().executeCommand(modifyCommand);
+                    mainController.getAppState().getUndoManager().executeCommand(modifyCommand);
                     mainController.notifyTrackModified(trackToModify);
                 }
             } else {
@@ -182,20 +166,17 @@ public class AddModTrackController implements ITrackImporter {
                         finalFilePathForDB, tag);
 
                 if (mainController != null) {
-                    ICommand addCommand = new AddTrack(mainController.getLibrary(), newTrack, mainController.getTrackDAO());
-                    mainController.getUndoManager().executeCommand(addCommand);
+                    ICommand addCommand = new AddTrack(mainController.getAppState().getLibrary(), newTrack,
+                            mainController.getAppState().getTrackDAO());
+                    mainController.getAppState().getUndoManager().executeCommand(addCommand);
                 }
             }
             closeWindow();
         } catch (NumberFormatException ex) {
-            mainController.getWindowManager().showError("Errore nell'inserimento dei dati numerici",
+            mainController.getAppState().getWindowManager().showError("Errore nell'inserimento dei dati numerici",
                     "Assicurarsi di aver inserito numeri nei campi 'Anno' e 'Durata'");
         } catch (IllegalArgumentException ex) {
-            mainController.getWindowManager().showError("Dati non vallidi", ex.getMessage());
-        } catch (IOException ex) {
-            mainController.getWindowManager().showError("Errore file",
-                    "Impossibile copiare il file audio nella libreria");
-            ex.printStackTrace();
+            mainController.getAppState().getWindowManager().showError("Dati non vallidi", ex.getMessage());
         }
     }
 
@@ -206,7 +187,6 @@ public class AddModTrackController implements ITrackImporter {
      */
     @FXML
     public void handleSelectFile(ActionEvent event) {
-        // Recupera la finestra attuale
         Window currentWindow = ((Node) event.getSource()).getScene().getWindow();
 
         File selectedFile = selectAudioFile(currentWindow);

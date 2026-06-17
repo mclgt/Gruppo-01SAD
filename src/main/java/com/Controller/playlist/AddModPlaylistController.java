@@ -39,7 +39,7 @@ public class AddModPlaylistController {
     public void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
-    
+
     /**
      * @brief Imposta la playlist da modificara. Se viene passata una playlist
      *        esistente, il campo viene aggiornato con il suo nome attuale.
@@ -65,35 +65,39 @@ public class AddModPlaylistController {
         try {
             String name = txtPlaylistName.getText().trim();
 
-            ObservableList<Playlist> existingPlaylists = mainController.getPlaylistCatalog().getPlaylists();
+            ObservableList<Playlist> existingPlaylists = mainController.getAppState().getPlaylistCatalog()
+                    .getPlaylists();
 
             for (Playlist p : existingPlaylists) {
                 boolean isSamePlaylist = isEditMode && p.equals(currentPlaylist);
                 if (!isSamePlaylist && p.getName().equalsIgnoreCase(name)) {
-                    throw new IllegalArgumentException("Esiste già una playlist chiamata '" + name + "'. Scegli un altro nome.");
+                    throw new IllegalArgumentException(
+                            "Esiste già una playlist chiamata '" + name + "'. Scegli un altro nome.");
                 }
             }
 
             if (isEditMode) {
-                ICommand modifyCommand = new ModifyPlaylist(mainController.getPlaylistCatalog(), currentPlaylist, name, mainController.getPlaylistDAO());
+                ICommand modifyCommand = new ModifyPlaylist(mainController.getAppState().getPlaylistCatalog(),
+                        currentPlaylist, name, mainController.getAppState().getPlaylistDAO());
 
-                if(mainController != null){
-                    mainController.getUndoManager().executeCommand(modifyCommand);
+                if (mainController != null) {
+                    mainController.getAppState().getUndoManager().executeCommand(modifyCommand);
                 }
 
                 mainController.openPlaylistView(currentPlaylist);
             } else {
                 Playlist newPlaylist = new Playlist(name);
 
-                ICommand addCommand = new AddPlaylist(mainController.getPlaylistCatalog(), newPlaylist, mainController.getPlaylistDAO());
-                mainController.getUndoManager().executeCommand(addCommand);
+                ICommand addCommand = new AddPlaylist(mainController.getAppState().getPlaylistCatalog(), newPlaylist,
+                        mainController.getAppState().getPlaylistDAO());
+                mainController.getAppState().getUndoManager().executeCommand(addCommand);
 
                 mainController.openPlaylistView(newPlaylist);
             }
 
             closeWindow();
         } catch (IllegalArgumentException ex) {
-            mainController.getWindowManager().showWarning("Dati non validi", ex.getMessage());
+            mainController.getAppState().getWindowManager().showWarning("Dati non validi", ex.getMessage());
         }
     }
 

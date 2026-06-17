@@ -2,11 +2,12 @@ package com.DataLayer;
 
 /**
  * @brief Interfaccia comune per il pattern Proxy dedicata alla gestione audio.
- * Definisce il contratto che sia la traccia reale (RealTrack) sia il suo
- * sostituto (TrackProxy) devono rispettare per garantire l'intercambiabilità.
+ *        Definisce il contratto che sia la traccia reale (RealTrack) sia il suo
+ *        sostituto (TrackProxy) devono rispettare per garantire
+ *        l'intercambiabilità.
  *
  * @see DataLayer.TrackProxy
- * @see DataLayer.RealTrack
+ * @see RealTrackTest.RealTrack
  */
 public interface IAudioTrack {
 
@@ -37,7 +38,8 @@ public interface IAudioTrack {
 
     /**
      * @brief Verifica lo stato della riproduzione.
-     * @return boolean True se il brano sta suonando in questo momento, False altrimenti.
+     * @return boolean True se il brano sta suonando in questo momento, False
+     *         altrimenti.
      */
     boolean isPlaying();
 }

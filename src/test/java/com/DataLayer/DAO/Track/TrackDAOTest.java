@@ -31,7 +31,7 @@ public class TrackDAOTest {
 
         String createTableSql = "CREATE TABLE tracks (id TEXT PRIMARY KEY, title TEXT, author TEXT, year INTEGER, genre TEXT, duration INTEGER, album TEXT, file_path TEXT, play_count TEXT, tag TEXT);";
 
-        try(PreparedStatement st = c.prepareStatement(createTableSql)){
+        try (PreparedStatement st = c.prepareStatement(createTableSql)) {
             st.executeUpdate();
         }
 
@@ -39,15 +39,15 @@ public class TrackDAOTest {
         trackDAO = new TrackDAO(factory);
 
         File libraryAudio = new File("data/library_audio");
-        if(!libraryAudio.exists())
+        if (!libraryAudio.exists())
             libraryAudio.mkdir();
 
-        dummy1 = new File(libraryAudio, "bohemian.mp3");
-        if(!dummy1.exists())
+        dummy1 = new File(libraryAudio, "Bohemian.wav");
+        if (!dummy1.exists())
             dummy1.createNewFile();
 
-        dummy2 = new File(libraryAudio, "test.mp3");
-        if(!dummy2.exists())
+        dummy2 = new File(libraryAudio, "Test.wav");
+        if (!dummy2.exists())
             dummy2.createNewFile();
     }
 
@@ -56,34 +56,36 @@ public class TrackDAOTest {
         Connection c = DatabaseManager.getConnection();
 
         String dropTableSql = "DROP TABLE IF EXISTS tracks;";
-        try(PreparedStatement st = c.prepareStatement(dropTableSql)){
+        try (PreparedStatement st = c.prepareStatement(dropTableSql)) {
             st.executeUpdate();
         }
 
         DatabaseManager.closeConnection();
 
-        if(dummy1 != null && dummy1.exists())
+        if (dummy1 != null && dummy1.exists())
             dummy1.delete();
 
-        if(dummy2 != null && dummy2.exists())
+        if (dummy2 != null && dummy2.exists())
             dummy2.delete();
     }
 
     @Test
     public void testSaveAndGetAll() throws Exception {
-        Track track = factory.createTrack("Bohemian Rapsody", "Queen", 1975, "Rock", 354, "A Night at the Opera", "bohemian.mp3", TrackTag.FAVOURITE);
+        Track track = factory.createTrack("Bohemian Rapsody", "Queen", 1975, "Rock", 354, "A Night at the Opera",
+                dummy1.getAbsolutePath(), TrackTag.FAVOURITE);
 
         trackDAO.save(track);
         List<Track> savedTracks = trackDAO.getAll();
 
         assertEquals(1, savedTracks.size(), "Dovrebbe esserci esattamente una traccia");
         assertEquals("Bohemian Rapsody", savedTracks.get(0).getTitle());
-        assertEquals("Queen", savedTracks.get(0).getAuthor());        
+        assertEquals("Queen", savedTracks.get(0).getAuthor());
     }
 
     @Test
     public void testUpdatePlayCount() throws Exception {
-        Track track = factory.createTrack("Test", "Author", 2020, "Pop", 200, "", "test.mp3", TrackTag.NONE);
+        Track track = factory.createTrack("Test", "Author", 2020, "Pop", 200, "", dummy2.getAbsolutePath(),
+                TrackTag.NONE);
         trackDAO.save(track);
 
         track.setPlayCount(3);

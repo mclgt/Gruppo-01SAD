@@ -1,40 +1,18 @@
 package com.Controller.core;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.sql.Statement;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import com.Command.UndoManager;
-import com.Controller.playback.PlaybackTimerManager;
-import com.Controller.playback.PlayerController;
-import com.Controller.playlist.AddTrackToPlaylistController;
-import com.Controller.playlist.PlaylistController;
-import com.Controller.playlist.PlaylistTableController;
-import com.Controller.track.SearchController;
-import com.Controller.track.TrackTableController;
-import com.Controller.util.WindowManager;
+import com.Controller.navigation.ViewNavigator;
 import com.DataLayer.DAO.DatabaseManager;
-import com.DataLayer.DAO.Playlist.PlaylistDAO;
-import com.DataLayer.DAO.Track.TrackDAO;
-import com.Model.Library;
 import com.Model.Playlist;
-import com.Model.PlaylistCatalog;
 import com.Model.Track;
-import com.Model.TrackFactory;
 import com.Model.TrackTag;
-import com.State.PlayerContext;
-import com.Strategy.PlaybackContext;
-import com.Strategy.SequentialStrategy;
 
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -42,12 +20,10 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 /**
  * @brief Controller principale dell'applicazione, gestisce la schermata
@@ -82,7 +58,7 @@ public class MainController {
     private TableColumn<Playlist, String> nameCol;
     @FXML
     private Button btnUpTrack;
-    @FXML 
+    @FXML
     private Button btnDownTrack;
     @FXML
     private TextField searchField;
@@ -109,41 +85,9 @@ public class MainController {
     @FXML
     private TableColumn<Playlist, Integer> topPlaylistCountCol;
 
-    private PlaylistController playlistController;
-
-    private final TrackTableController trackTableController = new TrackTableController();
-    private final PlayerController playerController = new PlayerController();
-
-    private PlayerContext playerContext;
-    private final UndoManager undoManager = new UndoManager();
-    private final PlaylistCatalog playlistCatalog = new PlaylistCatalog();
-    private final PlaylistTableController playlistTableController = new PlaylistTableController();
-    private final Deque<Boolean> deletedPlayingStack = new ArrayDeque<>();
-    private final PlaybackTimerManager timerManager = new PlaybackTimerManager();
-    private WindowManager windowManager;
-
-    private SearchController searchController = new SearchController();
-
-    private Library trackList = new Library();
-
-    private final TrackDAO trackDAO;
-    private final PlaylistDAO playlistDAO;
-
-    public MainController(TrackFactory factory) {
-        windowManager = new WindowManager(this, factory);
-
-        this.trackDAO = new TrackDAO(factory);
-        this.playlistDAO = new PlaylistDAO(trackDAO);
-
-        try {
-            this.trackList.getTracks().addAll(trackDAO.getAll());
-            this.playlistCatalog.getPlaylists().addAll(playlistDAO.getAll());
-            System.out.println("Ripristino iniziale tramite DAO completato con successo.");
-        } catch (Exception e) {
-            System.err.println("Impossibile caricare i dati storici dal file DB all'avvio:");
-            e.printStackTrace();
-        }
-    }
+    private AppState appState;
+    private ViewNavigator navigator;
+    private javafx.scene.Node mainContentView;
 
     /**
      * @brief Inizializza i componenti dell'interfaccia grafica e i
@@ -157,35 +101,31 @@ public class MainController {
      *      demo nella libreria per facilitare i test sull'interfaccia.
      */
     @FXML
-    public void initialize() {
-        playerContext = new PlayerContext(new PlaybackContext(new SequentialStrategy()));
-        btnUndo.disableProperty().bind(undoManager.undoDisabledProperty());
+    public void init(AppState appState) {
+        this.appState = appState;
+        this.navigator = new ViewNavigator(centerContentArea, this);
+        appState.getWindowManager().setMainController(this);
+        btnUndo.disableProperty().bind(appState.getUndoManager().undoDisabledProperty());
+        if (playbackModeCombo != null) {
+            playbackModeCombo.setItems(FXCollections.observableArrayList(
+                    "Singola", "Sequenziale", "Loop brano", "Shuffle"));
 
-        // Inizialzzazione dei sotto-controller
-        trackTableController.init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle, lblAuthor,
-                lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
-        playerController.init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
-        playlistTableController.init(this, playlistList, nameCol);
-        searchController.init(trackList.getTracks(), trackTable);
-        searchController.bindSearchField(searchField);
+            playbackModeCombo.getSelectionModel().select("Singola");
 
-        playbackModeCombo.setItems(FXCollections.observableArrayList(
-                "Singola", "Sequenziale", "Loop brano", "Shuffle"));
-        playbackModeCombo.setValue("Singola");
-        playbackModeCombo.setOnAction(e -> playerController.setPlaybackMode(playbackModeCombo.getValue()));
-
-        topTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        topAuthorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
-        topCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
-
-        topPlaylistNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        topPlaylistCountCol.setCellValueFactory(new PropertyValueFactory<>("playCount"));
-
-        if (playlistList != null) {
-            playlistList.setItems(playlistCatalog.getPlaylists());
+            playbackModeCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    appState.getPlayerController().setPlaybackMode(newValue);
+                }
+            });
         }
-
-        updateTop();
+        appState.getTrackTableController().init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle,
+                lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
+        appState.getPlayerController().init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
+        appState.getPlaylistTableController().init(this, playlistList, nameCol);
+        mainContentView = centerContentArea.getChildren().get(0);
+        if (!centerContentArea.getChildren().isEmpty()) {
+            mainContentView = centerContentArea.getChildren().get(0);
+        }
     }
 
     /**
@@ -193,54 +133,61 @@ public class MainController {
      *        Compatibile con versioni Java 11+ tramite
      *        .collect(Collectors.toList())
      */
+
     public void updateTop() {
-        try {
-            List<Track> topTracks = this.trackDAO.getFrequentlyPlayed(5);
-            List<Playlist> topPlaylists = this.playlistDAO.getFrequentlyPlayed(5);
+        javafx.application.Platform.runLater(() -> {
+            try {
+                List<Track> topTracks = appState.getTrackDAO().getFrequentlyPlayed(5);
+                List<Playlist> topPlaylists = appState.getPlaylistDAO().getFrequentlyPlayed(5);
 
-            boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0) ||
-                    topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
+                boolean hasHistory = topTracks.stream().anyMatch(t -> t.getPlayCount() > 0)
+                        ||
+                        topPlaylists.stream().anyMatch(p -> p.getPlayCount() > 0);
 
-            if (hasHistory) {
-                if (lblEmptyHistoryMessage != null) {
-                    lblEmptyHistoryMessage.setVisible(false);
-                    lblEmptyHistoryMessage.setManaged(false);
-                }
-                if (frequentlyPlayedContainer != null) {
-                    frequentlyPlayedContainer.setVisible(true);
-                    frequentlyPlayedContainer.setManaged(true);
-                }
+                if (hasHistory) {
+                    if (lblEmptyHistoryMessage != null) {
+                        lblEmptyHistoryMessage.setVisible(false);
+                        lblEmptyHistoryMessage.setManaged(false);
+                    }
+                    if (frequentlyPlayedContainer != null) {
+                        frequentlyPlayedContainer.setVisible(true);
+                        frequentlyPlayedContainer.setManaged(true);
+                    }
 
-                List<Track> filteredTracks = topTracks.stream()
-                        .filter(t -> t.getPlayCount() > 0)
-                        .collect(Collectors.toList());
-                frequentlyPlayedTable.setItems(FXCollections.observableArrayList(filteredTracks));
+                    List<Track> filteredTracks = topTracks.stream()
+                            .filter(t -> t.getPlayCount() > 0)
+                            .collect(Collectors.toList());
+                    frequentlyPlayedTable.setItems(FXCollections.observableArrayList(
+                            filteredTracks));
 
-                List<Playlist> filteredPlaylists = topPlaylists.stream()
-                        .filter(p -> p.getPlayCount() > 0)
-                        .collect(Collectors.toList());
-                frequentlyPlayedPlaylistTable.setItems(FXCollections.observableArrayList(filteredPlaylists));
-            } else {
-                if (frequentlyPlayedContainer != null) {
-                    frequentlyPlayedContainer.setVisible(false);
-                    frequentlyPlayedContainer.setManaged(false);
+                    List<Playlist> filteredPlaylists = topPlaylists.stream()
+                            .filter(p -> p.getPlayCount() > 0)
+                            .collect(Collectors.toList());
+                    frequentlyPlayedPlaylistTable.setItems(FXCollections.observableArrayList(
+                            filteredPlaylists));
+                } else {
+                    if (frequentlyPlayedContainer != null) {
+                        frequentlyPlayedContainer.setVisible(false);
+                        frequentlyPlayedContainer.setManaged(false);
+                    }
+                    if (lblEmptyHistoryMessage != null) {
+                        lblEmptyHistoryMessage.setVisible(true);
+                        lblEmptyHistoryMessage.setManaged(true);
+                    }
                 }
-                if (lblEmptyHistoryMessage != null) {
-                    lblEmptyHistoryMessage.setVisible(true);
-                    lblEmptyHistoryMessage.setManaged(true);
-                }
+            } catch (Exception e) {
+                System.err.println("Errore nell'aggiornamento grafico del Frequently Played: " +
+                        e.getMessage());
             }
-        } catch (Exception e) {
-            System.err.println("Errore nell'aggiornamento grafico del Frequently Played: " + e.getMessage());
-        }
+        });
     }
 
     /**
-     * @brief Esegue una sincronizzazione di sicurezza (Fallback) alla chiusura.
-     * Dato che l'app è in Real-Time, i database dovrebbero essere già allineati.
-     * Questo metodo fa un semplice UPDATE (non distruttivo) di tutto ciò che è in RAM
-     * per catturare eventuali modifiche sfuggite.
+     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo
+     *        tramite Transazione (Commit).
+     *        Invocato esclusivamente dal metodo stop() della classe Main.
      */
+
     public void saveDB() {
         System.out.println("Avvio fallback di chiusura ...");
         Connection c = null;
@@ -248,18 +195,21 @@ public class MainController {
             c = DatabaseManager.getConnection();
             c.setAutoCommit(false); // Avviamo la transazione sicura
 
-            for(Track track : this.trackList.getTracks()){
-                this.trackDAO.update(track);
+            try (Statement st = c.createStatement()) {
+                st.executeUpdate("DELETE FROM tracks;");
+                st.executeUpdate("DELETE FROM playlists;");
             }
 
-            for(Playlist playlist : this.playlistCatalog.getPlaylists()){
-                this.playlistDAO.update(playlist);
+            for (Track track : appState.getLibrary().getTracks()) {
+                appState.getTrackDAO().update(track);
             }
 
-            c.commit();
-            System.out.println("Chiusura sicura completata. Tutti i dati sono allineati.");
+            for (Playlist playlist : appState.getPlaylistCatalog().getPlaylists()) {
+                appState.getPlaylistDAO().update(playlist);
+            }
 
-
+            c.commit(); // Scrittura fisica bloccata sul file db
+            System.out.println("Sincronizzazione finale completata. File SQLite aggiornato.");
         } catch (Exception e) {
             System.err.println("Errore durante la sincronizzazione di sicurezza: ");
             e.printStackTrace();
@@ -280,74 +230,8 @@ public class MainController {
         }
     }
 
-    public List<Track> getFrequentlyPlayedTracks(int limit) throws Exception {
-        return this.trackDAO.getFrequentlyPlayed(limit);
-    }
-
-    public List<Playlist> getFrequentlyPlayedPlaylists(int limit) throws Exception {
-        return this.playlistDAO.getFrequentlyPlayed(limit);
-    }
-
-    /**
-     * @brief Fornisce il riferimento alla libreria musicale (che funge da Receiver
-     *        globale)
-     * @return L'oggetto Library corrente.
-     */
-    public Library getLibrary() {
-        return trackList;
-    }
-
-    public PlaylistDAO getPlaylistDAO(){
-        return playlistDAO;
-    }
-
-    public TrackDAO getTrackDAO(){
-        return trackDAO;
-    }
-
     public Button getBtnAddToPlaylist() {
         return btnAddToPlaylist;
-    }
-
-    /**
-     * @brief Fornisce il riferimento all'Invoker del sistema per la gestione
-     *        dell'Undo list.
-     * @return L'oggetto UndoManager corrente.
-     */
-    public UndoManager getUndoManager() {
-        return undoManager;
-    }
-
-    public PlaylistCatalog getPlaylistCatalog() {
-        return playlistCatalog;
-    }
-
-    public PlaylistTableController getPlaylistTableController() {
-        return playlistTableController;
-    }
-
-    public PlayerContext getPlayerContext() {
-        return playerContext;
-    }
-
-    public PlaybackTimerManager getTimerManager() {
-        return timerManager;
-    }
-
-    public Deque<Boolean> getDeletedPlayingStack() {
-        return deletedPlayingStack;
-    }
-
-    public WindowManager getWindowManager() {
-        return windowManager;
-    }
-
-    public TrackTableController getTrackTableController() {
-        return trackTableController;
-    }
-
-    public PlayerController getPlayerController() {
-        return playerController;
     }
 
     public void setTrackManagementButtonVisible(boolean visible) {
@@ -362,30 +246,12 @@ public class MainController {
     }
 
     public void addTrackMainTable(Track track) {
-        trackList.addTrack(track);
+        appState.getLibrary().addTrack(track);
     }
 
     public void notifyTrackModified(Track track) {
-        playerController.handleTrackModified(track);
+        appState.getPlayerController().handleTrackModified(track);
         updateDetailPanel(track);
-
-        updateTop();
-
-        if(trackTable != null){
-            trackTable.refresh();
-        }
-
-        if(frequentlyPlayedTable != null){
-            frequentlyPlayedTable.refresh();
-        }
-
-        if(frequentlyPlayedPlaylistTable != null){
-            frequentlyPlayedPlaylistTable.refresh();
-        }
-
-        if(playlistController != null && playlistController.getPlaylistTrackList() != null){
-            playlistController.getPlaylistTrackList().refresh();
-        }
     }
 
     /**
@@ -396,15 +262,7 @@ public class MainController {
      */
     @FXML
     public void handleUndo(ActionEvent event) {
-        undoManager.undo();
-        boolean wasPlayingDelete = !deletedPlayingStack.isEmpty() && deletedPlayingStack.pop();
-        if (wasPlayingDelete) {
-            timerManager.stop();
-            playerController.resetUI();
-            playerController.setTrackFinished(false);
-            playerContext.setCurrentTrack(null);
-        }
-        updateTop();
+        appState.getUndoManager().undo();
     }
 
     /**
@@ -416,17 +274,7 @@ public class MainController {
      */
     @FXML
     public void togglePlayPause() {
-        Track current = playerContext.getCurrentTrack();
-        Track librarySelected = trackTableController.getSelectedTrack();
-        Track playlistSelected = playlistController != null ? playlistController.getSelectedTrack() : null;
-        Track selected = librarySelected != null ? librarySelected : playlistSelected;
-
-        if (current != null && !playerController.isTrackFinished()
-                && (selected == null || selected == current)) {
-            playerController.pauseSong();
-        } else {
-            playerController.playSong();
-        }
+        appState.getPlayerController().togglePlayPause(appState.getPlayerContext(), trackTable);
     }
 
     /**
@@ -442,83 +290,73 @@ public class MainController {
 
     public void updateNextButton() {
         if (btnNext != null) {
-            btnNext.setDisable(!playerController.isNextAvailable());
+            btnNext.setDisable(!appState.getPlayerController().isNextAvailable());
         }
     }
 
     @FXML
     public void handleNext(ActionEvent ev) {
-        playerController.handleNext(ev);
+        appState.getPlayerController().handleNext(ev);
     }
 
     @FXML
     public void handlePrev(ActionEvent ev) {
-        playerController.handlePrev(ev);
+        appState.getPlayerController().handlePrev(ev);
     }
 
     @FXML
     public void openAddTrackWindow(ActionEvent ev) {
-        trackTableController.openAddTrackWindow(ev);
+        appState.getTrackTableController().openAddTrackWindow(ev);
     }
 
     @FXML
     public void openModifyTrackView(ActionEvent ev) {
-        trackTableController.openModifyTrackView(ev);
+        appState.getTrackTableController().openModifyTrackView(ev);
     }
 
     @FXML
     public void openAddPlaylistView(ActionEvent ev) {
-        windowManager.openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
+        appState.getWindowManager().openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
     @FXML
     public void openAutoPlaylistWindow(ActionEvent ev) {
-        windowManager.openAutoPlaylistWindow(this);
+        appState.getWindowManager().openAutoPlaylistWindow(this);
     }
 
     public void openPlaylistView(Playlist selectedPlaylist) {
-        try {
-            setTrackManagementButtonVisible(false);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/PlaylistView.fxml"));
-            VBox playlistViewNode = loader.load();
-
-            playlistController = loader.getController();
-            playlistController.setMainController(this);
-            playlistController.setPlaylistData(selectedPlaylist);
-            searchController.resetContext(selectedPlaylist.getTracks(), playlistController.getPlaylistTrackList());
-
-            centerContentArea.getChildren().clear();
-            centerContentArea.getChildren().add(playlistViewNode);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        navigator.loadPlaylistView(selectedPlaylist);
     }
 
     @FXML
     public void openAddTrackToPlaylistView() {
-        Playlist selectedPlaylist = playlistTableController.getSelectedPlaylist();
+        Playlist selectedPlaylist = appState.getPlaylistTableController().getSelectedPlaylist();
         openAddTrackToPlaylistView(selectedPlaylist);
     }
 
     public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
-        if (selectedPlaylist != null) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
-                Parent root = loader.load();
-
-                AddTrackToPlaylistController controller = loader.getController();
-                controller.initData(this, selectedPlaylist);
-
-                Stage stage = new Stage();
-                stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
-                stage.setScene(new Scene(root));
-                stage.show();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            System.out.println("Nessuna playlist selezionata!");
-        }
+        /*
+         * if (selectedPlaylist != null) {
+         * try {
+         * FXMLLoader loader = new
+         * FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
+         * Parent root = loader.load();
+         * 
+         * AddTrackToPlaylistController controller = loader.getController();
+         * controller.initData(this, selectedPlaylist);
+         * 
+         * Stage stage = new Stage();
+         * stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
+         * stage.setScene(new Scene(root));
+         * stage.show();
+         * } catch (Exception ex) {
+         * ex.printStackTrace();
+         * }
+         * } else {
+         * System.out.println("Nessuna playlist selezionata!");
+         * }
+         */
+        appState.getWindowManager().openAddTrackToPlaylistWindow(selectedPlaylist);
     }
 
     /**
@@ -526,23 +364,19 @@ public class MainController {
      *        centrale,
      *        chiudendo di fatto la vista della playlist.
      */
-    public PlaylistController getPlaylistController() {
-        return playlistController;
-    }
+    /*
+     * public PlaylistController getPlaylistController() {
+     * return appState.playlistController;
+     * }
+     */
 
     public void restoreMainLibraryView() {
-        playlistController = null;
-        setTrackManagementButtonVisible(true);
-        searchController.resetContext(trackList.getTracks(), trackTable);
-        if (centerContentArea != null && trackTable != null) {
-            centerContentArea.getChildren().clear();
-            centerContentArea.getChildren().add(trackTable);
-        }
+        navigator.restoreMainLibraryView(mainContentView);
     }
 
     @FXML
     public void handleRemoveTrack(ActionEvent ev) {
-        trackTableController.handleRemoveTrack(ev);
+        appState.getTrackTableController().handleRemoveTrack(ev);
     }
 
     @FXML
@@ -553,13 +387,13 @@ public class MainController {
                 return;
             node = node.getParent();
         }
-        trackTableController.clearSelection();
-        playlistTableController.clearSelection();
+        appState.getTrackTableController().clearSelection();
+        appState.getPlaylistTableController().clearSelection();
     }
 
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
-        playlistTableController.openModPlaylistView(ev);
+        appState.getPlaylistTableController().openModPlaylistView(ev);
     }
 
     public void updateDetailPanel(Track track) {
@@ -593,27 +427,30 @@ public class MainController {
      */
     @FXML
     public void handleDeletePlaylist(ActionEvent ev) {
-        playlistTableController.handleDeletePlaylist(ev);
+        appState.getPlaylistTableController().handleDeletePlaylist(ev);
     }
 
-    public void setMoveButtonDisable(boolean disableUp, boolean disableDown){
-        if(btnUpTrack != null){
+    public void setMoveButtonDisable(boolean disableUp, boolean disableDown) {
+        if (btnUpTrack != null) {
             btnUpTrack.setDisable(disableUp);
         }
-        if(btnDownTrack != null){
+        if (btnDownTrack != null) {
             btnDownTrack.setDisable(disableDown);
         }
     }
 
     @FXML
     private void handleMoveUp(ActionEvent event) {
-        trackTableController.handleMoveUp(event);
+        appState.getTrackTableController().handleMoveUp(event);
     }
 
     @FXML
     private void handleMoveDown(ActionEvent event) {
-        trackTableController.handleMoveDown(event);
+        appState.getTrackTableController().handleMoveDown(event);
     }
 
+    public AppState getAppState() {
+        return appState;
+    }
 
 }
