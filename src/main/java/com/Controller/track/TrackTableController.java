@@ -184,7 +184,8 @@ public class TrackTableController implements IPlayerSubscriber {
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             ICommand removeCommand = new RemoveTrack(mainController.getAppState().getLibrary(), selectedTrack,
-                    mainController.getAppState().getPlaylistCatalog());
+                    mainController.getAppState().getPlaylistCatalog(), mainController.getAppState().getTrackDAO(),
+                    mainController.getAppState().getPlaylistDAO());
 
             boolean wasPlaying = mainController.getAppState().getPlayerContext().isPlaying()
                     && selectedTrack == mainController.getAppState().getPlayerContext().getCurrentTrack();
@@ -197,6 +198,8 @@ public class TrackTableController implements IPlayerSubscriber {
             int idx = mainController.getAppState().getLibrary().getTracks().indexOf(selectedTrack);
             mainController.getAppState().getUndoManager().executeCommand(removeCommand);
             clearSelection();
+
+            mainController.updateTop();
 
             if (wasPlaying) {
                 mainController.getAppState().getPlayerController().handleTrackRemoval(idx);

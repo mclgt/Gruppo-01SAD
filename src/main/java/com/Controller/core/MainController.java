@@ -189,7 +189,7 @@ public class MainController {
      */
 
     public void saveDB() {
-        System.out.println("Inizio esportazione massiva dello stato RAM sul database...");
+        System.out.println("Avvio fallback di chiusura ...");
         Connection c = null;
         try {
             c = DatabaseManager.getConnection();
@@ -201,17 +201,17 @@ public class MainController {
             }
 
             for (Track track : appState.getLibrary().getTracks()) {
-                appState.getTrackDAO().save(track);
+                appState.getTrackDAO().update(track);
             }
 
             for (Playlist playlist : appState.getPlaylistCatalog().getPlaylists()) {
-                appState.getPlaylistDAO().save(playlist);
+                appState.getPlaylistDAO().update(playlist);
             }
 
             c.commit(); // Scrittura fisica bloccata sul file db
             System.out.println("Sincronizzazione finale completata. File SQLite aggiornato.");
         } catch (Exception e) {
-            System.err.println("Errore durante la persistenza di chiusura dei DAO:");
+            System.err.println("Errore durante la sincronizzazione di sicurezza: ");
             e.printStackTrace();
             if (c != null) {
                 try {

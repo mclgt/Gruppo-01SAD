@@ -9,7 +9,7 @@ import com.Model.Playlist;
 import com.Model.PlaylistCatalog;
 import com.Model.Track;
 import com.Model.TrackFactory;
-
+import com.DataLayer.DAO.Playlist.PlaylistDAO;
 import com.Model.MockTrackFactory;
 
 /**
@@ -25,6 +25,7 @@ public class ModifyPlaylistTest {
     private Playlist playlistTest;
     private Track t;
     private TrackFactory factory;
+    private PlaylistDAO playlistDAO;
 
     /**
      * @brief Configura il test prima di ogni esecuzione. Crea un nuovo catalogo,
@@ -50,7 +51,7 @@ public class ModifyPlaylistTest {
      */
     @Test
     public void testUpdatePlaylist_executeAndUndo() {
-        ICommand updateCommand = new ModifyPlaylist(catalog, playlistTest, "nuovo test");
+        ICommand updateCommand = new ModifyPlaylist(catalog, playlistTest, "nuovo test", playlistDAO);
         updateCommand.execute();
         assertEquals("nuovo test", playlistTest.getName(), "Nome non modificato");
         updateCommand.undo();

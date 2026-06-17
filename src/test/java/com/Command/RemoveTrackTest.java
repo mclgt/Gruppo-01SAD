@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.ITrackContainer;
 import com.Model.Library;
 import com.Model.Track;
@@ -19,6 +20,7 @@ public class RemoveTrackTest {
 
     private ITrackContainer container;
     private UndoManager undoManager;
+    private TrackDAO trackDAO;
     private Track track1;
     private Track track2;
     private Track track3;
@@ -50,7 +52,7 @@ public class RemoveTrackTest {
         assertEquals(3, library.getTracksCount(), "La libreria dovrebbe contenere 3 tracce");
         assertEquals(track2, library.getTracks().get(1), "Il brano track2 dovrebbe essere in posizione 1");
 
-        ICommand removeCommand = new RemoveTrack(container, track2);
+        ICommand removeCommand = new RemoveTrack(container, track2, trackDAO);
         undoManager.executeCommand(removeCommand);
 
         assertEquals(2, library.getTracksCount(), "La libreria dovrebbe contenere 2 tracce dopo la rimozione");

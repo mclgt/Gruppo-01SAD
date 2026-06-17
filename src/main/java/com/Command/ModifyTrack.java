@@ -1,5 +1,6 @@
 package com.Command;
 
+import com.DataLayer.DAO.Track.TrackDAO;
 import com.Model.Library;
 import com.Model.Track;
 import com.Model.TrackTag;
@@ -7,6 +8,7 @@ import com.Model.TrackTag;
 public class ModifyTrack implements ICommand {
     private final Library receiver;
     private final Track trackToModify;
+    private final TrackDAO trackDAO;
 
     private final String oldTitle, oldAuthor, oldGenre, oldAlbum, oldFilePath;
     private final int oldYear, oldDuration;
@@ -16,9 +18,10 @@ public class ModifyTrack implements ICommand {
     private final TrackTag newTag;
 
     public ModifyTrack(Library receiver, Track trackToModify, String newTitle, String newAuthor, int newYear,
-            String newGenre, int newDuration, String newAlbum, String newFilePath, TrackTag newTag) {
+            String newGenre, int newDuration, String newAlbum, String newFilePath, TrackTag newTag, TrackDAO trackDAO) {
         this.receiver = receiver;
         this.trackToModify = trackToModify;
+        this.trackDAO = trackDAO;
 
         // Salvo i vecchi valori per poter eseguire l'undo
         this.oldTitle = trackToModify.getTitle();
@@ -42,12 +45,28 @@ public class ModifyTrack implements ICommand {
     }
 
     @Override
-    public void undo() { 
-        receiver.updateTrack(trackToModify, oldTitle, oldAuthor, oldYear, oldGenre, oldDuration, oldAlbum, oldFilePath, oldTag);
+    public void undo() {
+        receiver.updateTrack(trackToModify, oldTitle, oldAuthor, oldYear, oldGenre, oldDuration, oldAlbum, oldFilePath,
+                oldTag);
+
+        try {
+            if (trackDAO != null)
+                trackDAO.update(trackToModify);
+        } catch (Exception e) {
+            System.err.println("Errore DB in ModifyTrack (execute): " + e.getMessage());
+        }
     }
 
     @Override
     public void execute() {
-        receiver.updateTrack(trackToModify, newTitle, newAuthor, newYear, newGenre, newDuration, newAlbum, newFilePath, newTag);
+        receiver.updateTrack(trackToModify, newTitle, newAuthor, newYear, newGenre, newDuration, newAlbum, newFilePath,
+                newTag);
+
+        try {
+            if (trackDAO != null)
+                trackDAO.update(trackToModify);
+        } catch (Exception e) {
+            System.err.println("Errore DB in ModifyTrack (undo): " + e.getMessage());
+        }
     }
 }

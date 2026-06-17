@@ -64,7 +64,7 @@ public class AddTrackToPlaylistController {
                 mainController.getAppState().getWindowManager().showWarning("Brano Duplicato",
                         "Il brano '" + track.getTitle() + "' è già presente.");
             } else {
-                ICommand addCmd = new AddTrack(targetPlaylist, track);
+                ICommand addCmd = new AddTrack(targetPlaylist, track, mainController.getAppState().getTrackDAO());
                 mainController.getAppState().getUndoManager().executeCommand(addCmd);
                 addedCount++;
             }

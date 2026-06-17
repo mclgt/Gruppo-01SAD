@@ -154,7 +154,8 @@ public class AddModTrackController implements ITrackImporter {
             if (isEditMode) {
                 ICommand modifyCommand = new ModifyTrack(mainController.getAppState().getLibrary(), trackToModify,
                         title, author,
-                        year, genre, duration, album, originalFilePath, tag);
+                        year, genre, duration, album, originalFilePath, tag,
+                        mainController.getAppState().getTrackDAO());
 
                 if (mainController != null) {
                     mainController.getAppState().getUndoManager().executeCommand(modifyCommand);
@@ -165,7 +166,8 @@ public class AddModTrackController implements ITrackImporter {
                         finalFilePathForDB, tag);
 
                 if (mainController != null) {
-                    ICommand addCommand = new AddTrack(mainController.getAppState().getLibrary(), newTrack);
+                    ICommand addCommand = new AddTrack(mainController.getAppState().getLibrary(), newTrack,
+                            mainController.getAppState().getTrackDAO());
                     mainController.getAppState().getUndoManager().executeCommand(addCommand);
                 }
             }

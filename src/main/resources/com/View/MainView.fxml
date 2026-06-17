@@ -83,6 +83,15 @@
                         </ImageView>
                      </graphic>
                   </Button>
+                <Button fx:id="btnAutoPlaylist" mnemonicParsing="false" onAction="#openAutoPlaylistWindow" text="Genera Playlist Automatica">
+                     <graphic>
+                        <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@add.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                </Button>
               </items>
             </ToolBar>
          </children>

@@ -130,7 +130,8 @@ public class AutoPlaylistController {
             playlist.addTrack(t);
         }
 
-        ICommand cmd = new AddPlaylist(mainController.getAppState().getPlaylistCatalog(), playlist);
+        ICommand cmd = new AddPlaylist(mainController.getAppState().getPlaylistCatalog(), playlist,
+                mainController.getAppState().getPlaylistDAO());
         mainController.getAppState().getUndoManager().executeCommand(cmd);
 
         closeWindow();

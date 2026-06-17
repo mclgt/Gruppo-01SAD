@@ -133,9 +133,11 @@ public class PlaylistTableController implements IPlayerSubscriber {
                     "Sei sicuro di voler eliminare la playlist \"" + selectedPlaylist.getName() + "\"?", null);
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 ICommand removeCmd = new RemovePlaylist(mainController.getAppState().getPlaylistCatalog(),
-                        selectedPlaylist);
+                        selectedPlaylist, mainController.getAppState().getPlaylistDAO());
                 mainController.getAppState().getUndoManager().executeCommand(removeCmd);
                 mainController.restoreMainLibraryView();
+
+                mainController.updateTop();
             }
         } else {
             mainController.getAppState().getWindowManager().showWarning("Attenzione",
