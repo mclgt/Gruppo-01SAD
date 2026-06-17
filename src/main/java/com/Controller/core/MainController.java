@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.Controller.navigation.ViewNavigator;
 import com.Controller.playlist.PlaylistController;
+import com.Controller.track.SearchController;
 import com.DataLayer.DAO.DatabaseManager;
 import com.Model.Playlist;
 import com.Model.Track;
@@ -121,6 +122,9 @@ public class MainController {
         }
         appState.getTrackTableController().init(this, trackTable, titleCol, authorCol, genreCol, detailPanel, lblTitle,
                 lblAuthor, lblAlbum, lblGenre, lblDuration, lblYear, lblTagTitle, lblTag);
+
+        appState.getSearchController().init(appState.getLibrary().getTracks(), trackTable);
+        appState.getSearchController().bindSearchField(searchField);
         appState.getPlayerController().init(this, lblNowPlaying, lblCurrentTime, lblTotalTime, progressSlider);
         appState.getPlaylistTableController().init(this, playlistList, nameCol);
         appState.getPlayerContext().subscribe(appState.getPlaylistTableController());

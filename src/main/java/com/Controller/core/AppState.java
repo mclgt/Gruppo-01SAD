@@ -9,6 +9,7 @@ import com.Controller.playback.PlaybackTimerManager;
 import com.Controller.playback.PlayerController;
 import com.Controller.playlist.PlaylistController;
 import com.Controller.playlist.PlaylistTableController;
+import com.Controller.track.SearchController;
 import com.Controller.track.TrackTableController;
 import com.DataLayer.DAO.Playlist.PlaylistDAO;
 import com.DataLayer.DAO.Track.TrackDAO;
@@ -41,6 +42,7 @@ public class AppState {
     private final Deque<Boolean> deletedPlayingStack;
     private final TrackDAO trackDAO;
     private final PlaylistDAO playlistDAO;
+    private final SearchController searchController;
     private WindowManager windowManager;
 
     /**
@@ -63,6 +65,7 @@ public class AppState {
         this.deletedPlayingStack = new ArrayDeque<>();
         this.trackDAO = new TrackDAO(factory);
         this.playlistDAO = new PlaylistDAO(trackDAO);
+        this.searchController = new SearchController();
     }
 
     /**
@@ -194,6 +197,14 @@ public class AppState {
      */
     public PlaylistDAO getPlaylistDAO() {
         return playlistDAO;
+    }
+
+    /**
+     * @brief Restituisce il controller che si occupa della ricerca
+     * @return controller che gestisce la ricerca
+     */
+    public SearchController getSearchController() {
+        return searchController;
     }
 
     /**
