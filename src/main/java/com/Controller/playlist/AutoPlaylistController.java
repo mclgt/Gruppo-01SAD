@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @class AutoPlaylistController
  * @brief Controller della finestra "Genera Playlist Automatica".
  *        Gestisce l'input utente, popola i menu a tendina dalla libreria,
  *        delega il filtraggio ad AutoPlaylistService e crea la playlist.
@@ -60,10 +61,18 @@ public class AutoPlaylistController {
         populateCombos();
     }
 
+    /**
+     * @brief Popola i ComboBox con valori dinamici estratti dalla libreria.
+     *        Scansiona tutti i brani presenti e utilizza gli Stream di Java per
+     *        estrarre valori univoci per l'anno di pubblicazione e il genere.
+     *        La lista degli anni viene ordinata in senso decrescente, mentre quella
+     *        dei generi in ordine alfabetico. Inserisce di default l'opzione
+     *        "Qualsiasi"
+     *        in tutti i menu.
+     */
     private void populateCombos() {
         List<Track> tracks = mainController.getAppState().getLibrary().getTracks();
 
-        // Anno: valori unici dalla libreria, ordinati decrescenti
         List<String> years = new ArrayList<>();
         years.add(AutoPlaylistService.ANY);
         tracks.stream()
@@ -75,8 +84,6 @@ public class AutoPlaylistController {
                 .forEach(years::add);
         comboAnno.setItems(FXCollections.observableArrayList(years));
         comboAnno.setValue(AutoPlaylistService.ANY);
-
-        // Genere: valori unici dalla libreria, ordinati
         List<String> genres = new ArrayList<>();
         genres.add(AutoPlaylistService.ANY);
         tracks.stream()
@@ -87,8 +94,6 @@ public class AutoPlaylistController {
                 .forEach(genres::add);
         comboGenre.setItems(FXCollections.observableArrayList(genres));
         comboGenre.setValue(AutoPlaylistService.ANY);
-
-        // Tag: valori dall'enum TrackTag
         List<String> tags = new ArrayList<>();
         tags.add(AutoPlaylistService.ANY);
         for (TrackTag tag : TrackTag.values()) {
@@ -102,6 +107,19 @@ public class AutoPlaylistController {
         comboTag.setValue(AutoPlaylistService.ANY);
     }
 
+    /**
+     * @brief Gestisce l'evento di pressione sul pulsante di generazione.
+     *        Valida il nome della playlist per evitare duplicati o stringhe vuote.
+     *        Delega ad AutoPlaylistService il filtraggio dei brani in base ai
+     *        ComboBox.
+     *        Se non trova brani, mostra un avviso testuale sulla UI e interrompe
+     *        l'azione.
+     *        Se trova brani, assembla la nuova playlist e utilizza l'UndoManager
+     *        per inviare un AddPlaylist Command in modo che l'azione sia
+     *        reversibile.
+     *        Chiude la finestra e fornisce feedback di successo.
+     * @param ev L'evento scatenato dal click sul pulsante "Genera".
+     */
     @FXML
     public void handleGenerate(ActionEvent ev) {
         String name = txtName.getText().trim();
@@ -139,11 +157,20 @@ public class AutoPlaylistController {
                 "La playlist \"" + name + "\" è stata creata con " + filtered.size() + " brani.");
     }
 
+    /**
+     * @brief Gestisce l'annullamento dell'operazione.
+     *        Invocato dalla pressione del tasto "Annulla", si limita a chiudere
+     *        la finestra senza applicare alcuna modifica al sistema.
+     * @param ev L'evento scatenato dal click sul pulsante "Annulla".
+     */
     @FXML
     public void handleCancel(ActionEvent ev) {
         closeWindow();
     }
 
+    /**
+     * @brief Estrae lo Stage corrente a partire dal bottone "Annulla" e lo chiude.
+     */
     private void closeWindow() {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         stage.close();
