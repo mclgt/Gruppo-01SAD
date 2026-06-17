@@ -507,11 +507,10 @@ public class PlayerController {
         PlaylistController pc = appState.getPlaylistController();
         Track selectedTrack = pc != null ? pc.getSelectedTrack() : null;
         activeContainer = playlist;
-        trackFinished = false;
         sequentialMode = true;
         loopMode = false;
         Track startTrack = selectedTrack != null ? selectedTrack : playlist.getTracks().get(0);
-        startTrackPlayback(startTrack);
+        setupEngineAndPlay(playlist.getTracks(), startTrack);
         mainController.updateNextButton();
     }
 
