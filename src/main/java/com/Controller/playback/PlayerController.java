@@ -6,7 +6,6 @@ import com.Controller.playlist.PlaylistController;
 import com.Model.ITrackContainer;
 import com.Model.Playlist;
 import com.Model.Track;
-import com.Observer.IPlayerSubscriber;
 import com.State.PlayerContext;
 import com.Strategy.LoopPlaylistStrategy;
 import com.Strategy.LoopTrackStrategy;
