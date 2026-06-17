@@ -21,11 +21,12 @@ import com.Model.Track;
 public class RemoveTrack implements ICommand {
     private final ITrackContainer receiver;
     private final Track track;
-    private final int savedIndex;
+    private int savedIndex;
     private final Map<Playlist, Integer> savedPlaylistIndicies = new HashMap<>();
 
     private final TrackDAO trackDAO;
     private PlaylistDAO playlistDAO;
+    private PlaylistCatalog playlistCatalog;
 
     /**
      * @brief Costruttore che inizializza la rimozione di una traccia.
@@ -38,22 +39,15 @@ public class RemoveTrack implements ICommand {
         this.track = track;
         this.trackDAO = trackDAO;
         this.playlistDAO = null;
-        this.savedIndex = receiver.indexOf(track);
+        this.playlistCatalog = null;
     }
 
     public RemoveTrack(ITrackContainer receiver, Track track, PlaylistCatalog playlistCatalog, TrackDAO trackDAO,
             PlaylistDAO playlistDAO) {
+
         this(receiver, track, trackDAO);
         this.playlistDAO = playlistDAO;
-
-        if (playlistCatalog != null) {
-            for (Playlist p : playlistCatalog.getPlaylists()) {
-                int index = p.indexOf(track);
-                if (index >= 0) {
-                    this.savedPlaylistIndicies.put(p, index);
-                }
-            }
-        }
+        this.playlistCatalog = playlistCatalog;
     }
 
     /**
@@ -63,6 +57,17 @@ public class RemoveTrack implements ICommand {
      */
     @Override
     public void execute() {
+        this.savedIndex = receiver.indexOf(track);
+
+        if (playlistCatalog != null) {
+            for (Playlist p : playlistCatalog.getPlaylists()) {
+                int index = p.indexOf(track);
+                if (index >= 0) {
+                    this.savedPlaylistIndicies.put(p, index);
+                }
+            }
+        }
+        
         this.receiver.removeTrack(track);
 
         for (Playlist p : this.savedPlaylistIndicies.keySet()) {
