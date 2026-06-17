@@ -187,11 +187,11 @@ public class TrackTableController implements IPlayerSubscriber {
                     mainController.getAppState().getPlaylistCatalog(), mainController.getAppState().getTrackDAO(),
                     mainController.getAppState().getPlaylistDAO());
 
-            boolean wasPlaying = mainController.getAppState().getPlayerContext().isPlaying()
-                    && selectedTrack == mainController.getAppState().getPlayerContext().getCurrentTrack();
+            boolean isCurrentTrack = selectedTrack == mainController.getAppState().getPlayerContext().getCurrentTrack();
+            boolean wasPlaying = mainController.getAppState().getPlayerContext().isPlaying() && isCurrentTrack;
 
             mainController.getAppState().getDeletedPlayingStack().push(wasPlaying);
-            if (wasPlaying) {
+            if (isCurrentTrack) {
                 mainController.getAppState().getTimerManager().stop();
             }
 
@@ -201,7 +201,7 @@ public class TrackTableController implements IPlayerSubscriber {
 
             mainController.updateTop();
 
-            if (wasPlaying) {
+            if (isCurrentTrack) {
                 mainController.getAppState().getPlayerController().handleTrackRemoval(idx);
             }
         }
