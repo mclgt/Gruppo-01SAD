@@ -179,6 +179,15 @@ public class PlayerController {
     private void setupEngineAndPlay(ObservableList<Track> queue, Track track) {
         trackFinished = false;
         var playerContext = mainController.getAppState().getPlayerContext();
+        if (activeContainer instanceof Playlist) {
+            Playlist activePlaylist = (Playlist) activeContainer;
+            activePlaylist.incrementPlayCount();
+            try {
+                mainController.getAppState().getPlaylistDAO().update(activePlaylist);
+            } catch (Exception e) {
+                System.err.println("Errore salvataggio statistiche playlist: " + e.getMessage());
+            }
+        }
         playerContext.getPlaybackContext().setCurrentQueue(queue, track);
         playerContext.setCurrentTrack(track);
         startTrackPlayback(track);
@@ -351,11 +360,6 @@ public class PlayerController {
             return;
         }
         handleNext(null);
-        ITrackContainer container = getActiveContainer();
-        if (container instanceof Playlist) {
-            Playlist activePlaylist = (Playlist) container;
-            activePlaylist.incrementPlayCount();
-        }
     }
 
     /**
