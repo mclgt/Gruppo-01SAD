@@ -1,8 +1,13 @@
 package com.DataLayer;
 
-import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * @brief Rappresenta la gestione fisica del file audio in memoria.
@@ -12,7 +17,7 @@ import java.io.IOException;
  * @see DataLayer.IAudioTrack
  */
 public class RealTrack implements IAudioTrack {
-    private String filePath; // Percorso audio
+    private final String filePath; // Percorso audio
     private Clip audioClip; // Oggetto nativo di java che mantiene il buffer audio nella scheda audio
 
     /**
@@ -47,7 +52,7 @@ public class RealTrack implements IAudioTrack {
 
         } catch (UnsupportedAudioFileException e) {
             System.err.println("Formato non supportato (Javax Sound supporta solo WAV/AIFF): " + e.getMessage());
-        } catch (Exception e) {
+        } catch (IOException | LineUnavailableException e) {
             System.err.println("Errore caricamento: " + e.getMessage());
         }
     }
