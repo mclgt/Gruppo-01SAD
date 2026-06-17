@@ -10,13 +10,6 @@ import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-/**
- * @class LoopPlaylistStrategyTest
- * @brief Classe di test per LoopPlaylistStrategy.
- *        Verifica che la navigazione con loop nella playlist effettui il wrap-around correttamente
- *        a entrambe le estremità della coda, e gestisca casi limite come
- *        la traccia corrente null o una coda con un solo elemento.
- */
 public class LoopPlaylistStrategyTest {
 
     private LoopPlaylistStrategy strategy;
@@ -25,9 +18,6 @@ public class LoopPlaylistStrategyTest {
     private Track track3;
     private TrackFactory factory;
 
-    /**
-     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
-     */
     @BeforeEach
     void setUp() {
         factory = new MockTrackFactory();
@@ -44,10 +34,6 @@ public class LoopPlaylistStrategyTest {
     // Test per nextTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that nextTrack() returns the first track when current is
-     *        null.
-     */
     @Test
     void nextTrack_currentNull_returnsFirstTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -55,10 +41,6 @@ public class LoopPlaylistStrategyTest {
         assertSame(track1, strategy.nextTrack(null));
     }
 
-    /**
-     * @brief Verifies that nextTrack() returns the same track when the queue
-     *        contains only one element.
-     */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
@@ -67,10 +49,6 @@ public class LoopPlaylistStrategyTest {
         assertSame(track1, strategy.nextTrack( track1));
     }
 
-    /**
-     * @brief Verifies that nextTrack() returns the second track when current is the
-     *        first.
-     */
     @Test
     void nextTrack_firstTrack_returnsSecondTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -79,10 +57,6 @@ public class LoopPlaylistStrategyTest {
         assertSame(track2, strategy.nextTrack(track1));
     }
 
-    /**
-     * @brief Verifies that nextTrack() wraps around and returns the first track
-     *        when current is the last.
-     */
     @Test
     void nextTrack_lastTrack_returnsFirstTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -94,10 +68,6 @@ public class LoopPlaylistStrategyTest {
     // Test per previousTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that previousTrack() returns the first track when current is
-     *        null.
-     */
     @Test
     void previousTrack_currentNull_returnsFirstTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -105,10 +75,6 @@ public class LoopPlaylistStrategyTest {
         assertSame(track1, strategy.previousTrack(null));
     }
 
-    /**
-     * @brief Verifies that previousTrack() returns the same track when the queue
-     *        contains only one element.
-     */
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
@@ -117,10 +83,6 @@ public class LoopPlaylistStrategyTest {
         assertSame(track1, strategy.previousTrack( track1));
     }
 
-    /**
-     * @brief Verifies that previousTrack() returns the first track when current is
-     *        the second.
-     */
     @Test
     void previousTrack_secondTrack_returnsFirstTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -129,10 +91,6 @@ public class LoopPlaylistStrategyTest {
         assertSame(track1, strategy.previousTrack( track2));
     }
 
-    /**
-     * @brief Verifies that previousTrack() wraps around and returns the last track
-     *        when current is the first.
-     */
     @Test
     void previousTrack_firstTrack_returnsLastTrack() {
         List<Track> queue = List.of(track1, track2, track3);

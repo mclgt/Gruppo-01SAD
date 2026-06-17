@@ -12,15 +12,6 @@ import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-/**
- * @class ShuffleStrategyTest
- * @brief Test class for ShuffleStrategy.
- *        Verifies that shuffle navigation returns valid tracks from the queue
- *        and almost never returns the current track when multiple tracks are
- *        available.
- *        Statistical checks are performed over 20 iterations to rule out always
- *        returning the same track by chance.
- */
 class ShuffleStrategyTest {
 
     private ShuffleStrategy strategy;
@@ -29,9 +20,6 @@ class ShuffleStrategyTest {
     private Track track3;
     private TrackFactory factory;
 
-    /**
-     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
-     */
     @BeforeEach
     void setUp() {
         factory = new MockTrackFactory();
@@ -45,9 +33,6 @@ class ShuffleStrategyTest {
     // Test per nextTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifica che nextTrack() restituisca null quando la coda è vuota.
-     */
     @Test
     void nextTrack_emptyQueue_returnsNull() {
         List<Track> queue = List.of();
@@ -55,10 +40,6 @@ class ShuffleStrategyTest {
         assertNull(strategy.nextTrack( null));
     }
 
-    /**
-     * @brief Verifies that nextTrack() returns the only available track when the
-     *        queue has one element.
-     */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
@@ -66,12 +47,6 @@ class ShuffleStrategyTest {
         assertEquals(track1, strategy.nextTrack(track1));
     }
 
-    /**
-     * @brief Verifies that nextTrack() almost never returns the current track when
-     *        multiple tracks are
-     *        available, checked over 20 iterations to rule out accidental
-     *        repetition.
-     */
     @Test
     void nextTrack_multipleTracks_almostNeverReturnsCurrentTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -82,11 +57,6 @@ class ShuffleStrategyTest {
         }
     }
 
-    /**
-     * @brief Verifies that nextTrack() returns a track different from the current
-     *        one
-     *        when multiple tracks are available.
-     */
     @Test
     void nextTrack_multipleTracks_returnsValidTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -98,12 +68,6 @@ class ShuffleStrategyTest {
     // Test per previousTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that previousTrack() behaves identically to nextTrack() to
-     *        preserve
-     *        shuffle semantics: almost never returns the current track over 20
-     *        iterations.
-     */
     @Test
     void previousTrack_behaviorSameAsNextTrack() {
         List<Track> queue = List.of(track1, track2, track3);

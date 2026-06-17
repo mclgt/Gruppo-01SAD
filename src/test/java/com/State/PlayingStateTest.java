@@ -14,29 +14,8 @@ import com.Model.TrackFactory;
 import com.Strategy.IPlaybackStrategy;
 import com.Strategy.PlaybackContext;
 
-/**
- * @brief Tests for PlayingState: verifies the behavior of the active playback
- *        state
- *        (i.e., a song is currently playing) in PlayerContext.
- *
- *        PlayingState is the state the player is in during playback.
- *        Tests verify that play() correctly updates the current track in
- *        PlayerContext,
- *        that next()/previous() navigate between tracks and start the new one,
- *        or call stop() when no track is available.
- *
- * @author Christian
- * @see PlayingState
- * @see PlayerContext
- * @see IPlayerState
- */
 public class PlayingStateTest {
 
-    /**
-     * @brief DummyStrategy that returns predefined values for nextTrack() and
-     *        previousTrack(),
-     *        used to simplify tests without a mocking framework.
-     */
     private static class DummyStrategy implements IPlaybackStrategy {
         private final Track nextResult;
         private final Track prevResult;
@@ -80,7 +59,6 @@ public class PlayingStateTest {
         queue = Arrays.asList(track1, track2, track3);
     }
 
-    /** @brief Crea un PlayerContext con una DummyStrategy che restituisce i valori forniti. */
     private PlayerContext contextWith(Track nextTrack, Track prevTrack) {
         PlaybackContext pb = new PlaybackContext(new DummyStrategy(nextTrack, prevTrack));
         return new PlayerContext(pb);
@@ -90,9 +68,6 @@ public class PlayingStateTest {
     // Test per play()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifica che play() imposti la traccia corrente nel contesto.
-     */
     @Test
     public void testPlay_setsCurrentTrack() {
         System.out.println("[TEST PlayingState] play() -> deve impostare la traccia corrente nel contesto");
@@ -109,9 +84,6 @@ public class PlayingStateTest {
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifica che una seconda chiamata a play() aggiorni la traccia corrente.
-     */
     @Test
     public void testPlay_subsequentCall_updatesCurrentTrack() {
         System.out.println("[TEST PlayingState] play() chiamata due volte -> la traccia corrente deve essere l'ultima riprodotta");
@@ -129,10 +101,6 @@ public class PlayingStateTest {
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifies that play() on different tracks always updates the current
-     *        track.
-     */
     @Test
     public void testPlay_thirdTrack_updatesCurrentTrack() {
         System.out.println("[TEST PlayingState] play() su una traccia diversa -> deve aggiornare la traccia corrente");
@@ -148,9 +116,6 @@ public class PlayingStateTest {
         assertEquals(track3, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifica che play() su una traccia senza audioSource non lanci eccezioni.
-     */
     @Test
     public void testPlay_trackWithoutAudioSource_doesNotThrow() {
         System.out.println("[TEST PlayingState] play() su traccia senza audioSource -> non deve lanciare eccezioni");
@@ -166,10 +131,6 @@ public class PlayingStateTest {
     // Test per next()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that next() with a valid next track sets it as the current
-     *        track.
-     */
     @Test
     public void testNext_withValidNext_setsNextTrackAsCurrent() {
         System.out.println("[TEST PlayingState] next() con traccia valida -> deve impostare la traccia successiva come corrente");
@@ -186,11 +147,6 @@ public class PlayingStateTest {
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifies that calling next() twice uses the strategy result each time.
-     *        The stub always returns the same value, so the current track
-     *        stabilizes on it.
-     */
     @Test
     public void testNext_calledTwice_usesStrategyResultEachTime() {
         System.out.println("[TEST PlayingState] next() chiamata due volte -> ogni chiamata usa il risultato della strategia");
@@ -209,10 +165,6 @@ public class PlayingStateTest {
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifies that next() with no next track (null) does not change the
-     *        current track.
-     */
     @Test
     public void testNext_withNoNext_currentTrackUnchanged() {
         System.out.println("[TEST PlayingState] next() senza traccia successiva -> la traccia corrente non deve cambiare");
@@ -229,10 +181,6 @@ public class PlayingStateTest {
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifies that next() with a valid next track does not throw any
-     *        exception.
-     */
     @Test
     public void testNext_withValidNext_doesNotThrow() {
         System.out.println("[TEST PlayingState] next() con traccia valida -> non deve lanciare eccezioni");
@@ -248,10 +196,6 @@ public class PlayingStateTest {
     // Test per previous()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that previous() with a valid previous track sets it as the
-     *        current track.
-     */
     @Test
     public void testPrevious_withValidPrevious_setsPreviousTrackAsCurrent() {
         System.out.println("[TEST PlayingState] previous() con traccia valida -> deve impostare la traccia precedente come corrente");
@@ -268,10 +212,6 @@ public class PlayingStateTest {
         assertEquals(track1, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifies that previous() with no previous track (null) does not change
-     *        the current track.
-     */
     @Test
     public void testPrevious_withNoPrevious_currentTrackUnchanged() {
         System.out.println("[TEST PlayingState] previous() senza traccia precedente -> la traccia corrente non deve cambiare");
@@ -288,10 +228,6 @@ public class PlayingStateTest {
         assertEquals(track2, ctx.getCurrentTrack());
     }
 
-    /**
-     * @brief Verifies that previous() with a valid previous track does not throw
-     *        any exception.
-     */
     @Test
     public void testPrevious_withValidPrevious_doesNotThrow() {
         System.out.println("[TEST PlayingState] previous() con traccia valida -> non deve lanciare eccezioni");
@@ -303,10 +239,6 @@ public class PlayingStateTest {
         assertDoesNotThrow(() -> state.previous());
     }
 
-    /**
-     * @brief Verifies that previous() with no previous track does not throw any
-     *        exception.
-     */
     @Test
     public void testPrevious_withNoPrevious_doesNotThrow() {
         System.out.println("[TEST PlayingState] previous() senza traccia precedente -> non deve lanciare eccezioni");
@@ -322,10 +254,6 @@ public class PlayingStateTest {
     // Test per pause() e stop()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that pause() does not throw any exception (currently a no-op
-     *        in PlayingState).
-     */
     @Test
     public void testPause_doesNotThrow() {
         System.out.println("[TEST PlayingState] pause() -> non deve lanciare eccezioni");
@@ -337,10 +265,6 @@ public class PlayingStateTest {
         assertDoesNotThrow(() -> state.pause());
     }
 
-    /**
-     * @brief Verifies that stop() does not throw any exception (currently a no-op
-     *        in PlayingState).
-     */
     @Test
     public void testStop_doesNotThrow() {
         System.out.println("[TEST PlayingState] stop() -> non deve lanciare eccezioni");

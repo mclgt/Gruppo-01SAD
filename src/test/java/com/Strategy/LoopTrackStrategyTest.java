@@ -11,12 +11,6 @@ import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
 
-/**
- * @class LoopTrackStrategyTest
- * @brief Classe di test per LoopTrackStrategy.
- *        Verifica che il loop su singola traccia restituisca sempre la stessa traccia corrente,
- *        indipendentemente dalla dimensione della coda, e restituisca null quando current è null.
- */
 public class LoopTrackStrategyTest {
 
     private LoopTrackStrategy strategy;
@@ -25,9 +19,6 @@ public class LoopTrackStrategyTest {
     private Track track3;
     private TrackFactory factory;
 
-    /**
-     * @brief Inizializza la strategia e tre tracce dummy prima di ogni test.
-     */
     @BeforeEach
     void setUp() {
         factory = new MockTrackFactory();
@@ -44,10 +35,6 @@ public class LoopTrackStrategyTest {
     // Test per nextTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifies that nextTrack() returns null when current is null — no track
-     *        to loop on.
-     */
     @Test
     void nextTrack_currentNull_returnsNull() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -55,10 +42,6 @@ public class LoopTrackStrategyTest {
         assertNull(strategy.nextTrack(null));
     }
 
-    /**
-     * @brief Verifies that nextTrack() returns the same track when the queue
-     *        contains only one element.
-     */
     @Test
     void nextTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
@@ -66,10 +49,6 @@ public class LoopTrackStrategyTest {
         assertSame(track1, strategy.nextTrack(track1));
     }
 
-    /**
-     * @brief Verifies that nextTrack() always returns the current track regardless
-     *        of queue size.
-     */
     @Test
     void nextTrack_multipleTracks_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -77,10 +56,6 @@ public class LoopTrackStrategyTest {
         assertSame(track2, strategy.nextTrack(track2));
     }
 
-    /**
-     * @brief Verifies that nextTrack() returns the same last track when looping on
-     *        it.
-     */
     @Test
     void nextTrack_lastTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -92,9 +67,6 @@ public class LoopTrackStrategyTest {
     // Test per previousTrack()
     // -----------------------------------------------------------------------
 
-    /**
-     * @brief Verifica che previousTrack() restituisca null quando current è null.
-     */
     @Test
     void previousTrack_currentNull_returnsNull() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -103,10 +75,6 @@ public class LoopTrackStrategyTest {
         assertNull(strategy.previousTrack( null));
     }
 
-    /**
-     * @brief Verifies that previousTrack() returns the same track when the queue
-     *        contains only one element.
-     */
     @Test
     void previousTrack_singleTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1);
@@ -115,10 +83,6 @@ public class LoopTrackStrategyTest {
         assertSame(track1, strategy.previousTrack(track1));
     }
 
-    /**
-     * @brief Verifies that previousTrack() always returns the current track
-     *        regardless of queue size.
-     */
     @Test
     void previousTrack_multipleTracks_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
@@ -126,10 +90,6 @@ public class LoopTrackStrategyTest {
         assertSame(track2, strategy.previousTrack(track2));
     }
 
-    /**
-     * @brief Verifies that previousTrack() returns the same first track when
-     *        looping on it.
-     */
     @Test
     void previousTrack_firstTrack_returnsSameTrack() {
         List<Track> queue = List.of(track1, track2, track3);
