@@ -211,15 +211,4 @@ public class WindowManager {
         alert.setContentText(content);
         return alert.showAndWait();
     }
-
-    /**
-     * @brief Crea e mostra uno Stage modale con la scena data.
-     */
-    private void showModalStage(Parent root, String title) {
-        Stage stage = new Stage();
-        stage.setTitle(title);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setScene(new Scene(root));
-        stage.showAndWait();
-    }
 }

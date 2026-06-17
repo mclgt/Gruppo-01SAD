@@ -9,7 +9,6 @@ import com.Controller.playlist.PlaylistController;
 import com.DataLayer.DAO.DatabaseManager;
 import com.Model.Playlist;
 import com.Model.Track;
-import com.Model.TrackFactory;
 import com.Model.TrackTag;
 
 import javafx.collections.FXCollections;

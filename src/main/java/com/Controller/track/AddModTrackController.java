@@ -197,9 +197,8 @@ public class AddModTrackController implements ITrackImporter {
     }
 
     /**
-     * @brief Mostra il FileChooser nativo del sistema operativo filtrato per file
-     *        .mp3 e .wav.
-     *        Inizia la navigazione dalla directory "Home" dell'utente.
+     * @brief Mostra il FileChooser nativo del sistema operativo filtrato per file .wav.
+     *        Inizia la navigazione dalla directory locale "library_audio" se esistente, "Home" dell'utente altrimenti.
      *
      * @param ownerWindow Finestra chiamante (blocca l'interazione sottostante
      *                    finché non si chiude).
@@ -209,10 +208,15 @@ public class AddModTrackController implements ITrackImporter {
     public File selectAudioFile(Window ownerWindow) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Importa Brano Audio");
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        File initialDir = new File("data/library_audio");
 
-        FileChooser.ExtensionFilter audioFilter = new FileChooser.ExtensionFilter("File Audio (*.mp3, *wav)", "*.mp3",
-                "*.wav");
+        if(initialDir.exists() && initialDir.isDirectory()){
+            fileChooser.setInitialDirectory(initialDir);
+        }else{
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        }
+
+        FileChooser.ExtensionFilter audioFilter = new FileChooser.ExtensionFilter("File Audio (*wav)","*.wav");
         fileChooser.getExtensionFilters().add(audioFilter);
 
         return fileChooser.showOpenDialog(ownerWindow);
