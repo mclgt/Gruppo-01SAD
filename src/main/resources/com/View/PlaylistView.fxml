@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox spacing="10.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.playlist.PlaylistController">
+<VBox spacing="10.0" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.playlist.PlaylistController">
    <ToolBar prefHeight="40.0" prefWidth="200.0">
       <items>
          <Button fx:id="btnBack" mnemonicParsing="false" onAction="#handleBackToLibrary" text="Indietro" />
@@ -58,15 +58,12 @@
    </ToolBar>
    <HBox prefHeight="27.0" prefWidth="574.0">
       <children>
-         <Label fx:id="lblPlaylist" prefHeight="47.0" prefWidth="238.0" text="Nome della Playlist">
-            <font>
-               <Font name="System Bold" size="18.0" />
-            </font>
+         <Label fx:id="lblPlaylist" styleClass="label-heading" prefHeight="47.0" prefWidth="238.0" text="Nome della Playlist">
             <HBox.margin>
                <Insets left="20.0" />
             </HBox.margin>
          </Label>
-         <Button fx:id="btnAddToPlaylist11" mnemonicParsing="false" onAction="#handleLoopPlaylist">
+         <Button fx:id="btnLoop" mnemonicParsing="false" onAction="#handleLoopPlaylist">
             <graphic>
                <ImageView fx:id="btnLoopPlaylist" fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
                   <image>

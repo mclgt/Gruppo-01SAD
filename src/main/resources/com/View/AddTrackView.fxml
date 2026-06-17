@@ -10,18 +10,13 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.track.AddModTrackController">
+<VBox prefWidth="400.0" spacing="20.0" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Controller.track.AddModTrackController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
    <children>
-      <Label text="Aggiungi Nuovo Brano">
-         <font>
-            <Font name="System Bold" size="18.0" />
-         </font>
-      </Label>
+      <Label text="Aggiungi Nuovo Brano" styleClass="label-heading"/>
       
       <GridPane hgap="10.0" vgap="15.0">
         <columnConstraints>
@@ -39,11 +34,10 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Titolo:" />
+            <Label text="Titolo:"/>
             <Label text="Autore:" GridPane.rowIndex="1" />
             <Label text="Genere:" GridPane.rowIndex="2" />
             <Label text="File Audio:" GridPane.rowIndex="5" />
-            
             <TextField fx:id="txtTitle" promptText="Es. Bohemian Rhapsody" GridPane.columnIndex="1" />
             <TextField fx:id="txtAuthor" promptText="Es. Queen" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="txtGenre" promptText="Es. Rock" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -51,7 +45,7 @@
             <HBox spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <children>
                   <TextField fx:id="txtFilePath" editable="false" promptText="Nessun file selezionato..." HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnChoose" mnemonicParsing="false" onAction="#handleSelectFile" text="..." />
+                  <Button fx:id="btnChoose" styleClass="btn-compact" mnemonicParsing="false" onAction="#handleSelectFile" text="..." />
                </children>
             </HBox>
             <Label text="Durata: " GridPane.rowIndex="6" />
@@ -69,7 +63,7 @@
          <children>
             <Button fx:id="btnDelete" cancelButton="true" mnemonicParsing="false" onAction="#handleDelete" text="Annulla" />
             
-            <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#handleSave" style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-weight: bold;" text="Salva Brano" />
+            <Button fx:id="btnSave" defaultButton="true" mnemonicParsing="false" onAction="#handleSave" style="btn-primary" text="Salva Brano" />
          </children>
          <VBox.margin>
             <Insets top="10.0" />
