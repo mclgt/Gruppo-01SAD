@@ -18,7 +18,7 @@ public class RemovePlaylist implements ICommand {
     private PlaylistCatalog playlistList;
     private Playlist playlist;
     private PlaylistDAO playlistDAO;
-    private int index;
+    private int index = -1;
 
     /**
      * @brief Costruttore che inizializza il comando di rimozione di una playlist.
@@ -32,7 +32,6 @@ public class RemovePlaylist implements ICommand {
         this.playlistList = playlistList;
         this.playlist = playlist;
         this.playlistDAO = playlistDAO;
-        this.index = playlistList.getPlaylists().indexOf(playlist);
     }
 
     /**
@@ -42,6 +41,8 @@ public class RemovePlaylist implements ICommand {
      */
     @Override
     public void execute() {
+        this.index = playlistList.getPlaylists().indexOf(playlist);
+        
         if (index != -1) {
             playlistList.removePlaylist(playlist);
             try {
