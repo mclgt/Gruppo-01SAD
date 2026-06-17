@@ -28,11 +28,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 /**
- * @brief Controller principale dell'applicazione, gestisce la schermata
- *        principale e si occupa della visualizzazione della tabella dei brani
- *        musicali e dell'interazione con l'utente.
+ * @class MainController
+ * @brief Controller principale dell'applicazione.
+ *
+ *        Gestisce la schermata principale: tabella dei brani, pannello di
+ *        dettaglio, controlli di riproduzione, navigazione tra playlist e
+ *        sezione "Ascoltati di frequente". Coordina tutti i sotto-controller
+ *        (TrackTableController, PlayerController, PlaylistTableController,
+ *        SearchController) tramite l'oggetto {@link AppState}.
+ *
+ * @see AppState
+ * @see com.Controller.playback.PlayerController
  */
-
 public class MainController {
     @FXML
     private TableView<Track> trackTable;
@@ -92,15 +99,12 @@ public class MainController {
     private javafx.scene.Node mainContentView;
 
     /**
-     * @brief Inizializza i componenti dell'interfaccia grafica e i
-     *        sotto-controller.
-     *        Crea il @ref PlayerContext con strategia sequenziale di default,
-     *        inizializza
-     * @ref TrackTableController, @ref PlayerController e @ref
-     *      PlaylistTableController
-     *      passando i riferimenti ai componenti FXML. Carica inoltre un set di
-     *      brani
-     *      demo nella libreria per facilitare i test sull'interfaccia.
+     * @brief Inizializza i componenti dell'interfaccia grafica e i sotto-controller.
+     *        Crea il {@link com.State.PlayerContext} con strategia di default,
+     *        inizializza TrackTableController, PlayerController e
+     *        PlaylistTableController passando i riferimenti ai componenti FXML.
+     *        Registra i subscriber dell'Observer e carica la sezione Frequently Played.
+     * @param appState Il contenitore centralizzato dello stato dell'applicazione.
      */
     @FXML
     public void init(AppState appState) {
@@ -143,11 +147,11 @@ public class MainController {
     }
 
     /**
-     * @brief Aggiorna lo stato visivo dei tab Frequently Played (US-21)
-     *        Compatibile con versioni Java 11+ tramite
-     *        .collect(Collectors.toList())
+     * @brief Aggiorna la sezione "Ascoltati di frequente" nella UI.
+     *        Recupera dal DAO i 5 brani e le 5 playlist più riprodotti;
+     *        se nessuno ha playCount &gt; 0 mostra un messaggio vuoto,
+     *        altrimenti popola le tabelle e nasconde il messaggio.
      */
-
     public void updateTop() {
         javafx.application.Platform.runLater(() -> {
             try {
@@ -197,11 +201,11 @@ public class MainController {
     }
 
     /**
-     * @brief Pialla preventivamente il DB ed esegue il salvataggio atomico massivo
-     *        tramite Transazione (Commit).
-     *        Invocato esclusivamente dal metodo stop() della classe Main.
+     * @brief Salva in modo atomico l'intero stato dell'applicazione nel database SQLite.
+     *        Svuota le tabelle esistenti e reinserisce tutti i brani e le playlist
+     *        all'interno di una singola transazione. In caso di errore esegue il rollback.
+     *        Invocato esclusivamente da {@link com.Main#stop()}.
      */
-
     public void saveDB() {
         System.out.println("Avvio fallback di chiusura ...");
         Connection c = null;
@@ -245,10 +249,22 @@ public class MainController {
         }
     }
 
+    /**
+     * @brief Restituisce il pulsante "Aggiungi a Playlist" della toolbar.
+     *        Usato da sotto-controller per abilitare/disabilitare il pulsante
+     *        in base alla selezione corrente.
+     * @return Il Button FXML btnAddToPlaylist.
+     */
     public Button getBtnAddToPlaylist() {
         return btnAddToPlaylist;
     }
 
+    /**
+     * @brief Mostra o nasconde i pulsanti di gestione brani (Aggiungi, Modifica, Rimuovi).
+     *        Viene invocato quando si passa dalla vista libreria alla vista playlist
+     *        e viceversa, per adattare la toolbar al contesto corrente.
+     * @param visible {@code true} per rendere i pulsanti visibili, {@code false} per nasconderli.
+     */
     public void setTrackManagementButtonVisible(boolean visible) {
         btnAddTrack.setVisible(visible);
         btnAddTrack.setManaged(visible);
@@ -260,10 +276,21 @@ public class MainController {
         btnRemoveTrack.setManaged(visible);
     }
 
+    /**
+     * @brief Aggiunge un brano alla libreria principale tramite l'AppState.
+     *        Chiamato dai sotto-controller dopo aver creato un nuovo Track.
+     * @param track Il brano da aggiungere alla libreria.
+     */
     public void addTrackMainTable(Track track) {
         appState.getLibrary().addTrack(track);
     }
 
+    /**
+     * @brief Notifica al sistema che un brano esistente è stato modificato.
+     *        Aggiorna il PlayerController (per sincronizzare il brano in riproduzione)
+     *        e il pannello di dettaglio laterale.
+     * @param track Il brano che è stato modificato.
+     */
     public void notifyTrackModified(Track track) {
         appState.getPlayerController().handleTrackModified(track);
         updateDetailPanel(track);
@@ -273,7 +300,7 @@ public class MainController {
      * @brief Gestisce l'evento di pressione sul pulsante di undo.
      *        Richiama il metodo undo() dell'UndoManager, che si occupa di
      *        annullare l'ultima operazione.
-     * @param event
+     * @param event L'evento generato dalla pressione del pulsante.
      */
     @FXML
     public void handleUndo(ActionEvent event) {
@@ -285,7 +312,7 @@ public class MainController {
      *        Se non c'è un brano attivo (o è terminato) avvia la riproduzione;
      *        se il brano è in riproduzione lo mette in pausa;
      *        se è in pausa lo riprende dal punto in cui era stato fermato.
-     *        Il testo del pulsante viene aggiornato da @ref updatePlayPauseButton.
+     *        Il testo del pulsante viene aggiornato da {@link #updatePlayPauseButton}.
      */
     @FXML
     public void togglePlayPause() {
@@ -300,7 +327,7 @@ public class MainController {
 
     /**
      * @brief Aggiorna il testo del pulsante play/pausa in base allo stato.
-     *        Chiamato da @ref PlayerController ogni volta che lo stato cambia.
+     *        Chiamato da PlayerController ogni volta che lo stato cambia.
      * @param playing {@code true} mostra "⏸ Pause", {@code false} mostra "▶ Play".
      */
     public void updatePlayPauseButton(boolean playing) {
@@ -309,52 +336,96 @@ public class MainController {
         }
     }
 
+    /**
+     * @brief Aggiorna lo stato abilitato/disabilitato del pulsante Next.
+     *        Delega la verifica della disponibilità al PlayerController.
+     */
     public void updateNextButton() {
         if (btnNext != null) {
             btnNext.setDisable(!appState.getPlayerController().isNextAvailable());
         }
     }
 
+    /**
+     * @brief Gestisce il click sul pulsante "Successivo": avanza al brano seguente
+     *        secondo la modalità di riproduzione attiva.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void handleNext(ActionEvent ev) {
         appState.getPlayerController().handleNext(ev);
     }
 
+    /**
+     * @brief Gestisce il click sul pulsante "Precedente": torna al brano precedente
+     *        secondo la modalità di riproduzione attiva.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void handlePrev(ActionEvent ev) {
         appState.getPlayerController().handlePrev(ev);
     }
 
+    /**
+     * @brief Apre la finestra di dialogo per l'aggiunta di un nuovo brano alla libreria.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void openAddTrackWindow(ActionEvent ev) {
         appState.getTrackTableController().openAddTrackWindow(ev);
     }
 
+    /**
+     * @brief Apre la finestra di dialogo per la modifica del brano selezionato.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void openModifyTrackView(ActionEvent ev) {
         appState.getTrackTableController().openModifyTrackView(ev);
     }
 
+    /**
+     * @brief Apre la finestra di dialogo per la creazione di una nuova playlist.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void openAddPlaylistView(ActionEvent ev) {
         appState.getWindowManager().openPlaylistWindow("/com/View/AddPlaylistView.fxml", "Nuova Playlist", null, this);
     }
 
+    /**
+     * @brief Apre la finestra per la creazione automatica di una playlist
+     *        basata su criteri di filtraggio (tag, genere, anno, ecc.).
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void openAutoPlaylistWindow(ActionEvent ev) {
         appState.getWindowManager().openAutoPlaylistWindow(this);
     }
 
+    /**
+     * @brief Sostituisce la vista centrale con la vista dettaglio della playlist selezionata.
+     * @param selectedPlaylist La playlist da visualizzare.
+     */
     public void openPlaylistView(Playlist selectedPlaylist) {
         navigator.loadPlaylistView(selectedPlaylist);
     }
 
+    /**
+     * @brief Apre la finestra "Aggiungi a Playlist" usando la playlist attualmente
+     *        selezionata nella tabella delle playlist.
+     */
     @FXML
     public void openAddTrackToPlaylistView() {
         Playlist selectedPlaylist = appState.getPlaylistTableController().getSelectedPlaylist();
         openAddTrackToPlaylistView(selectedPlaylist);
     }
 
+    /**
+     * @brief Apre la finestra "Aggiungi a Playlist" per la playlist specificata.
+     *        Delegato al WindowManager per il caricamento dell'FXML.
+     * @param selectedPlaylist La playlist a cui aggiungere i brani.
+     */
     public void openAddTrackToPlaylistView(Playlist selectedPlaylist) {
         /*
          * if (selectedPlaylist != null) {
@@ -362,10 +433,10 @@ public class MainController {
          * FXMLLoader loader = new
          * FXMLLoader(getClass().getResource("/com/View/AddTrackToPlaylistView.fxml"));
          * Parent root = loader.load();
-         * 
+         *
          * AddTrackToPlaylistController controller = loader.getController();
          * controller.initData(this, selectedPlaylist);
-         * 
+         *
          * Stage stage = new Stage();
          * stage.setTitle("Aggiungi brani a " + selectedPlaylist.getName());
          * stage.setScene(new Scene(root));
@@ -381,25 +452,34 @@ public class MainController {
     }
 
     /**
-     * @brief Ripristina la visualizzazione della libreria globale nell'area
-     *        centrale,
-     *        chiudendo di fatto la vista della playlist.
+     * @brief Ripristina la visualizzazione della libreria globale nell'area centrale,
+     *        chiudendo di fatto la vista della playlist corrente.
      */
     /*
      * public PlaylistController getPlaylistController() {
      * return appState.playlistController;
      * }
      */
-
     public void restoreMainLibraryView() {
         navigator.restoreMainLibraryView(mainContentView);
     }
 
+    /**
+     * @brief Gestisce la rimozione del brano selezionato dalla libreria.
+     *        Delega l'operazione al TrackTableController che usa il pattern Command.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void handleRemoveTrack(ActionEvent ev) {
         appState.getTrackTableController().handleRemoveTrack(ev);
     }
 
+    /**
+     * @brief Deseleziona brani e playlist quando l'utente clicca su un'area vuota
+     *        della schermata. Percorre l'albero dei nodi per verificare che il click
+     *        non sia avvenuto su un controllo JavaFX.
+     * @param ev L'evento di click del mouse.
+     */
     @FXML
     public void handleBackgroundClick(MouseEvent ev) {
         javafx.scene.Node node = (javafx.scene.Node) ev.getTarget();
@@ -412,11 +492,21 @@ public class MainController {
         appState.getPlaylistTableController().clearSelection();
     }
 
+    /**
+     * @brief Apre la finestra di modifica per la playlist selezionata.
+     * @param ev L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     public void openModPlaylistView(ActionEvent ev) {
         appState.getPlaylistTableController().openModPlaylistView(ev);
     }
 
+    /**
+     * @brief Aggiorna il pannello laterale di dettaglio con le informazioni del brano.
+     *        Se il brano passato è null, nasconde il pannello. Gestisce anche la
+     *        visibilità dell'etichetta del tag (non mostrata se il tag è NONE o null).
+     * @param track Il brano da visualizzare, oppure null per nascondere il pannello.
+     */
     public void updateDetailPanel(Track track) {
         if (track == null) {
             detailPanel.setVisible(false);
@@ -443,14 +533,21 @@ public class MainController {
     }
 
     /**
-     * @brief Gestisce l'evento di eliminazione di una playlist.
-     * @param ev
+     * @brief Gestisce l'evento di eliminazione di una playlist selezionata.
+     *        Delega l'operazione al PlaylistTableController che usa il pattern Command.
+     * @param ev L'evento generato dalla pressione del pulsante.
      */
     @FXML
     public void handleDeletePlaylist(ActionEvent ev) {
         appState.getPlaylistTableController().handleDeletePlaylist(ev);
     }
 
+    /**
+     * @brief Abilita o disabilita i pulsanti di riordinamento (Su / Giù) in base
+     *        alla posizione del brano selezionato nella lista.
+     * @param disableUp   {@code true} per disabilitare il pulsante "Sposta su".
+     * @param disableDown {@code true} per disabilitare il pulsante "Sposta giù".
+     */
     public void setMoveButtonDisable(boolean disableUp, boolean disableDown) {
         if (btnUpTrack != null) {
             btnUpTrack.setDisable(disableUp);
@@ -460,16 +557,28 @@ public class MainController {
         }
     }
 
+    /**
+     * @brief Sposta il brano selezionato di una posizione verso l'alto nella lista.
+     * @param event L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     private void handleMoveUp(ActionEvent event) {
         appState.getTrackTableController().handleMoveUp(event);
     }
 
+    /**
+     * @brief Sposta il brano selezionato di una posizione verso il basso nella lista.
+     * @param event L'evento generato dalla pressione del pulsante.
+     */
     @FXML
     private void handleMoveDown(ActionEvent event) {
         appState.getTrackTableController().handleMoveDown(event);
     }
 
+    /**
+     * @brief Restituisce il riferimento all'AppState dell'applicazione.
+     * @return L'istanza di {@link AppState} che contiene tutti i sotto-sistemi.
+     */
     public AppState getAppState() {
         return appState;
     }
