@@ -237,7 +237,7 @@ public class TrackTableController implements IPlayerSubscriber {
         if (selectedTrack != null) {
             int index = trackTable.getSelectionModel().getSelectedIndex();
             if (index > 0) {
-                ICommand moveUp = new MoveUpTrack(mainController.getAppState().getLibrary().getTracks(), selectedTrack);
+                ICommand moveUp = new MoveUpTrack(mainController.getAppState().getLibrary(), selectedTrack);
                 mainController.getAppState().getUndoManager().executeCommand(moveUp);
                 trackTable.getSelectionModel().select(index - 1);
                 mainController.updateNextButton();
@@ -253,7 +253,7 @@ public class TrackTableController implements IPlayerSubscriber {
             int index = trackTable.getSelectionModel().getSelectedIndex();
             int size = mainController.getAppState().getLibrary().getTracksCount();
             if (index >= 0 && index < size - 1) {
-                ICommand moveDown = new MoveDownTrack(mainController.getAppState().getLibrary().getTracks(),
+                ICommand moveDown = new MoveDownTrack(mainController.getAppState().getLibrary(),
                         selectedTrack);
                 mainController.getAppState().getUndoManager().executeCommand(moveDown);
                 trackTable.getSelectionModel().select(index + 1);

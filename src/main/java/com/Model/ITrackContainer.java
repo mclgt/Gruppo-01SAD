@@ -10,4 +10,8 @@ public interface ITrackContainer {
 
     int indexOf(Track track);
     ObservableList<Track> getTracks();
+
+    public boolean moveTrackUp(Track track);
+    
+    public boolean moveTrackDown(Track track);
 }

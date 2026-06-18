@@ -267,7 +267,7 @@ public class PlaylistController implements IPlayerSubscriber {
         if (selectedTrack != null) {
             int index = playlistTrackList.getSelectionModel().getSelectedIndex();
             if (index > 0) {
-                ICommand moveUp = new MoveUpTrack(getCurrentPlaylist().getTracks(), selectedTrack);
+                ICommand moveUp = new MoveUpTrack(getCurrentPlaylist(), selectedTrack);
                 mainController.getAppState().getUndoManager().executeCommand(moveUp);
                 playlistTrackList.getSelectionModel().select(index - 1);
             }
@@ -282,7 +282,7 @@ public class PlaylistController implements IPlayerSubscriber {
             int index = playlistTrackList.getSelectionModel().getSelectedIndex();
             int size = getCurrentPlaylist().getTracksCount();
             if (index >= 0 && index < size - 1) {
-                ICommand moveDown = new MoveDownTrack(getCurrentPlaylist().getTracks(), selectedTrack);
+                ICommand moveDown = new MoveDownTrack(getCurrentPlaylist(), selectedTrack);
                 mainController.getAppState().getUndoManager().executeCommand(moveDown);
                 playlistTrackList.getSelectionModel().select(index + 1);
             }

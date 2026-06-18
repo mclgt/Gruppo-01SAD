@@ -5,19 +5,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.Model.ITrackContainer;
+import com.Model.Library;
 import com.Model.MockTrackFactory;
 import com.Model.Track;
 import com.Model.TrackFactory;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
  * @brief Classe di test unitari per la classe MoveUpTrack
  */
 public class MoveUpTrackTest {
     private TrackFactory factory;
-    private ObservableList<Track> trackList;
+    private ITrackContainer receiver;
     private Track track1;
     private Track track2;
     private Track track3;
@@ -29,12 +28,14 @@ public class MoveUpTrackTest {
     @BeforeEach
     public void setUp() {
         factory = new MockTrackFactory();
-        
+        receiver = new Library();
         track1 = factory.createTrack("Track 1", "Artist 1", 2020, "Genre 1", 240, "Album 1", "path/to/track1.mp3", null);
         track2 = factory.createTrack("Track 2", "Artist 2", 2021, "Genre 2", 300, "Album 2", "path/to/track2.mp3", null);
         track3 = factory.createTrack("Track 3", "Artist 3", 2022, "Genre 3", 180, "Album 3", "path/to/track3.mp3", null);
         
-        trackList = FXCollections.observableArrayList(track1, track2, track3);
+       receiver.addTrack(track1);
+       receiver.addTrack(track2);
+       receiver.addTrack(track3);
     }
 
     /**
@@ -44,18 +45,18 @@ public class MoveUpTrackTest {
      */
     @Test
     public void testExecuteAndUndoSuccess() {
-        MoveUpTrack command = new MoveUpTrack(trackList, track2);
+        MoveUpTrack command = new MoveUpTrack(receiver, track2);
         command.execute();
 
-        assertEquals(0, trackList.indexOf(track2), "La traccia 2 dovrebbe trovarsi all'indice 0 dopo l'execute.");
-        assertEquals(1, trackList.indexOf(track1), "La traccia 1 dovrebbe essere scesa all'indice 1.");
-        assertEquals(2, trackList.indexOf(track3), "La traccia 3 non dovrebbe aver subito variazioni.");
+        assertEquals(0, receiver.indexOf(track2), "La traccia 2 dovrebbe trovarsi all'indice 0 dopo l'execute.");
+        assertEquals(1, receiver.indexOf(track1), "La traccia 1 dovrebbe essere scesa all'indice 1.");
+        assertEquals(2, receiver.indexOf(track3), "La traccia 3 non dovrebbe aver subito variazioni.");
 
         command.undo();
 
-        assertEquals(0, trackList.indexOf(track1), "L'undo dovrebbe riportare la traccia 1 all'indice 0.");
-        assertEquals(1, trackList.indexOf(track2), "L'undo dovrebbe riportare la traccia 2 all'indice 1.");
-        assertEquals(2, trackList.indexOf(track3), "La traccia 3 deve rimanere invariata al suo posto.");
+        assertEquals(0, receiver.indexOf(track1), "L'undo dovrebbe riportare la traccia 1 all'indice 0.");
+        assertEquals(1, receiver.indexOf(track2), "L'undo dovrebbe riportare la traccia 2 all'indice 1.");
+        assertEquals(2, receiver.indexOf(track3), "La traccia 3 deve rimanere invariata al suo posto.");
     }
 
     /**
@@ -66,17 +67,17 @@ public class MoveUpTrackTest {
      */
     @Test
     public void testExecuteWhenTrackIsAtTheTop() {
-        MoveUpTrack command = new MoveUpTrack(trackList, track1);
+        MoveUpTrack command = new MoveUpTrack(receiver, track1);
 
         command.execute();
 
-        assertEquals(0, trackList.indexOf(track1), "La traccia 1 deve rimanere al primo posto.");
-        assertEquals(1, trackList.indexOf(track2), "L'ordine complessivo non deve cambiare.");
-        assertEquals(2, trackList.indexOf(track3), "L'ordine complessivo non deve cambiare.");
+        assertEquals(0, receiver.indexOf(track1), "La traccia 1 deve rimanere al primo posto.");
+        assertEquals(1, receiver.indexOf(track2), "L'ordine complessivo non deve cambiare.");
+        assertEquals(2, receiver.indexOf(track3), "L'ordine complessivo non deve cambiare.");
 
         command.undo();
         
-        assertEquals(0, trackList.indexOf(track1), "L'ordine deve rimanere invariato anche dopo l'undo.");
+        assertEquals(0, receiver.indexOf(track1), "L'ordine deve rimanere invariato anche dopo l'undo.");
     }
 
     /**
@@ -87,13 +88,13 @@ public class MoveUpTrackTest {
     @Test
     public void testExecuteWithTrackNotFound() {
         Track track4 = factory.createTrack("Track 4", "Artist 4", 2023, "Genre 4", 320, "Album 4", "path/to/track4.mp3", null);
-        MoveUpTrack command = new MoveUpTrack(trackList, track4);
+        MoveUpTrack command = new MoveUpTrack(receiver, track4);
 
         assertDoesNotThrow(() -> command.execute(), "L'esecuzione con traccia non presente non deve sollevare eccezioni.");
 
-        assertEquals(0, trackList.indexOf(track1));
-        assertEquals(1, trackList.indexOf(track2));
-        assertEquals(2, trackList.indexOf(track3));
+        assertEquals(0, receiver.indexOf(track1));
+        assertEquals(1, receiver.indexOf(track2));
+        assertEquals(2, receiver.indexOf(track3));
 
         assertDoesNotThrow(() -> command.undo(), "L'undo con traccia non trovata non deve sollevare eccezioni.");
     }

@@ -1,5 +1,6 @@
 package com.Model;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -212,5 +213,43 @@ public class Playlist implements ITrackContainer {
     @Override
     public int hashCode() {
         return id.hashCode();
+    }
+
+    /**
+     * @brief Sposta una traccia specifica verso il basso all'interno della libreria.
+     * Il metodo individua la posizione attuale del brano. Se il brano è presente
+     * e non occupa già l'ultima posizione della lista, effettua
+     * uno scambio con il brano immediatamente successivo. 
+     * @param track La traccia musicale (Track) da spostare verso il basso.
+     * @return true se lo spostamento è avvenuto con successo, false se la traccia 
+     * non è stata trovata o si trovava già in fondo alla lista.
+     */
+    @Override
+    public boolean moveTrackDown(Track track) {
+        int currentIndex = tracks.indexOf(track);
+        if (currentIndex >= 0 && currentIndex < tracks.size() - 1) {
+            Collections.swap(tracks, currentIndex, currentIndex + 1);
+            return true; 
+        }
+        return false;
+    }
+
+    /**
+     * @brief Sposta una traccia specifica verso l'alto all'interno della libreria.
+     * Il metodo individua la posizione attuale del brano. Se il brano è presente
+     * e non occupa la prima posizione, effettua
+     * uno scambio con il brano immediatamente precedente.
+     * @param track La traccia musicale (Track) da spostare verso l'alto.
+     * @return true se lo spostamento è avvenuto con successo, false se la traccia
+     * non è stata trovata o si trovava già in cima alla lista.
+     */
+    @Override
+    public boolean moveTrackUp(Track track) {
+        int currentIndex = tracks.indexOf(track);
+        if (currentIndex > 0) {
+            Collections.swap(tracks, currentIndex, currentIndex - 1);
+            return true; 
+        }
+        return false;
     }
 }
